@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 const navLinks = [
   { href: "/", label: "Departments" },
   { href: "/search", label: "Courses" },
-  { href: "/about", label: "Faculty" },
+  { href: "/faculty", label: "Faculty" },
   { href: "/about", label: "About Us" },
 ];
 
@@ -24,11 +24,11 @@ export default function Header() {
             <Image
               src="/logo.png"
               alt="ARICT Logo"
-              width={32}
-              height={32}
+              width={140}
+              height={40}
               priority
             />
-            <span>ARICT Portal</span>
+            <span>PAPER PORTAL</span>
           </Link>
 
           <nav className="header-nav" id="desktop-nav">

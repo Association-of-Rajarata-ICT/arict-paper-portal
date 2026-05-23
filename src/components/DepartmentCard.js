@@ -1,7 +1,14 @@
 import Link from "next/link";
+import { FileText, BookOpen, Users } from "lucide-react";
 
 export default function DepartmentCard({ department, index }) {
   const isFirst = index === 0;
+  const hasCounts =
+    Number.isFinite(department.paperCount) &&
+    Number.isFinite(department.courseCount);
+  const resourceTotal = hasCounts
+    ? (department.paperCount + department.courseCount).toLocaleString()
+    : "—";
 
   return (
     <Link
@@ -13,19 +20,54 @@ export default function DepartmentCard({ department, index }) {
         animationFillMode: "both",
       }}
     >
-      <div className={`dept-card-icon ${isFirst ? "primary" : "neutral"}`}>
-        <span
-          className="material-symbols-outlined"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          {department.icon}
-        </span>
+      <div className="dept-card-body">
+        <div className="dept-card-avatar">
+          <div className={`dept-card-avatar-inner ${isFirst ? "primary" : "neutral"}`}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              {department.icon}
+            </span>
+          </div>
+        </div>
+
+        <h3 className="dept-card-name">{department.name}</h3>
+        <p className="dept-card-desc">
+          {department.description || "Resources curated for this department."}
+        </p>
+
+        <div className="dept-card-stats">
+          <div className="dept-card-stat">
+            <span className="dept-card-stat-value">
+              {hasCounts ? department.paperCount.toLocaleString() : "—"}
+            </span>
+            <span className="dept-card-stat-label">Papers</span>
+          </div>
+          <div className="dept-card-stat">
+            <span className="dept-card-stat-value">
+              {hasCounts ? department.courseCount.toLocaleString() : "—"}
+            </span>
+            <span className="dept-card-stat-label">Courses</span>
+          </div>
+          <div className="dept-card-stat">
+            <span className="dept-card-stat-value">{resourceTotal}</span>
+            <span className="dept-card-stat-label">Resources</span>
+          </div>
+        </div>
+
+        <div className="dept-card-footer" aria-hidden="true">
+          <span className="dept-card-footer-icon">
+            <FileText size={16} />
+          </span>
+          <span className="dept-card-footer-icon">
+            <BookOpen size={16} />
+          </span>
+          <span className="dept-card-footer-icon">
+            <Users size={16} />
+          </span>
+        </div>
       </div>
-      <h3 className="text-headline-sm">{department.name}</h3>
-      <p className="dept-card-meta">
-        {department.paperCount.toLocaleString()} Papers ·{" "}
-        {department.courseCount} Courses
-      </p>
     </Link>
   );
 }

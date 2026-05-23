@@ -1,39 +1,48 @@
 export const departments = [
   {
-    id: "computer-science",
-    name: "Computer Science",
+    id: "biological-sciences",
+    name: "Biological Sciences",
+    icon: "biotech",
+    paperCount: null,
+    courseCount: null,
+    description:
+      "Study resources focused on life sciences, genetics, ecology, and related fields.",
+  },
+  {
+    id: "chemical-sciences",
+    name: "Chemical Sciences",
+    icon: "science",
+    paperCount: null,
+    courseCount: null,
+    description:
+      "Explore chemistry-focused materials across analytical, organic, and physical chemistry.",
+  },
+  {
+    id: "computing",
+    name: "Computing",
     icon: "computer",
-    paperCount: 1240,
-    courseCount: 45,
+    paperCount: null,
+    courseCount: null,
     description:
-      "Explore past papers from core computing modules including algorithms, software engineering, databases, and more.",
+      "Find papers covering programming, software engineering, databases, and systems.",
   },
   {
-    id: "networking",
-    name: "Networking",
-    icon: "router",
-    paperCount: 850,
-    courseCount: 32,
+    id: "health-promotion",
+    name: "Health Promotion",
+    icon: "health_and_safety",
+    paperCount: null,
+    courseCount: null,
     description:
-      "Access networking examination resources covering protocols, security, wireless technologies, and network administration.",
+      "Resources on community health, well-being, and public health initiatives.",
   },
   {
-    id: "data-science",
-    name: "Data Science",
-    icon: "database",
-    paperCount: 620,
-    courseCount: 28,
+    id: "physical-sciences",
+    name: "Physical Sciences",
+    icon: "travel_explore",
+    paperCount: null,
+    courseCount: null,
     description:
-      "Find data science papers spanning analytics, machine learning, statistical methods, and big data processing.",
-  },
-  {
-    id: "software-engineering",
-    name: "Software Engineering",
-    icon: "memory",
-    paperCount: 1050,
-    courseCount: 38,
-    description:
-      "Browse software engineering papers on design patterns, project management, testing, and development methodologies.",
+      "Study materials spanning physics, earth sciences, and broader physical science topics.",
   },
 ];
 

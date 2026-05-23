@@ -11,13 +11,11 @@ import { searchPapers } from "@/data/papers";
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "Computer Science";
+  const query = searchParams.get("q") || "Computing";
 
   const [viewMode, setViewMode] = useState("grid"); // grid, compact, list
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedDepartments, setSelectedDepartments] = useState([
-    "Computer Science",
-  ]);
+  const [selectedDepartments, setSelectedDepartments] = useState(["Computing"]);
   const [selectedYears, setSelectedYears] = useState(["2023"]);
 
   const results = useMemo(() => {

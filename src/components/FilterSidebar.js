@@ -1,10 +1,11 @@
 "use client";
 
 const departmentOptions = [
-  { label: "Computer Science (CS)", value: "Computer Science" },
-  { label: "Information Tech (IT)", value: "Information Technology" },
-  { label: "Engineering (ENG)", value: "Engineering" },
-  { label: "Mathematics (MATH)", value: "Mathematics" },
+  { label: "Biological Sciences", value: "Biological Sciences" },
+  { label: "Chemical Sciences", value: "Chemical Sciences" },
+  { label: "Computing", value: "Computing" },
+  { label: "Health Promotion", value: "Health Promotion" },
+  { label: "Physical Sciences", value: "Physical Sciences" },
 ];
 
 const yearOptions = ["2024", "2023", "2022", "2021", "2020"];
