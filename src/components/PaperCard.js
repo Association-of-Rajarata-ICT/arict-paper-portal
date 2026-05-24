@@ -1,7 +1,11 @@
 import Link from "next/link";
 import Chip from "./Chip";
+import CopyLinkButton from "./CopyLinkButton";
 
 export default function PaperCard({ paper }) {
+  const encodedId = encodeURIComponent(paper.docId || paper.id);
+  const paperUrl = `/paper/${encodedId}?dept=${encodeURIComponent(paper.departmentFull || paper.department || "")}`;
+  
   return (
     <div className="card paper-card" id={`paper-card-${paper.id}`}>
       <div>
@@ -28,11 +32,10 @@ export default function PaperCard({ paper }) {
           <p className="paper-card-description">{paper.description}</p>
         )}
       </div>
-      <div className="paper-card-footer">
+      <div className="paper-card-footer" style={{ display: "flex", gap: "12px", alignItems: "center", justifyContent: "space-between" }}>
+        <CopyLinkButton url={paperUrl} className="btn" />
         <Link
-          href={`/paper/${paper.docId || paper.id}?dept=${encodeURIComponent(
-            paper.departmentFull || paper.department || ""
-          )}`}
+          href={paperUrl}
           className="btn btn-secondary"
           id={`view-details-${paper.id}`}
         >

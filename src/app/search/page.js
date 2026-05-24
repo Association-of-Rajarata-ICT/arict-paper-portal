@@ -8,16 +8,47 @@ import PaperCard from "@/components/PaperCard";
 import PaperListItem from "@/components/PaperListItem";
 import Pagination from "@/components/Pagination";
 import { filterPapers, papers as localPapers } from "@/data/papers";
+import { departments } from "@/data/departments";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-const departmentCollections = [
-  "Biological Sciences",
-  "Chemical Sciences",
-  "Computing",
-  "Health Promotion",
-  "Physical Sciences",
-];
+const departmentCollections = departments.map((dept) => dept.name);
+
+const getInstructorValue = (data = {}) => {
+  const value =
+    data.instructor ??
+    data.Instructor ??
+    data["instructor name"] ??
+    data["Instructor Name"] ??
+    data.lecturer ??
+    data.Lecturer ??
+    data["lecturer name"] ??
+    data["Lecturer Name"] ??
+    data.instructor_name ??
+    data.lecturer_name ??
+    "";
+
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+
+  const matchingKey = Object.keys(data).find((key) => {
+    const normalized = key.trim().toLowerCase();
+    return (
+      normalized === "instructor" ||
+      normalized === "instructor name" ||
+      normalized === "lecturer" ||
+      normalized === "lecturer name"
+    );
+  });
+
+  if (matchingKey) {
+    const fallbackValue = data[matchingKey];
+    return typeof fallbackValue === "string" ? fallbackValue.trim() : "";
+  }
+
+  return "";
+};
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
@@ -48,7 +79,7 @@ function SearchResultsContent() {
               docData["subject code"] || docData.subjectCode || docData.courseCode || "";
             const subjectName =
               docData["subject name"] || docData.subjectName || docData.title || "";
-            const instructor = docData.instructor || "";
+            const instructor = getInstructorValue(docData);
             const driveLink = docData["drive link"] || docData.driveLink || "";
             const year = docData.year || "";
 
@@ -103,6 +134,13 @@ function SearchResultsContent() {
     });
   }, [papers, query, selectedDepartments, selectedYears]);
 
+  const availableYears = useMemo(() => {
+    const years = papers
+      .map((paper) => (paper.year || "").trim())
+      .filter(Boolean);
+    return Array.from(new Set(years));
+  }, [papers]);
+
   // If filters produce no results, show all matching the query
   const displayResults = results.length > 0 ? results : filterPapers(papers, query);
   const totalResults = displayResults.length;
@@ -133,6 +171,7 @@ function SearchResultsContent() {
             selectedYears={selectedYears}
             onDepartmentChange={setSelectedDepartments}
             onYearChange={setSelectedYears}
+            yearOptions={availableYears.length > 0 ? availableYears : undefined}
           />
 
           <div>

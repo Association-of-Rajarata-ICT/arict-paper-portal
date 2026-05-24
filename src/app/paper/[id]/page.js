@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
 import Chip from "@/components/Chip";
+import CopyLinkButton from "@/components/CopyLinkButton";
 import RelatedPaperCard from "@/components/RelatedPaperCard";
 import { getPaperById, getRelatedPapers } from "@/data/papers";
 import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/firestore";
@@ -39,10 +40,54 @@ const getDownloadUrl = (url = "") => {
   return url || "";
 };
 
+const getInstructorValue = (data = {}) => {
+  const value =
+    data.instructor ??
+    data.Instructor ??
+    data["instructor name"] ??
+    data["Instructor Name"] ??
+    data.lecturer ??
+    data.Lecturer ??
+    data["lecturer name"] ??
+    data["Lecturer Name"] ??
+    data.instructor_name ??
+    data.lecturer_name ??
+    "";
+
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+
+  const matchingKey = Object.keys(data).find((key) => {
+    const normalized = key.trim().toLowerCase();
+    return (
+      normalized === "instructor" ||
+      normalized === "instructor name" ||
+      normalized === "lecturer" ||
+      normalized === "lecturer name"
+    );
+  });
+
+  if (matchingKey) {
+    const fallbackValue = data[matchingKey];
+    return typeof fallbackValue === "string" ? fallbackValue.trim() : "";
+  }
+
+  return "";
+};
+
 export default function PaperDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
+  let id = rawId;
+  if (rawId) {
+    try {
+      id = decodeURIComponent(rawId);
+    } catch {
+      id = rawId;
+    }
+  }
   const deptParam = searchParams.get("dept") || "";
   const [paper, setPaper] = useState(null);
   const [relatedPapers, setRelatedPapers] = useState([]);
@@ -67,7 +112,7 @@ export default function PaperDetailPage() {
       difficulty: data.difficulty || "",
       type: data.type || null,
       isRestricted: Boolean(data.isRestricted),
-      instructor: data.instructor || "",
+      instructor: getInstructorValue(data),
       driveLink: data["drive link"] || data.driveLink || "",
     });
 
@@ -224,12 +269,10 @@ export default function PaperDetailPage() {
                   <label>Department</label>
                   <span>{paper.departmentFull}</span>
                 </div>
-                {paper.instructor && (
-                  <div className="paper-detail-meta-item">
-                    <label>Instructor</label>
-                    <span>{paper.instructor}</span>
-                  </div>
-                )}
+                <div className="paper-detail-meta-item">
+                  <label>Instructor</label>
+                  <span>{paper.instructor && paper.instructor.trim() ? paper.instructor.trim() : "-"}</span>
+                </div>
                 {paper.duration && (
                   <div className="paper-detail-meta-item">
                     <label>Duration</label>
@@ -296,6 +339,7 @@ export default function PaperDetailPage() {
                 </span>
                 Share
               </button>
+              <CopyLinkButton className="btn btn-secondary" />
             </div>
           </div>
         </div>

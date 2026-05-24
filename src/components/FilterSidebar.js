@@ -1,20 +1,21 @@
 "use client";
 
-const departmentOptions = [
-  { label: "Biological Sciences", value: "Biological Sciences" },
-  { label: "Chemical Sciences", value: "Chemical Sciences" },
-  { label: "Computing", value: "Computing" },
-  { label: "Health Promotion", value: "Health Promotion" },
-  { label: "Physical Sciences", value: "Physical Sciences" },
-];
+import { departments } from "@/data/departments";
 
-const yearOptions = ["2024", "2023", "2022", "2021", "2020"];
+const defaultDepartmentOptions = departments.map((dept) => ({
+  label: dept.name,
+  value: dept.name,
+}));
+
+const defaultYearOptions = ["2026", "2025", "2024", "2023", "2022", "2021", "2020"];
 
 export default function FilterSidebar({
   selectedDepartments = [],
   selectedYears = [],
   onDepartmentChange,
   onYearChange,
+  departmentOptions = defaultDepartmentOptions,
+  yearOptions = defaultYearOptions,
 }) {
   const handleDeptToggle = (value) => {
     if (selectedDepartments.includes(value)) {
