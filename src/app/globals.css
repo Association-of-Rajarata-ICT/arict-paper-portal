@@ -1420,6 +1420,19 @@ ol {
   margin-bottom: var(--space-base);
 }
 
+.paper-list-item-instructor {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.paper-list-item-instructor span {
+  color: var(--color-on-surface);
+  font-weight: 600;
+  margin-right: 6px;
+}
+
 .paper-list-item-chips {
   display: flex;
   flex-wrap: wrap;

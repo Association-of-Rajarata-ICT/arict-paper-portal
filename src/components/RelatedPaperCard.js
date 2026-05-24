@@ -2,9 +2,10 @@ import Link from "next/link";
 import Chip from "./Chip";
 
 export default function RelatedPaperCard({ paper }) {
+  const encodedId = encodeURIComponent(paper.docId || paper.id);
   return (
     <Link
-      href={`/paper/${paper.docId || paper.id}?dept=${encodeURIComponent(
+      href={`/paper/${encodedId}?dept=${encodeURIComponent(
         paper.departmentFull || paper.department || ""
       )}`}
       className="related-card"

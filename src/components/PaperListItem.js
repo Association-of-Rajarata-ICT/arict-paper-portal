@@ -1,12 +1,21 @@
 import Link from "next/link";
 import Chip from "./Chip";
+import CopyLinkButton from "./CopyLinkButton";
 
 export default function PaperListItem({ paper }) {
+  const encodedId = encodeURIComponent(paper.docId || paper.id);
+  const paperUrl = `/paper/${encodedId}?dept=${encodeURIComponent(paper.departmentFull || paper.department || "")}`;
+  const instructorName = paper.instructor && paper.instructor.trim() ? paper.instructor.trim() : "-";
+  
   return (
     <div className="paper-list-item" id={`paper-list-${paper.id}`}>
       <div className="paper-list-item-code">{paper.courseCode}</div>
       <div className="paper-list-item-content">
         <h3>{paper.title}</h3>
+        <div className="paper-list-item-instructor">
+          <span>Instructor:</span>
+          {instructorName}
+        </div>
         <div className="paper-list-item-chips">
           <Chip icon="calendar_today">{paper.year}</Chip>
           <Chip>{paper.department}</Chip>
@@ -25,11 +34,10 @@ export default function PaperListItem({ paper }) {
           <p className="paper-list-item-description">{paper.description}</p>
         )}
       </div>
-      <div className="paper-list-item-action">
+      <div className="paper-list-item-action" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <CopyLinkButton url={paperUrl} className="btn" />
         <Link
-          href={`/paper/${paper.docId || paper.id}?dept=${encodeURIComponent(
-            paper.departmentFull || paper.department || ""
-          )}`}
+          href={paperUrl}
           className="btn btn-secondary"
           id={`list-view-details-${paper.id}`}
         >
