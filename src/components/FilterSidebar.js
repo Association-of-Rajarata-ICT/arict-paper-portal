@@ -63,7 +63,7 @@ export default function FilterSidebar({
       {/* Academic Year Filter */}
       <div className="filter-group">
         <div className="filter-group-header">
-          <h3>Academic Year</h3>
+          <h3>Examination period</h3>
           <span
             className="material-symbols-outlined filter-icon"
           >

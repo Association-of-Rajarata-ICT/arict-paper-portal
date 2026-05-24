@@ -127,11 +127,20 @@ function SearchResultsContent() {
     };
   }, []);
 
-  const results = useMemo(() => {
-    return filterPapers(papers, query, {
-      departments: selectedDepartments.length > 0 ? selectedDepartments : undefined,
-      years: selectedYears.length > 0 ? selectedYears : undefined,
-    });
+  const displayResults = useMemo(() => {
+    let filtered = filterPapers(papers, query);
+
+    if (selectedDepartments.length > 0) {
+      filtered = filtered.filter((p) =>
+        selectedDepartments.includes(p.departmentFull || p.department)
+      );
+    }
+
+    if (selectedYears.length > 0) {
+      filtered = filtered.filter((p) => selectedYears.includes(p.year));
+    }
+
+    return filtered;
   }, [papers, query, selectedDepartments, selectedYears]);
 
   const availableYears = useMemo(() => {
@@ -141,8 +150,6 @@ function SearchResultsContent() {
     return Array.from(new Set(years));
   }, [papers]);
 
-  // If filters produce no results, show all matching the query
-  const displayResults = results.length > 0 ? results : filterPapers(papers, query);
   const totalResults = displayResults.length;
 
   return (
@@ -151,12 +158,17 @@ function SearchResultsContent() {
         {/* Header */}
         <div className="search-page-header">
           <div>
-            <h1 className="text-headline-lg">Search Results</h1>
+            <h1 className="text-headline-lg">{query ? "Search Results" : "Courses"}</h1>
             <p className="text-body-md" style={{ color: "var(--color-secondary)" }}>
-              Showing {totalResults} past papers for{" "}
-              <strong style={{ color: "var(--color-on-surface)" }}>
-                &ldquo;{query}&rdquo;
-              </strong>
+              Showing {totalResults} past papers
+              {query && (
+                <>
+                  {" "}for{" "}
+                  <strong style={{ color: "var(--color-on-surface)" }}>
+                    &ldquo;{query}&rdquo;
+                  </strong>
+                </>
+              )}
             </p>
           </div>
           <SearchBar variant="inline" defaultValue={query} />

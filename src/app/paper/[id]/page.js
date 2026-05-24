@@ -262,7 +262,7 @@ export default function PaperDetailPage() {
 
               <div className="paper-detail-meta">
                 <div className="paper-detail-meta-item">
-                  <label>Academic Year</label>
+                  <label>Examination period</label>
                   <span>{paper.year}</span>
                 </div>
                 <div className="paper-detail-meta-item">

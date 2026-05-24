@@ -70,12 +70,6 @@ export default function Home() {
             organized by department and course for ARICT students.
           </p>
           <SearchBar />
-          <div className="hero-popular">
-            <span>Popular:</span>
-            <Link href="/search?q=ICT101">ICT101</Link>
-            <Link href="/search?q=NET204">NET204</Link>
-            <Link href="/search?q=DBM302">DBM302</Link>
-          </div>
         </div>
       </section>
 
