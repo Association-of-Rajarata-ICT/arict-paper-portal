@@ -25,6 +25,9 @@ function getDepartmentFilterFromQuery(searchQuery = "") {
   return match ? [match.name] : [];
 }
 
+const LIST_PAGE_SIZE = 5;
+const COMPACT_PAGE_SIZE = 12;
+
 function SearchResultsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -146,6 +149,29 @@ function SearchResultsContent() {
   }, [papers]);
 
   const totalResults = displayResults.length;
+  const pageSize = viewMode === "list" ? LIST_PAGE_SIZE : COMPACT_PAGE_SIZE;
+  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+
+  const paginatedResults = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return displayResults.slice(start, start + pageSize);
+  }, [displayResults, currentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    viewMode,
+    selectedDepartments,
+    selectedExamPeriods,
+    selectedAcademicYears,
+    selectedSemesters,
+  ]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const hasActiveFilters =
     Boolean(query.trim()) ||
@@ -171,7 +197,13 @@ function SearchResultsContent() {
           <div>
             <h1 className="text-headline-lg">{query ? "Search Results" : "Papers"}</h1>
             <p className="text-body-md" style={{ color: "var(--color-secondary)" }}>
-              Showing {totalResults} past papers
+              Showing {totalResults} past paper{totalResults === 1 ? "" : "s"}
+              {totalResults > pageSize && (
+                <>
+                  {" "}
+                  (page {currentPage} of {totalPages})
+                </>
+              )}
               {query && (
                 <>
                   {" "}for{" "}
@@ -243,13 +275,13 @@ function SearchResultsContent() {
               </div>
             ) : viewMode === "list" ? (
               <div className="results-list">
-                {displayResults.map((paper) => (
+                {paginatedResults.map((paper) => (
                   <PaperListItem key={paper.id} paper={paper} />
                 ))}
               </div>
             ) : (
               <div className="results-grid results-grid-compact">
-                {displayResults.map((paper) => (
+                {paginatedResults.map((paper) => (
                   <PaperCard
                     key={paper.id}
                     paper={paper}
@@ -259,12 +291,13 @@ function SearchResultsContent() {
               </div>
             )}
 
-            {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={3}
-              onPageChange={setCurrentPage}
-            />
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </div>
         </div>
       </div>
