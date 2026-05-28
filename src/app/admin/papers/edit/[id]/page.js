@@ -10,9 +10,8 @@ import {
   updatePaper,
 } from "@/lib/papers";
 
-export default function EditPaperPage() {
+export default function EditPaperByIdPage() {
   const params = useParams();
-  const departmentParam = decodeURIComponent(params.department || "");
   const docId = decodeURIComponent(params.id || "");
 
   const [form, setForm] = useState({
@@ -38,7 +37,7 @@ export default function EditPaperPage() {
       if (!docId) return;
       setLoading(true);
       try {
-        const paper = await fetchPaperById(departmentParam, docId);
+        const paper = await fetchPaperById("", docId);
         if (!isMounted) return;
 
         if (!paper) {
@@ -66,7 +65,7 @@ export default function EditPaperPage() {
     return () => {
       isMounted = false;
     };
-  }, [departmentParam, docId]);
+  }, [docId]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -94,11 +93,12 @@ export default function EditPaperPage() {
 
     setSubmitting(true);
     try {
-      await updatePaper(departmentParam, docId, form, originalDepartment, selectedFile);
-      setOriginalDepartment(form.department);
-      if (selectedFile) {
-        setForm((prev) => ({ ...prev, driveLink: "" }));
+      await updatePaper("", docId, form, originalDepartment, selectedFile);
+      const refreshed = await fetchPaperById("", docId);
+      if (refreshed) {
+        setForm(paperToForm(refreshed));
       }
+      setOriginalDepartment(form.department);
       setSelectedFile(null);
       setStatus({ type: "success", message: "Paper updated successfully." });
     } catch (error) {

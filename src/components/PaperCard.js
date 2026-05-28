@@ -1,22 +1,9 @@
 import Link from "next/link";
 import Chip from "./Chip";
-const extractDriveId = (url = "") => {
-  if (!url) return "";
-  const directMatch = url.match(/\/d\/([^/]+)/);
-  if (directMatch) return directMatch[1];
-  const paramMatch = url.match(/[?&]id=([^&]+)/);
-  if (paramMatch) return paramMatch[1];
-  return "";
-};
-
-const getDownloadUrl = (url = "") => {
-  const id = extractDriveId(url);
-  if (id) return `https://drive.google.com/uc?export=download&id=${id}`;
-  return url || "";
-};
+import { getDownloadUrl, getPaperRouteId } from "@/lib/papers";
 
 export default function PaperCard({ paper, compact = false }) {
-  const encodedId = encodeURIComponent(paper.docId || paper.id);
+  const encodedId = encodeURIComponent(getPaperRouteId(paper));
   const paperUrl = `/paper/${encodedId}?dept=${encodeURIComponent(paper.departmentFull || paper.department || "")}`;
   const instructorName = paper.instructor && paper.instructor.trim() ? paper.instructor.trim() : "";
   const downloadUrl = getDownloadUrl(paper.driveLink || "");

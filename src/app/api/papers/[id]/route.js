@@ -19,7 +19,7 @@ function normalizeValue(value) {
 
 export async function GET(_request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const paper = await getPaperById(id);
     if (!paper) {
       return NextResponse.json({ message: "Paper not found." }, { status: 404 });
@@ -35,7 +35,7 @@ export async function GET(_request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const existing = await getPaperById(id);
     if (!existing) {
       return NextResponse.json({ message: "Paper not found." }, { status: 404 });
@@ -99,7 +99,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(_request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await removePaperRecord(id);
     return NextResponse.json({ success: true });
   } catch (error) {

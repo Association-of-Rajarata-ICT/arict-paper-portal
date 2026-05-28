@@ -71,7 +71,17 @@ export const getExamPeriodValue = (data = {}) => {
   return typeof value === "string" ? value.trim() : "";
 };
 
+export function getPaperRouteId(paper = {}) {
+  if (paper.docId) return paper.docId;
+  const raw = String(paper.id || "");
+  const uuidMatch = raw.match(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  );
+  return uuidMatch ? uuidMatch[0] : raw;
+}
+
 export const normalizePaper = (docId, data, departmentName = "") => {
+  const canonicalId = data.id || docId;
   const subjectCode = data.subjectCode || data.courseCode || data["subject code"] || "";
   const subjectName = data.subjectName || data.title || data["subject name"] || "";
   const driveLink = data.driveLink || data["drive link"] || "";
@@ -79,8 +89,8 @@ export const normalizePaper = (docId, data, departmentName = "") => {
   const department = departmentName || data.department || data.departmentFull || "";
 
   return {
-    id: department ? `${department}-${docId}` : docId,
-    docId,
+    id: department ? `${department}-${canonicalId}` : canonicalId,
+    docId: canonicalId,
     courseCode: subjectCode,
     title: subjectName,
     description: data.description || "",

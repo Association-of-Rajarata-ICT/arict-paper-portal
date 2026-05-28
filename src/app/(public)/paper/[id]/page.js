@@ -21,6 +21,10 @@ export default function PaperDetailPage() {
       id = rawId;
     }
   }
+  const uuidMatch = String(id).match(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  );
+  const paperId = uuidMatch ? uuidMatch[0] : id;
   const deptParam = searchParams.get("dept") || "";
   const [paper, setPaper] = useState(null);
   const [relatedPapers, setRelatedPapers] = useState([]);
@@ -30,11 +34,11 @@ export default function PaperDetailPage() {
     let isMounted = true;
 
     const fetchPaper = async () => {
-      if (!id) return;
+      if (!paperId) return;
       setLoading(true);
 
       try {
-        let resolvedPaper = await fetchPaperById(deptParam, id);
+        let resolvedPaper = await fetchPaperById(deptParam, paperId);
 
         if (resolvedPaper) {
           if (isMounted) {
@@ -55,14 +59,14 @@ export default function PaperDetailPage() {
             }
           }
         } else {
-          const fallback = getPaperById(id);
+          const fallback = getPaperById(paperId);
           if (isMounted) {
             setPaper(fallback || null);
             setRelatedPapers(fallback ? getRelatedPapers(fallback.id) : []);
           }
         }
       } catch (error) {
-        const fallback = getPaperById(id);
+        const fallback = getPaperById(paperId);
         if (isMounted) {
           setPaper(fallback || null);
           setRelatedPapers(fallback ? getRelatedPapers(fallback.id) : []);
@@ -79,7 +83,7 @@ export default function PaperDetailPage() {
     return () => {
       isMounted = false;
     };
-  }, [id, deptParam]);
+  }, [paperId, deptParam]);
 
   const breadcrumbItems = useMemo(() => {
     if (!paper) return [];

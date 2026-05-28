@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { getPaperRouteId } from "@/lib/papers";
 
 function formatDate(createdAt) {
   if (!createdAt) return "—";
@@ -14,13 +15,12 @@ function formatDate(createdAt) {
 }
 
 function getEditHref(paper) {
-  const department = encodeURIComponent(paper.departmentFull || paper.department);
-  const docId = encodeURIComponent(paper.docId);
-  return `/admin/papers/${department}/${docId}`;
+  const docId = encodeURIComponent(getPaperRouteId(paper));
+  return `/admin/papers/edit/${docId}`;
 }
 
 function getPublicHref(paper) {
-  const docId = encodeURIComponent(paper.docId);
+  const docId = encodeURIComponent(getPaperRouteId(paper));
   const department = encodeURIComponent(paper.departmentFull || paper.department || "");
   return `/paper/${docId}?dept=${department}`;
 }

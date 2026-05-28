@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Chip from "./Chip";
+import { getPaperRouteId } from "@/lib/papers";
 
 export default function RelatedPaperCard({ paper }) {
-  const encodedId = encodeURIComponent(paper.docId || paper.id);
+  const encodedId = encodeURIComponent(getPaperRouteId(paper));
   return (
     <Link
       href={`/paper/${encodedId}?dept=${encodeURIComponent(
