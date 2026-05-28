@@ -57,5 +57,12 @@ export async function ensureSchema() {
     CREATE INDEX IF NOT EXISTS idx_papers_created_at ON papers(created_at DESC);
   `);
 
+  await query(`
+    ALTER TABLE papers ADD COLUMN IF NOT EXISTS exam_period TEXT;
+  `);
+  await query(`
+    CREATE INDEX IF NOT EXISTS idx_papers_exam_period ON papers(exam_period);
+  `);
+
   initialized = true;
 }

@@ -18,7 +18,8 @@ export default function PaperListItem({ paper }) {
           {instructorName}
         </div>
         <div className="paper-list-item-chips">
-          <Chip icon="calendar_today">{paper.year}</Chip>
+          {paper.examPeriod && <Chip icon="calendar_today">{paper.examPeriod}</Chip>}
+          {paper.academicYear && <Chip>{paper.academicYear}</Chip>}
           <Chip>{paper.department}</Chip>
           {paper.type && <Chip variant="accent">{paper.type}</Chip>}
           {paper.difficulty && (

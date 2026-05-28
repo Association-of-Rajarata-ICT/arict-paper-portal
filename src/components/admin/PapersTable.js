@@ -52,7 +52,8 @@ export default function PapersTable({
             <th>Code</th>
             <th>Subject</th>
             {!compact && <th>Department</th>}
-            <th>Year</th>
+            <th>Academic year</th>
+            {!compact && <th>Exam period</th>}
             {!compact && <th>Instructor</th>}
             {!compact && <th>Added</th>}
             <th>Actions</th>
@@ -66,7 +67,8 @@ export default function PapersTable({
               {!compact && (
                 <td>{paper.departmentFull || paper.department || "—"}</td>
               )}
-              <td>{paper.year || "—"}</td>
+              <td>{paper.academicYear || "—"}</td>
+              {!compact && <td>{paper.examPeriod || "—"}</td>}
               {!compact && <td>{paper.instructor || "—"}</td>}
               {!compact && <td>{formatDate(paper.createdAt)}</td>}
               <td>

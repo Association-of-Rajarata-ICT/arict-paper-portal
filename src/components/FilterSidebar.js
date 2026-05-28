@@ -9,13 +9,16 @@ const defaultDepartmentOptions = departments.map((dept) => ({
 
 export default function FilterSidebar({
   selectedDepartments = [],
-  selectedYears = [],
+  selectedExamPeriods = [],
+  selectedAcademicYears = [],
   selectedSemesters = [],
   onDepartmentChange,
-  onYearChange,
+  onExamPeriodChange,
+  onAcademicYearChange,
   onSemesterChange,
   departmentOptions = defaultDepartmentOptions,
-  yearOptions = ["Year 1", "Year 2", "Year 3", "Year 4"],
+  examPeriodOptions = [],
+  academicYearOptions = ["Year 1", "Year 2", "Year 3", "Year 4"],
   semesterOptions = ["Semester 1", "Semester 2"],
 }) {
   const handleDeptToggle = (value) => {
@@ -26,11 +29,19 @@ export default function FilterSidebar({
     }
   };
 
-  const handleYearToggle = (value) => {
-    if (selectedYears.includes(value)) {
-      onYearChange(selectedYears.filter((y) => y !== value));
+  const handleExamPeriodToggle = (value) => {
+    if (selectedExamPeriods.includes(value)) {
+      onExamPeriodChange(selectedExamPeriods.filter((period) => period !== value));
     } else {
-      onYearChange([...selectedYears, value]);
+      onExamPeriodChange([...selectedExamPeriods, value]);
+    }
+  };
+
+  const handleAcademicYearToggle = (value) => {
+    if (selectedAcademicYears.includes(value)) {
+      onAcademicYearChange(selectedAcademicYears.filter((year) => year !== value));
+    } else {
+      onAcademicYearChange([...selectedAcademicYears, value]);
     }
   };
 
@@ -44,7 +55,6 @@ export default function FilterSidebar({
 
   return (
     <aside className="filter-sidebar" id="filter-sidebar">
-      {/* Department Filter */}
       <div className="filter-group">
         <div className="filter-group-header">
           <h3>Department</h3>
@@ -69,23 +79,43 @@ export default function FilterSidebar({
         </div>
       </div>
 
-      {/* Academic Year Filter */}
       <div className="filter-group">
         <div className="filter-group-header">
           <h3>Examination period</h3>
-          <span
-            className="material-symbols-outlined filter-icon"
-          >
-            calendar_month
-          </span>
+          <span className="material-symbols-outlined filter-icon">calendar_month</span>
         </div>
         <div className="filter-options">
-          {yearOptions.map((year) => (
+          {examPeriodOptions.length > 0 ? (
+            examPeriodOptions.map((period) => (
+              <label key={period} className="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  checked={selectedExamPeriods.includes(period)}
+                  onChange={() => handleExamPeriodToggle(period)}
+                />
+                {period}
+              </label>
+            ))
+          ) : (
+            <p className="text-body-md" style={{ color: "var(--color-secondary)" }}>
+              No examination periods yet.
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="filter-group">
+        <div className="filter-group-header">
+          <h3>Academic year</h3>
+          <span className="material-symbols-outlined filter-icon">school</span>
+        </div>
+        <div className="filter-options">
+          {academicYearOptions.map((year) => (
             <label key={year} className="checkbox-wrapper">
               <input
                 type="checkbox"
-                checked={selectedYears.includes(year)}
-                onChange={() => handleYearToggle(year)}
+                checked={selectedAcademicYears.includes(year)}
+                onChange={() => handleAcademicYearToggle(year)}
               />
               {year}
             </label>
@@ -96,7 +126,7 @@ export default function FilterSidebar({
       <div className="filter-group">
         <div className="filter-group-header">
           <h3>Semester</h3>
-          <span className="material-symbols-outlined filter-icon">school</span>
+          <span className="material-symbols-outlined filter-icon">event</span>
         </div>
         <div className="filter-options">
           {semesterOptions.map((semester) => (

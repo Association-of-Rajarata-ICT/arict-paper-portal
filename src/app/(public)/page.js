@@ -18,7 +18,9 @@ export default function Home() {
     const fetchCounts = async () => {
       try {
         const papers = await fetchAllPapers();
-        const periodSet = new Set(papers.map((paper) => paper.year).filter(Boolean));
+        const periodSet = new Set(
+          papers.map((paper) => paper.examPeriod).filter(Boolean)
+        );
         const countMap = papers.reduce((acc, paper) => {
           const department = paper.departmentFull || paper.department;
           acc[department] = (acc[department] || 0) + 1;

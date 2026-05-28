@@ -60,8 +60,8 @@ export const getInstructorValue = (data = {}) => {
 
 export const getExamPeriodValue = (data = {}) => {
   const value =
-    data.year ??
-    data.Year ??
+    data.examPeriod ??
+    data.exam_period ??
     data["exam period"] ??
     data["examination period"] ??
     data["Exam period"] ??
@@ -85,7 +85,11 @@ export const normalizePaper = (docId, data, departmentName = "") => {
   const subjectCode = data.subjectCode || data.courseCode || data["subject code"] || "";
   const subjectName = data.subjectName || data.title || data["subject name"] || "";
   const driveLink = data.driveLink || data["drive link"] || "";
-  const year = data.year || getExamPeriodValue(data);
+  const examPeriod = getExamPeriodValue(data);
+  const academicYear =
+    data.academicYear ||
+    (data.yearNumber ? `Year ${data.yearNumber}` : "") ||
+    (typeof data.year === "string" && data.year.startsWith("Year ") ? data.year : "");
   const department = departmentName || data.department || data.departmentFull || "";
 
   return {
@@ -94,10 +98,12 @@ export const normalizePaper = (docId, data, departmentName = "") => {
     courseCode: subjectCode,
     title: subjectName,
     description: data.description || "",
-    year,
+    examPeriod,
+    academicYear,
+    year: examPeriod || academicYear,
     department,
     departmentFull: department,
-    semester: data.semester || "",
+    semester: data.semester || (data.semesterNumber ? `Semester ${data.semesterNumber}` : ""),
     duration: data.duration || "",
     fileSize: data.fileSize || "",
     difficulty: data.difficulty || "",
@@ -117,6 +123,7 @@ export const paperToForm = (paper) => ({
   instructor: paper.instructor || "",
   year: String(paper.yearNumber || ""),
   semester: String(paper.semesterNumber || ""),
+  examPeriod: paper.examPeriod || "",
   department: paper.departmentFull || paper.department || "",
   driveLink: paper.driveLink || "",
 });
@@ -156,6 +163,7 @@ export async function createPaper(form, file) {
   body.set("department", form.department);
   body.set("year", form.year);
   body.set("semester", form.semester);
+  body.set("examPeriod", form.examPeriod.trim());
   if (file) {
     body.set("file", file);
   }
@@ -181,6 +189,7 @@ export async function updatePaper(_department, docId, form, _previousDepartment,
   body.set("department", form.department);
   body.set("year", form.year);
   body.set("semester", form.semester);
+  body.set("examPeriod", form.examPeriod.trim());
   if (file) {
     body.set("file", file);
   }
@@ -239,6 +248,8 @@ export function filterAdminPapers(papers, { query = "", department = "" } = {}) 
         paper.courseCode.toLowerCase().includes(q) ||
         paper.title.toLowerCase().includes(q) ||
         (paper.instructor || "").toLowerCase().includes(q) ||
+        (paper.examPeriod || "").toLowerCase().includes(q) ||
+        (paper.academicYear || "").toLowerCase().includes(q) ||
         (paper.year || "").toLowerCase().includes(q) ||
         (paper.departmentFull || paper.department || "").toLowerCase().includes(q)
     );

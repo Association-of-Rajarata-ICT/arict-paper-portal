@@ -13,7 +13,7 @@ export default function RelatedPaperCard({ paper }) {
       id={`related-${paper.id}`}
     >
       <div className="related-card-header">
-        <Chip>{paper.year}</Chip>
+        {paper.examPeriod ? <Chip>{paper.examPeriod}</Chip> : <Chip>{paper.year}</Chip>}
         <span className="material-symbols-outlined related-card-download">
           download
         </span>

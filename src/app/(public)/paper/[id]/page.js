@@ -140,6 +140,8 @@ export default function PaperDetailPage() {
             <div style={{ flex: "1 1 0%", minWidth: "280px" }}>
               <div className="paper-detail-chips">
                 {paper.type && <Chip>{paper.type}</Chip>}
+                {paper.examPeriod && <Chip icon="calendar_today">{paper.examPeriod}</Chip>}
+                {paper.academicYear && <Chip>{paper.academicYear}</Chip>}
                 <Chip>{paper.semester}</Chip>
               </div>
 
@@ -154,7 +156,11 @@ export default function PaperDetailPage() {
               <div className="paper-detail-meta">
                 <div className="paper-detail-meta-item">
                   <label>Examination period</label>
-                  <span>{paper.year}</span>
+                  <span>{paper.examPeriod || "-"}</span>
+                </div>
+                <div className="paper-detail-meta-item">
+                  <label>Academic year</label>
+                  <span>{paper.academicYear || "-"}</span>
                 </div>
                 <div className="paper-detail-meta-item">
                   <label>Department</label>

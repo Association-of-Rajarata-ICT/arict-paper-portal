@@ -62,7 +62,19 @@ export default function PaperForm({
           />
         </div>
         <div className="form-field">
-          <label htmlFor="year">Year *</label>
+          <label htmlFor="examPeriod">Examination Period *</label>
+          <input
+            id="examPeriod"
+            name="examPeriod"
+            className="input-field"
+            value={form.examPeriod}
+            onChange={onChange}
+            placeholder="October | November 2023"
+            required
+          />
+        </div>
+        <div className="form-field">
+          <label htmlFor="year">Academic Year *</label>
           <select
             id="year"
             name="year"
@@ -72,7 +84,7 @@ export default function PaperForm({
             required
           >
             <option value="" disabled>
-              Select year
+              Select academic year
             </option>
             {[1, 2, 3, 4].map((year) => (
               <option key={year} value={year}>

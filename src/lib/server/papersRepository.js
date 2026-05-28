@@ -10,7 +10,8 @@ function rowToPaper(row) {
     instructor: row.instructor || "",
     department: row.department,
     departmentFull: row.department,
-    year: `Year ${row.year}`,
+    academicYear: `Year ${row.year}`,
+    examPeriod: row.exam_period || "",
     semester: `Semester ${row.semester}`,
     yearNumber: row.year,
     semesterNumber: row.semester,
@@ -68,8 +69,8 @@ export async function createPaperRecord(payload) {
     `
       INSERT INTO papers (
         id, subject_code, subject_name, instructor, department, year, semester,
-        drive_file_id, drive_link, drive_preview_link, drive_folder_path
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        exam_period, drive_file_id, drive_link, drive_preview_link, drive_folder_path
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
     `,
     [
       id,
@@ -79,6 +80,7 @@ export async function createPaperRecord(payload) {
       payload.department,
       payload.year,
       payload.semester,
+      payload.examPeriod || "",
       payload.driveFileId,
       payload.driveLink,
       payload.drivePreviewLink,
@@ -100,6 +102,7 @@ export async function updatePaperRecord(id, payload) {
   const department = payload.department ?? existing.departmentFull;
   const year = payload.year ?? existing.yearNumber;
   const semester = payload.semester ?? existing.semesterNumber;
+  const examPeriod = payload.examPeriod ?? existing.examPeriod ?? "";
   const driveFileId = payload.driveFileId ?? existing.driveFileId;
   const driveLink = payload.driveLink ?? existing.driveLink;
   const drivePreviewLink = payload.drivePreviewLink ?? existing.drivePreviewLink;
@@ -115,10 +118,11 @@ export async function updatePaperRecord(id, payload) {
         department = $5,
         year = $6,
         semester = $7,
-        drive_file_id = $8,
-        drive_link = $9,
-        drive_preview_link = $10,
-        drive_folder_path = $11,
+        exam_period = $8,
+        drive_file_id = $9,
+        drive_link = $10,
+        drive_preview_link = $11,
+        drive_folder_path = $12,
         updated_at = NOW()
       WHERE id = $1
     `,
@@ -130,6 +134,7 @@ export async function updatePaperRecord(id, payload) {
       department,
       year,
       semester,
+      examPeriod,
       driveFileId,
       driveLink,
       drivePreviewLink,

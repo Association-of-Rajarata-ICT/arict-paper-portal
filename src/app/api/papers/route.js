@@ -8,9 +8,9 @@ function toPositiveInt(value) {
   return Number.isFinite(parsed) ? parsed : NaN;
 }
 
-function validatePayload({ subjectCode, subjectName, department, year, semester }) {
-  if (!subjectCode || !subjectName || !department || !year || !semester) {
-    return "Subject code, subject name, department, year, and semester are required.";
+function validatePayload({ subjectCode, subjectName, department, year, semester, examPeriod }) {
+  if (!subjectCode || !subjectName || !department || !year || !semester || !examPeriod) {
+    return "Subject code, subject name, department, academic year, semester, and examination period are required.";
   }
 
   if (!DEPARTMENT_NAMES.includes(department)) {
@@ -59,6 +59,7 @@ export async function POST(request) {
     const department = String(formData.get("department") || "").trim();
     const year = toPositiveInt(formData.get("year"));
     const semester = toPositiveInt(formData.get("semester"));
+    const examPeriod = String(formData.get("examPeriod") || "").trim();
     const file = formData.get("file");
 
     const validationError = validatePayload({
@@ -67,6 +68,7 @@ export async function POST(request) {
       department,
       year,
       semester,
+      examPeriod,
     });
     if (validationError) {
       return NextResponse.json({ message: validationError }, { status: 400 });
@@ -90,6 +92,7 @@ export async function POST(request) {
       department,
       year,
       semester,
+      examPeriod,
       ...upload,
     });
 

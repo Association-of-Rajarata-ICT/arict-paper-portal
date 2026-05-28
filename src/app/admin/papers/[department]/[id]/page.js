@@ -19,6 +19,7 @@ export default function EditPaperPage() {
     subjectCode: "",
     subjectName: "",
     instructor: "",
+    examPeriod: "",
     year: "",
     semester: "",
     department: "",
@@ -80,6 +81,7 @@ export default function EditPaperPage() {
     if (
       !form.subjectCode ||
       !form.subjectName ||
+      !form.examPeriod ||
       !form.year ||
       !form.semester ||
       !form.department
@@ -87,7 +89,7 @@ export default function EditPaperPage() {
       setStatus({
         type: "error",
         message:
-          "Subject code, subject name, department, year, and semester are required.",
+          "Subject code, subject name, examination period, department, academic year, and semester are required.",
       });
       return;
     }

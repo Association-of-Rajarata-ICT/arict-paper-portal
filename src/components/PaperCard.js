@@ -15,7 +15,8 @@ export default function PaperCard({ paper, compact = false }) {
     >
       <div className="paper-card-body">
         <div className="paper-card-chips">
-          <Chip icon="calendar_today">{paper.year}</Chip>
+          {paper.examPeriod && <Chip icon="calendar_today">{paper.examPeriod}</Chip>}
+          {paper.academicYear && <Chip>{paper.academicYear}</Chip>}
           <Chip>{paper.department}</Chip>
           {paper.type && <Chip variant="accent">{paper.type}</Chip>}
           {paper.isRestricted && (

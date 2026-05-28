@@ -48,6 +48,7 @@ export async function PUT(request, { params }) {
     const department = normalizeValue(formData.get("department"));
     const yearRaw = formData.get("year");
     const semesterRaw = formData.get("semester");
+    const examPeriod = normalizeValue(formData.get("examPeriod"));
     const file = formData.get("file");
 
     const year = yearRaw ? toPositiveInt(yearRaw) : undefined;
@@ -85,6 +86,7 @@ export async function PUT(request, { params }) {
       department,
       year,
       semester,
+      examPeriod,
       ...uploadPayload,
     });
 

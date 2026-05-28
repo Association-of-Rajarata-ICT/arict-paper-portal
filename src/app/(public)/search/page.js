@@ -14,7 +14,7 @@ function SearchResultsContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const yearsParam = searchParams.get("years") || "";
-  const initialYears = yearsParam
+  const initialExamPeriods = yearsParam
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
@@ -22,7 +22,8 @@ function SearchResultsContent() {
   const [viewMode, setViewMode] = useState("compact"); // compact, list
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
-  const [selectedYears, setSelectedYears] = useState(initialYears);
+  const [selectedExamPeriods, setSelectedExamPeriods] = useState(initialExamPeriods);
+  const [selectedAcademicYears, setSelectedAcademicYears] = useState([]);
   const [selectedSemesters, setSelectedSemesters] = useState([]);
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,8 +68,14 @@ function SearchResultsContent() {
       );
     }
 
-    if (selectedYears.length > 0) {
-      filtered = filtered.filter((p) => selectedYears.includes(p.year));
+    if (selectedExamPeriods.length > 0) {
+      filtered = filtered.filter((p) => selectedExamPeriods.includes(p.examPeriod));
+    }
+
+    if (selectedAcademicYears.length > 0) {
+      filtered = filtered.filter((p) =>
+        selectedAcademicYears.includes(p.academicYear)
+      );
     }
 
     if (selectedSemesters.length > 0) {
@@ -76,11 +83,25 @@ function SearchResultsContent() {
     }
 
     return filtered;
-  }, [papers, query, selectedDepartments, selectedYears, selectedSemesters]);
+  }, [
+    papers,
+    query,
+    selectedDepartments,
+    selectedExamPeriods,
+    selectedAcademicYears,
+    selectedSemesters,
+  ]);
 
-  const availableYears = useMemo(() => {
+  const availableExamPeriods = useMemo(() => {
+    const periods = papers
+      .map((paper) => (paper.examPeriod || "").trim())
+      .filter(Boolean);
+    return Array.from(new Set(periods)).sort((a, b) => b.localeCompare(a));
+  }, [papers]);
+
+  const availableAcademicYears = useMemo(() => {
     const years = papers
-      .map((paper) => (paper.year || "").trim())
+      .map((paper) => (paper.academicYear || "").trim())
       .filter(Boolean);
     return Array.from(new Set(years));
   }, [papers]);
@@ -122,12 +143,17 @@ function SearchResultsContent() {
         <div className="search-page-layout">
           <FilterSidebar
             selectedDepartments={selectedDepartments}
-            selectedYears={selectedYears}
-            onDepartmentChange={setSelectedDepartments}
-            onYearChange={setSelectedYears}
-            onSemesterChange={setSelectedSemesters}
-            yearOptions={availableYears.length > 0 ? availableYears : undefined}
+            selectedExamPeriods={selectedExamPeriods}
+            selectedAcademicYears={selectedAcademicYears}
             selectedSemesters={selectedSemesters}
+            onDepartmentChange={setSelectedDepartments}
+            onExamPeriodChange={setSelectedExamPeriods}
+            onAcademicYearChange={setSelectedAcademicYears}
+            onSemesterChange={setSelectedSemesters}
+            examPeriodOptions={availableExamPeriods}
+            academicYearOptions={
+              availableAcademicYears.length > 0 ? availableAcademicYears : undefined
+            }
             semesterOptions={
               availableSemesters.length > 0 ? availableSemesters : undefined
             }
