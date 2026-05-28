@@ -84,6 +84,7 @@ export default function AddPaperPage() {
         submitting={submitting}
         status={status}
         requireFile
+        selectedFile={selectedFile}
       />
     </section>
   );

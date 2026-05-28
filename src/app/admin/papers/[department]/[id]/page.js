@@ -153,6 +153,7 @@ export default function EditPaperPage() {
         submitting={submitting}
         status={status}
         requireFile={false}
+        selectedFile={selectedFile}
       />
     </section>
   );

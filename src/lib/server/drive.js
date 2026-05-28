@@ -2,9 +2,19 @@ import { google } from "googleapis";
 
 const DRIVE_FOLDER_MIME_TYPE = "application/vnd.google-apps.folder";
 
+function normalizePrivateKey(rawKey = "") {
+  const trimmed = rawKey.trim();
+  const withoutWrappingQuotes =
+    trimmed.startsWith('"') && trimmed.endsWith('"')
+      ? trimmed.slice(1, -1)
+      : trimmed;
+
+  return withoutWrappingQuotes.replace(/\\n/g, "\n");
+}
+
 function getDriveClient() {
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const privateKey = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY || "");
 
   if (!clientEmail || !privateKey) {
     throw new Error("Google Drive credentials are not configured.");

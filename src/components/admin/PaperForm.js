@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { DEPARTMENT_NAMES } from "@/lib/constants";
 import { getDownloadUrl, getPreviewUrl } from "@/lib/papers";
 
@@ -12,8 +13,25 @@ export default function PaperForm({
   submitting = false,
   status = { type: "idle", message: "" },
   requireFile = false,
+  selectedFile = null,
 }) {
-  const previewUrl = getPreviewUrl(form.driveLink);
+  const [localPreviewUrl, setLocalPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setLocalPreviewUrl("");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setLocalPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [selectedFile]);
+
+  const previewUrl = localPreviewUrl || getPreviewUrl(form.driveLink);
   const downloadUrl = getDownloadUrl(form.driveLink);
 
   return (
