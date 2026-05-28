@@ -1,7 +1,8 @@
 "use client";
 
 import { departments } from "@/data/departments";
-import { sortAcademicYears, sortExamPeriods, sortSemesters } from "@/lib/papers";
+import { sortAcademicYears, sortSemesters } from "@/lib/papers";
+// import { sortExamPeriods } from "@/lib/papers"; // restore with examination period filter
 
 const defaultDepartmentOptions = departments.map((dept) => ({
   label: dept.name,
@@ -24,9 +25,9 @@ export default function FilterSidebar({
   onReset,
   hasActiveFilters = false,
 }) {
-  const sortedExamPeriodOptions = sortExamPeriods(examPeriodOptions);
   const sortedAcademicYearOptions = sortAcademicYears(academicYearOptions);
   const sortedSemesterOptions = sortSemesters(semesterOptions);
+  // const sortedExamPeriodOptions = sortExamPeriods(examPeriodOptions);
 
   const handleDeptToggle = (value) => {
     if (selectedDepartments.includes(value)) {
@@ -36,13 +37,14 @@ export default function FilterSidebar({
     }
   };
 
-  const handleExamPeriodToggle = (value) => {
-    if (selectedExamPeriods.includes(value)) {
-      onExamPeriodChange(selectedExamPeriods.filter((period) => period !== value));
-    } else {
-      onExamPeriodChange([...selectedExamPeriods, value]);
-    }
-  };
+  // Temporarily hidden — uncomment to restore examination period filter
+  // const handleExamPeriodToggle = (value) => {
+  //   if (selectedExamPeriods.includes(value)) {
+  //     onExamPeriodChange(selectedExamPeriods.filter((period) => period !== value));
+  //   } else {
+  //     onExamPeriodChange([...selectedExamPeriods, value]);
+  //   }
+  // };
 
   const handleAcademicYearToggle = (value) => {
     if (selectedAcademicYears.includes(value)) {
@@ -101,6 +103,7 @@ export default function FilterSidebar({
         </div>
       </div>
 
+      {/* Temporarily hidden — uncomment to restore examination period filter
       <div className="filter-group">
         <div className="filter-group-header">
           <h3>Examination period</h3>
@@ -125,6 +128,7 @@ export default function FilterSidebar({
           )}
         </div>
       </div>
+      */}
 
       <div className="filter-group">
         <div className="filter-group-header">
