@@ -20,6 +20,8 @@ export default function FilterSidebar({
   examPeriodOptions = [],
   academicYearOptions = ["Year 1", "Year 2", "Year 3", "Year 4"],
   semesterOptions = ["Semester 1", "Semester 2"],
+  onReset,
+  hasActiveFilters = false,
 }) {
   const handleDeptToggle = (value) => {
     if (selectedDepartments.includes(value)) {
@@ -55,6 +57,21 @@ export default function FilterSidebar({
 
   return (
     <aside className="filter-sidebar" id="filter-sidebar">
+      <div className="filter-sidebar-header">
+        <h2 className="filter-sidebar-title">Filters</h2>
+        <button
+          type="button"
+          className="filter-reset-btn"
+          onClick={onReset}
+          disabled={!hasActiveFilters}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+            filter_alt_off
+          </span>
+          Reset filters
+        </button>
+      </div>
+
       <div className="filter-group">
         <div className="filter-group-header">
           <h3>Department</h3>

@@ -49,7 +49,7 @@ export default function AdminDashboardPage() {
   );
   const topDepartment = useMemo(() => {
     if (departmentStats.length === 0) return null;
-    return [...departmentStats].sort((a, b) => b.count - a.count)[0];
+    return [...departmentStats].sort((a, b) => b.paperCount - a.paperCount)[0];
   }, [departmentStats]);
 
   return (
@@ -91,7 +91,7 @@ export default function AdminDashboardPage() {
           value={loading ? "—" : topDepartment?.name || "—"}
           hint={
             topDepartment
-              ? `${topDepartment.count} paper${topDepartment.count === 1 ? "" : "s"}`
+              ? `${topDepartment.paperCount} paper${topDepartment.paperCount === 1 ? "" : "s"}`
               : undefined
           }
         />
@@ -112,7 +112,7 @@ export default function AdminDashboardPage() {
             {departmentStats.map((dept) => (
               <div key={dept.name} className="admin-dept-stat-row">
                 <span>{dept.name}</span>
-                <strong>{loading ? "—" : dept.count}</strong>
+                <strong>{loading ? "—" : dept.paperCount}</strong>
               </div>
             ))}
           </div>

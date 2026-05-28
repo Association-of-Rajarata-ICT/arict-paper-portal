@@ -1,16 +1,27 @@
 "use client";
 
 import { useState, useMemo, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import SearchBar from "@/components/SearchBar";
 import FilterSidebar from "@/components/FilterSidebar";
 import PaperCard from "@/components/PaperCard";
 import PaperListItem from "@/components/PaperListItem";
 import Pagination from "@/components/Pagination";
+import { departments } from "@/data/departments";
 import { filterPapers, papers as localPapers } from "@/data/papers";
 import { fetchAllPapers } from "@/lib/papers";
 
+function getDepartmentFilterFromQuery(searchQuery = "") {
+  const trimmed = searchQuery.trim();
+  if (!trimmed) return [];
+  const match = departments.find(
+    (dept) => dept.name.toLowerCase() === trimmed.toLowerCase()
+  );
+  return match ? [match.name] : [];
+}
+
 function SearchResultsContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const yearsParam = searchParams.get("years") || "";
@@ -18,16 +29,32 @@ function SearchResultsContent() {
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
+  const initialDepartments = getDepartmentFilterFromQuery(query);
 
   const [viewMode, setViewMode] = useState("compact"); // compact, list
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [selectedDepartments, setSelectedDepartments] = useState(initialDepartments);
   const [selectedExamPeriods, setSelectedExamPeriods] = useState(initialExamPeriods);
   const [selectedAcademicYears, setSelectedAcademicYears] = useState([]);
   const [selectedSemesters, setSelectedSemesters] = useState([]);
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    setSelectedDepartments(getDepartmentFilterFromQuery(query));
+    setSelectedExamPeriods(
+      yearsParam
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
+    );
+    if (!query && !yearsParam) {
+      setSelectedAcademicYears([]);
+      setSelectedSemesters([]);
+    }
+    setCurrentPage(1);
+  }, [query, yearsParam]);
 
   useEffect(() => {
     let isMounted = true;
@@ -115,6 +142,22 @@ function SearchResultsContent() {
 
   const totalResults = displayResults.length;
 
+  const hasActiveFilters =
+    Boolean(query.trim()) ||
+    selectedDepartments.length > 0 ||
+    selectedExamPeriods.length > 0 ||
+    selectedAcademicYears.length > 0 ||
+    selectedSemesters.length > 0;
+
+  const handleResetFilters = () => {
+    setSelectedDepartments([]);
+    setSelectedExamPeriods([]);
+    setSelectedAcademicYears([]);
+    setSelectedSemesters([]);
+    setCurrentPage(1);
+    router.replace("/search");
+  };
+
   return (
     <section className="search-page" id="search-page">
       <div className="container">
@@ -150,6 +193,8 @@ function SearchResultsContent() {
             onExamPeriodChange={setSelectedExamPeriods}
             onAcademicYearChange={setSelectedAcademicYears}
             onSemesterChange={setSelectedSemesters}
+            onReset={handleResetFilters}
+            hasActiveFilters={hasActiveFilters}
             examPeriodOptions={availableExamPeriods}
             academicYearOptions={
               availableAcademicYears.length > 0 ? availableAcademicYears : undefined

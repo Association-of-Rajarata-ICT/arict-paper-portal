@@ -224,11 +224,30 @@ export function sortPapersByDate(papers, direction = "desc") {
 }
 
 export function getDepartmentStats(papers) {
-  return DEPARTMENT_NAMES.map((name) => ({
-    name,
-    count: papers.filter(
+  return DEPARTMENT_NAMES.map((name) => {
+    const deptPapers = papers.filter(
       (paper) => (paper.departmentFull || paper.department) === name
-    ).length,
+    );
+    const uniqueSubjects = new Set(
+      deptPapers.map((paper) => paper.courseCode).filter(Boolean)
+    );
+
+    return {
+      name,
+      paperCount: deptPapers.length,
+      courseCount: uniqueSubjects.size,
+    };
+  });
+}
+
+export function applyDepartmentStats(departments, papers) {
+  const stats = getDepartmentStats(papers);
+  const statsMap = Object.fromEntries(stats.map((item) => [item.name, item]));
+
+  return departments.map((dept) => ({
+    ...dept,
+    paperCount: statsMap[dept.name]?.paperCount ?? 0,
+    courseCount: statsMap[dept.name]?.courseCount ?? 0,
   }));
 }
 

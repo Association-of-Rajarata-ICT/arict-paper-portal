@@ -6,48 +6,42 @@ import SearchBar from "@/components/SearchBar";
 import DepartmentCard from "@/components/DepartmentCard";
 import BrowseByExamPeriod from "@/components/BrowseByExamPeriod";
 import { departments } from "@/data/departments";
-import { fetchAllPapers } from "@/lib/papers";
+import { applyDepartmentStats, fetchAllPapers } from "@/lib/papers";
 
 export default function Home() {
   const [departmentList, setDepartmentList] = useState(departments);
   const [examPeriods, setExamPeriods] = useState([]);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchCounts = async () => {
+      setStatsLoading(true);
       try {
         const papers = await fetchAllPapers();
         const periodSet = new Set(
           papers.map((paper) => paper.examPeriod).filter(Boolean)
         );
-        const countMap = papers.reduce((acc, paper) => {
-          const department = paper.departmentFull || paper.department;
-          acc[department] = (acc[department] || 0) + 1;
-          return acc;
-        }, {});
 
         if (!isMounted) return;
 
-        setDepartmentList(
-          departments.map((dept) => {
-            return {
-              ...dept,
-              paperCount: Number.isFinite(countMap[dept.name]) ? countMap[dept.name] : 0,
-            };
-          })
-        );
-
+        setDepartmentList(applyDepartmentStats(departments, papers));
         setExamPeriods(Array.from(periodSet).sort((a, b) => b.localeCompare(a)));
       } catch (error) {
         if (isMounted) {
           setDepartmentList(
             departments.map((dept) => ({
               ...dept,
-              paperCount: Number.isFinite(dept.paperCount) ? dept.paperCount : 0,
+              paperCount: 0,
+              courseCount: 0,
             }))
           );
           setExamPeriods([]);
+        }
+      } finally {
+        if (isMounted) {
+          setStatsLoading(false);
         }
       }
     };
@@ -103,6 +97,7 @@ export default function Home() {
                 key={dept.id}
                 department={dept}
                 index={index}
+                loading={statsLoading}
               />
             ))}
           </div>

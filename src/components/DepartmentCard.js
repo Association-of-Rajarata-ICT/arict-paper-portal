@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { FileText, BookOpen, Users } from "lucide-react";
 
-export default function DepartmentCard({ department, index }) {
+export default function DepartmentCard({ department, index, loading = false }) {
   const isFirst = index === 0;
-  const hasPaperCount = Number.isFinite(department.paperCount);
-  const hasCourseCount = Number.isFinite(department.courseCount);
-  const resourceTotal = hasPaperCount && hasCourseCount
-    ? (department.paperCount + department.courseCount).toLocaleString()
-    : hasPaperCount
-      ? department.paperCount.toLocaleString()
-      : "—";
+  const formatStat = (value) =>
+    loading ? "…" : Number.isFinite(value) ? value.toLocaleString() : "—";
+  const resourceTotal = department.paperCount;
 
   return (
     <Link
@@ -41,18 +37,20 @@ export default function DepartmentCard({ department, index }) {
         <div className="dept-card-stats">
           <div className="dept-card-stat">
             <span className="dept-card-stat-value">
-              {hasPaperCount ? department.paperCount.toLocaleString() : "—"}
+              {formatStat(department.paperCount)}
             </span>
             <span className="dept-card-stat-label">Papers</span>
           </div>
           <div className="dept-card-stat">
             <span className="dept-card-stat-value">
-              {hasCourseCount ? department.courseCount.toLocaleString() : "—"}
+              {formatStat(department.courseCount)}
             </span>
             <span className="dept-card-stat-label">Subjects</span>
           </div>
           <div className="dept-card-stat">
-            <span className="dept-card-stat-value">{resourceTotal}</span>
+            <span className="dept-card-stat-value">
+              {formatStat(resourceTotal)}
+            </span>
             <span className="dept-card-stat-label">Resources</span>
           </div>
         </div>

@@ -1424,6 +1424,48 @@ ol {
   gap: var(--space-md);
 }
 
+.filter-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 0 var(--space-xs);
+}
+
+.filter-sidebar-title {
+  font-family: var(--font-headline);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.filter-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.filter-reset-btn:hover:not(:disabled) {
+  background: var(--color-surface-container);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.filter-reset-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .filter-group {
   background-color: var(--color-surface-container-lowest);
   border: 1px solid var(--color-outline-variant);

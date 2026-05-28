@@ -69,7 +69,7 @@ export default function PaperForm({
             className="input-field"
             value={form.examPeriod}
             onChange={onChange}
-            placeholder="October | November 2023"
+            placeholder="March | May 2026"
             required
           />
         </div>
