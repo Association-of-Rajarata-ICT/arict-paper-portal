@@ -20,6 +20,7 @@ export default function EditPaperPage() {
     subjectName: "",
     instructor: "",
     year: "",
+    semester: "",
     department: "",
     driveLink: "",
   });
@@ -28,6 +29,7 @@ export default function EditPaperPage() {
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState({ type: "idle", message: "" });
   const [notFound, setNotFound] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -75,18 +77,29 @@ export default function EditPaperPage() {
     event.preventDefault();
     setStatus({ type: "idle", message: "" });
 
-    if (!form.subjectCode || !form.subjectName || !form.year || !form.department) {
+    if (
+      !form.subjectCode ||
+      !form.subjectName ||
+      !form.year ||
+      !form.semester ||
+      !form.department
+    ) {
       setStatus({
         type: "error",
-        message: "Subject code, subject name, year, and department are required.",
+        message:
+          "Subject code, subject name, department, year, and semester are required.",
       });
       return;
     }
 
     setSubmitting(true);
     try {
-      await updatePaper(departmentParam, docId, form, originalDepartment);
+      await updatePaper(departmentParam, docId, form, originalDepartment, selectedFile);
       setOriginalDepartment(form.department);
+      if (selectedFile) {
+        setForm((prev) => ({ ...prev, driveLink: "" }));
+      }
+      setSelectedFile(null);
       setStatus({ type: "success", message: "Paper updated successfully." });
     } catch (error) {
       setStatus({
@@ -124,7 +137,7 @@ export default function EditPaperPage() {
         <div>
           <h1 className="text-headline-lg">Edit Paper</h1>
           <p className="text-body-md">
-            Update paper details or move it to another department.
+            Update paper details, folders, and optionally replace the uploaded PDF.
           </p>
         </div>
         <Link href="/admin/papers" className="btn btn-secondary">
@@ -134,10 +147,12 @@ export default function EditPaperPage() {
       <PaperForm
         form={form}
         onChange={handleChange}
+        onFileChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
         onSubmit={handleSubmit}
         submitLabel="Save Changes"
         submitting={submitting}
         status={status}
+        requireFile={false}
       />
     </section>
   );

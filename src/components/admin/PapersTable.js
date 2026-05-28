@@ -3,8 +3,10 @@
 import Link from "next/link";
 
 function formatDate(createdAt) {
-  if (!createdAt?.seconds) return "—";
-  return new Date(createdAt.seconds * 1000).toLocaleDateString("en-LK", {
+  if (!createdAt) return "—";
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-LK", {
     year: "numeric",
     month: "short",
     day: "numeric",

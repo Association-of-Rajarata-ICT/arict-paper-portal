@@ -8,112 +8,32 @@ import PaperCard from "@/components/PaperCard";
 import PaperListItem from "@/components/PaperListItem";
 import Pagination from "@/components/Pagination";
 import { filterPapers, papers as localPapers } from "@/data/papers";
-import { departments } from "@/data/departments";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
-const departmentCollections = departments.map((dept) => dept.name);
-
-const getInstructorValue = (data = {}) => {
-  const value =
-    data.instructor ??
-    data.Instructor ??
-    data["instructor name"] ??
-    data["Instructor Name"] ??
-    data.lecturer ??
-    data.Lecturer ??
-    data["lecturer name"] ??
-    data["Lecturer Name"] ??
-    data.instructor_name ??
-    data.lecturer_name ??
-    "";
-
-  if (typeof value === "string" && value.trim()) {
-    return value.trim();
-  }
-
-  const matchingKey = Object.keys(data).find((key) => {
-    const normalized = key.trim().toLowerCase();
-    return (
-      normalized === "instructor" ||
-      normalized === "instructor name" ||
-      normalized === "lecturer" ||
-      normalized === "lecturer name"
-    );
-  });
-
-  if (matchingKey) {
-    const fallbackValue = data[matchingKey];
-    return typeof fallbackValue === "string" ? fallbackValue.trim() : "";
-  }
-
-  return "";
-};
+import { fetchAllPapers } from "@/lib/papers";
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const yearsParam = searchParams.get("years") || "";
+  const initialYears = yearsParam
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
 
   const [viewMode, setViewMode] = useState("compact"); // compact, list
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
-  const [selectedYears, setSelectedYears] = useState([]);
+  const [selectedYears, setSelectedYears] = useState(initialYears);
+  const [selectedSemesters, setSelectedSemesters] = useState([]);
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
-
-  useEffect(() => {
-    const parsedYears = yearsParam
-      .split(",")
-      .map((value) => value.trim())
-      .filter(Boolean);
-
-    setSelectedYears(parsedYears);
-  }, [yearsParam]);
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchPapers = async () => {
       try {
-        const snapshots = await Promise.all(
-          departmentCollections.map((dept) => getDocs(collection(db, dept)))
-        );
-
-        const data = snapshots.flatMap((snapshot, index) => {
-          const collectionName = departmentCollections[index];
-          return snapshot.docs.map((doc) => {
-            const docData = doc.data();
-            const subjectCode =
-              docData["subject code"] || docData.subjectCode || docData.courseCode || "";
-            const subjectName =
-              docData["subject name"] || docData.subjectName || docData.title || "";
-            const instructor = getInstructorValue(docData);
-            const driveLink = docData["drive link"] || docData.driveLink || "";
-            const year = docData.year || "";
-            const description = docData.description || "";
-
-            return {
-              id: `${collectionName}-${doc.id}`,
-              docId: doc.id,
-              courseCode: subjectCode,
-              title: subjectName,
-              description,
-              year,
-              department: collectionName,
-              departmentFull: collectionName,
-              semester: docData.semester || "",
-              duration: docData.duration || "",
-              fileSize: docData.fileSize || "",
-              difficulty: docData.difficulty || "",
-              type: docData.type || null,
-              isRestricted: Boolean(docData.isRestricted),
-              driveLink,
-              instructor,
-            };
-          });
-        });
+        const data = await fetchAllPapers();
 
         if (isMounted) {
           setPapers(data);
@@ -151,14 +71,25 @@ function SearchResultsContent() {
       filtered = filtered.filter((p) => selectedYears.includes(p.year));
     }
 
+    if (selectedSemesters.length > 0) {
+      filtered = filtered.filter((p) => selectedSemesters.includes(p.semester));
+    }
+
     return filtered;
-  }, [papers, query, selectedDepartments, selectedYears]);
+  }, [papers, query, selectedDepartments, selectedYears, selectedSemesters]);
 
   const availableYears = useMemo(() => {
     const years = papers
       .map((paper) => (paper.year || "").trim())
       .filter(Boolean);
     return Array.from(new Set(years));
+  }, [papers]);
+
+  const availableSemesters = useMemo(() => {
+    const semesters = papers
+      .map((paper) => (paper.semester || "").trim())
+      .filter(Boolean);
+    return Array.from(new Set(semesters));
   }, [papers]);
 
   const totalResults = displayResults.length;
@@ -194,7 +125,12 @@ function SearchResultsContent() {
             selectedYears={selectedYears}
             onDepartmentChange={setSelectedDepartments}
             onYearChange={setSelectedYears}
+            onSemesterChange={setSelectedSemesters}
             yearOptions={availableYears.length > 0 ? availableYears : undefined}
+            selectedSemesters={selectedSemesters}
+            semesterOptions={
+              availableSemesters.length > 0 ? availableSemesters : undefined
+            }
           />
 
           <div>

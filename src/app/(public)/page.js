@@ -2,25 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, getDocs } from "firebase/firestore";
 import SearchBar from "@/components/SearchBar";
 import DepartmentCard from "@/components/DepartmentCard";
 import BrowseByExamPeriod from "@/components/BrowseByExamPeriod";
 import { departments } from "@/data/departments";
-import { db } from "@/lib/firebase";
-
-const getExamPeriodValue = (data = {}) => {
-  const value =
-    data.year ??
-    data.Year ??
-    data["exam period"] ??
-    data["examination period"] ??
-    data["Exam period"] ??
-    data["Examination period"] ??
-    "";
-
-  return typeof value === "string" ? value.trim() : "";
-};
+import { fetchAllPapers } from "@/lib/papers";
 
 export default function Home() {
   const [departmentList, setDepartmentList] = useState(departments);
@@ -31,30 +17,21 @@ export default function Home() {
 
     const fetchCounts = async () => {
       try {
-        const periodSet = new Set();
-        const counts = await Promise.all(
-          departments.map(async (dept) => {
-            const snapshot = await getDocs(collection(db, dept.name));
-            snapshot.docs.forEach((docItem) => {
-              const period = getExamPeriodValue(docItem.data());
-              if (period) {
-                periodSet.add(period);
-              }
-            });
-            return { id: dept.id, count: snapshot.size };
-          })
-        );
+        const papers = await fetchAllPapers();
+        const periodSet = new Set(papers.map((paper) => paper.year).filter(Boolean));
+        const countMap = papers.reduce((acc, paper) => {
+          const department = paper.departmentFull || paper.department;
+          acc[department] = (acc[department] || 0) + 1;
+          return acc;
+        }, {});
 
         if (!isMounted) return;
 
         setDepartmentList(
           departments.map((dept) => {
-            const match = counts.find((item) => item.id === dept.id);
             return {
               ...dept,
-              paperCount: Number.isFinite(match?.count)
-                ? match.count
-                : 0,
+              paperCount: Number.isFinite(countMap[dept.name]) ? countMap[dept.name] : 0,
             };
           })
         );

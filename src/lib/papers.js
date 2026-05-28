@@ -1,14 +1,3 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { DEPARTMENT_NAMES } from "@/lib/constants";
 
 export const extractDriveId = (url = "") => {
@@ -83,12 +72,10 @@ export const getExamPeriodValue = (data = {}) => {
 };
 
 export const normalizePaper = (docId, data, departmentName = "") => {
-  const subjectCode =
-    data["subject code"] || data.subjectCode || data.courseCode || "";
-  const subjectName =
-    data["subject name"] || data.subjectName || data.title || "";
-  const driveLink = data["drive link"] || data.driveLink || "";
-  const year = getExamPeriodValue(data);
+  const subjectCode = data.subjectCode || data.courseCode || data["subject code"] || "";
+  const subjectName = data.subjectName || data.title || data["subject name"] || "";
+  const driveLink = data.driveLink || data["drive link"] || "";
+  const year = data.year || getExamPeriodValue(data);
   const department = departmentName || data.department || data.departmentFull || "";
 
   return {
@@ -108,84 +95,111 @@ export const normalizePaper = (docId, data, departmentName = "") => {
     isRestricted: Boolean(data.isRestricted),
     instructor: getInstructorValue(data),
     driveLink,
-    createdAt: data.createdAt ?? null,
+    yearNumber: data.yearNumber || null,
+    semesterNumber: data.semesterNumber || null,
+    createdAt: data.createdAt || null,
   };
-};
-
-export const formToPayload = (form, { includeTimestamp = false } = {}) => {
-  const payload = {
-    "subject code": form.subjectCode.trim(),
-    "subject name": form.subjectName.trim(),
-    instructor: form.instructor.trim(),
-    year: form.year.trim(),
-    "drive link": form.driveLink.trim(),
-    department: form.department,
-  };
-
-  if (includeTimestamp) {
-    payload.createdAt = serverTimestamp();
-  }
-
-  return payload;
 };
 
 export const paperToForm = (paper) => ({
   subjectCode: paper.courseCode || "",
   subjectName: paper.title || "",
   instructor: paper.instructor || "",
-  year: paper.year || "",
+  year: String(paper.yearNumber || ""),
+  semester: String(paper.semesterNumber || ""),
   department: paper.departmentFull || paper.department || "",
   driveLink: paper.driveLink || "",
 });
 
 export async function fetchAllPapers() {
-  const snapshots = await Promise.all(
-    DEPARTMENT_NAMES.map((dept) => getDocs(collection(db, dept)))
-  );
-
-  return snapshots.flatMap((snapshot, index) => {
-    const collectionName = DEPARTMENT_NAMES[index];
-    return snapshot.docs.map((docSnap) =>
-      normalizePaper(docSnap.id, docSnap.data(), collectionName)
-    );
-  });
-}
-
-export async function fetchPaperById(department, docId) {
-  const snap = await getDoc(doc(db, department, docId));
-  if (!snap.exists()) return null;
-  return normalizePaper(snap.id, snap.data(), department);
-}
-
-export async function createPaper(form) {
-  const payload = formToPayload(form, { includeTimestamp: true });
-  const ref = await addDoc(collection(db, form.department), payload);
-  return ref.id;
-}
-
-export async function updatePaper(department, docId, form, previousDepartment) {
-  const payload = formToPayload(form);
-
-  if (previousDepartment && form.department !== previousDepartment) {
-    await addDoc(collection(db, form.department), {
-      ...payload,
-      createdAt: serverTimestamp(),
-    });
-    await deleteDoc(doc(db, previousDepartment, docId));
-    return;
+  const response = await fetch("/api/papers", { cache: "no-store" });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.message || "Failed to fetch papers.");
   }
 
-  await updateDoc(doc(db, department, docId), payload);
+  const payload = await response.json();
+  return (payload.papers || []).map((paper) => normalizePaper(paper.id, paper));
 }
 
-export async function deletePaper(department, docId) {
-  await deleteDoc(doc(db, department, docId));
+export async function fetchPaperById(_department, docId) {
+  const response = await fetch(`/api/papers/${encodeURIComponent(docId)}`, {
+    cache: "no-store",
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.message || "Failed to fetch paper.");
+  }
+
+  const payload = await response.json();
+  const paper = payload.paper;
+  return normalizePaper(paper.id, paper, paper.department);
+}
+
+export async function createPaper(form, file) {
+  const body = new FormData();
+  body.set("subjectCode", form.subjectCode.trim());
+  body.set("subjectName", form.subjectName.trim());
+  body.set("instructor", form.instructor.trim());
+  body.set("department", form.department);
+  body.set("year", form.year);
+  body.set("semester", form.semester);
+  if (file) {
+    body.set("file", file);
+  }
+
+  const response = await fetch("/api/papers", {
+    method: "POST",
+    body,
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.message || "Failed to create paper.");
+  }
+
+  return payload.paper?.id;
+}
+
+export async function updatePaper(_department, docId, form, _previousDepartment, file) {
+  const body = new FormData();
+  body.set("subjectCode", form.subjectCode.trim());
+  body.set("subjectName", form.subjectName.trim());
+  body.set("instructor", form.instructor.trim());
+  body.set("department", form.department);
+  body.set("year", form.year);
+  body.set("semester", form.semester);
+  if (file) {
+    body.set("file", file);
+  }
+
+  const response = await fetch(`/api/papers/${encodeURIComponent(docId)}`, {
+    method: "PUT",
+    body,
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.message || "Failed to update paper.");
+  }
+}
+
+export async function deletePaper(_department, docId) {
+  const response = await fetch(`/api/papers/${encodeURIComponent(docId)}`, {
+    method: "DELETE",
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.message || "Failed to delete paper.");
+  }
 }
 
 export function sortPapersByDate(papers, direction = "desc") {
   return [...papers].sort((a, b) => {
-    const aTime = a.createdAt?.seconds ?? 0;
-    const bTime = b.createdAt?.seconds ?? 0;
+    const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
     return direction === "desc" ? bTime - aTime : aTime - bTime;
   });
 }

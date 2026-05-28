@@ -7,74 +7,7 @@ import Chip from "@/components/Chip";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import RelatedPaperCard from "@/components/RelatedPaperCard";
 import { getPaperById, getRelatedPapers } from "@/data/papers";
-import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
-const departmentCollections = [
-  "Biological Sciences",
-  "Chemical Sciences",
-  "Computing",
-  "Health Promotion",
-  "Physical Sciences",
-];
-
-const extractDriveId = (url = "") => {
-  if (!url) return "";
-  const directMatch = url.match(/\/d\/([^/]+)/);
-  if (directMatch) return directMatch[1];
-  const paramMatch = url.match(/[?&]id=([^&]+)/);
-  if (paramMatch) return paramMatch[1];
-  return "";
-};
-
-const getPreviewUrl = (url = "") => {
-  const id = extractDriveId(url);
-  if (id) return `https://drive.google.com/file/d/${id}/preview`;
-  if (url && url.toLowerCase().endsWith(".pdf")) return url + "#toolbar=0";
-  return "";
-};
-
-const getDownloadUrl = (url = "") => {
-  const id = extractDriveId(url);
-  if (id) return `https://drive.google.com/uc?export=download&id=${id}`;
-  return url || "";
-};
-
-const getInstructorValue = (data = {}) => {
-  const value =
-    data.instructor ??
-    data.Instructor ??
-    data["instructor name"] ??
-    data["Instructor Name"] ??
-    data.lecturer ??
-    data.Lecturer ??
-    data["lecturer name"] ??
-    data["Lecturer Name"] ??
-    data.instructor_name ??
-    data.lecturer_name ??
-    "";
-
-  if (typeof value === "string" && value.trim()) {
-    return value.trim();
-  }
-
-  const matchingKey = Object.keys(data).find((key) => {
-    const normalized = key.trim().toLowerCase();
-    return (
-      normalized === "instructor" ||
-      normalized === "instructor name" ||
-      normalized === "lecturer" ||
-      normalized === "lecturer name"
-    );
-  });
-
-  if (matchingKey) {
-    const fallbackValue = data[matchingKey];
-    return typeof fallbackValue === "string" ? fallbackValue.trim() : "";
-  }
-
-  return "";
-};
+import { fetchAllPapers, fetchPaperById, getDownloadUrl, getPreviewUrl } from "@/lib/papers";
 
 export default function PaperDetailPage() {
   const params = useParams();
@@ -96,56 +29,12 @@ export default function PaperDetailPage() {
   useEffect(() => {
     let isMounted = true;
 
-    const normalizePaper = (docId, data, departmentName = "") => ({
-      id: departmentName ? `${departmentName}-${docId}` : docId,
-      docId,
-      courseCode:
-        data["subject code"] || data.subjectCode || data.courseCode || "",
-      title: data["subject name"] || data.subjectName || data.title || "",
-      description: data.description || "",
-      year: data.year || "",
-      department: departmentName || data.department || data.departmentFull || "",
-      departmentFull: departmentName || data.departmentFull || data.department || "",
-      semester: data.semester || "",
-      duration: data.duration || "",
-      fileSize: data.fileSize || "",
-      difficulty: data.difficulty || "",
-      type: data.type || null,
-      isRestricted: Boolean(data.isRestricted),
-      instructor: getInstructorValue(data),
-      driveLink: data["drive link"] || data.driveLink || "",
-    });
-
     const fetchPaper = async () => {
       if (!id) return;
       setLoading(true);
 
       try {
-        let resolvedPaper = null;
-        let resolvedDepartment = deptParam;
-
-        if (deptParam) {
-          const snap = await getDoc(doc(db, deptParam, id));
-          if (snap.exists()) {
-            resolvedPaper = normalizePaper(snap.id, snap.data(), deptParam);
-          }
-        }
-
-        if (!resolvedPaper) {
-          const snapshots = await Promise.all(
-            departmentCollections.map((dept) => getDoc(doc(db, dept, id)))
-          );
-          snapshots.forEach((snap, index) => {
-            if (!resolvedPaper && snap.exists()) {
-              resolvedDepartment = departmentCollections[index];
-              resolvedPaper = normalizePaper(
-                snap.id,
-                snap.data(),
-                resolvedDepartment
-              );
-            }
-          });
-        }
+        let resolvedPaper = await fetchPaperById(deptParam, id);
 
         if (resolvedPaper) {
           if (isMounted) {
@@ -154,14 +43,12 @@ export default function PaperDetailPage() {
 
           const department = resolvedPaper.departmentFull || resolvedPaper.department;
           if (department) {
-            const relatedSnapshot = await getDocs(
-              query(collection(db, department), limit(4))
-            );
-            const relatedData = relatedSnapshot.docs
-              .map((docItem) =>
-                normalizePaper(docItem.id, docItem.data(), department)
+            const relatedData = (await fetchAllPapers())
+              .filter(
+                (item) =>
+                  (item.departmentFull || item.department) === department &&
+                  item.id !== resolvedPaper.id
               )
-              .filter((item) => item.id !== resolvedPaper.id)
               .slice(0, 3);
             if (isMounted) {
               setRelatedPapers(relatedData);

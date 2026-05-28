@@ -6,10 +6,12 @@ import { getDownloadUrl, getPreviewUrl } from "@/lib/papers";
 export default function PaperForm({
   form,
   onChange,
+  onFileChange,
   onSubmit,
   submitLabel = "Save Paper",
   submitting = false,
   status = { type: "idle", message: "" },
+  requireFile = false,
 }) {
   const previewUrl = getPreviewUrl(form.driveLink);
   const downloadUrl = getDownloadUrl(form.driveLink);
@@ -43,15 +45,43 @@ export default function PaperForm({
         </div>
         <div className="form-field">
           <label htmlFor="year">Year *</label>
-          <input
+          <select
             id="year"
             name="year"
             className="input-field"
             value={form.year}
             onChange={onChange}
-            placeholder="October | November 2025"
             required
-          />
+          >
+            <option value="" disabled>
+              Select year
+            </option>
+            {[1, 2, 3, 4].map((year) => (
+              <option key={year} value={year}>
+                Year {year}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-field">
+          <label htmlFor="semester">Semester *</label>
+          <select
+            id="semester"
+            name="semester"
+            className="input-field"
+            value={form.semester}
+            onChange={onChange}
+            required
+          >
+            <option value="" disabled>
+              Select semester
+            </option>
+            {[1, 2].map((semester) => (
+              <option key={semester} value={semester}>
+                Semester {semester}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="form-field">
           <label htmlFor="department">Department *</label>
@@ -85,14 +115,15 @@ export default function PaperForm({
           />
         </div>
         <div className="form-field">
-          <label htmlFor="driveLink">Drive Link</label>
+          <label htmlFor="file">PDF File {requireFile ? "*" : ""}</label>
           <input
-            id="driveLink"
-            name="driveLink"
+            id="file"
+            name="file"
             className="input-field"
-            value={form.driveLink}
-            onChange={onChange}
-            placeholder="https://drive.google.com/..."
+            type="file"
+            accept="application/pdf"
+            onChange={onFileChange}
+            required={requireFile}
           />
         </div>
         <div className="form-field form-field--full">
@@ -140,7 +171,7 @@ export default function PaperForm({
                 />
               ) : (
                 <div className="form-preview-empty">
-                  Add a Drive link to see the PDF preview here.
+                  Upload or keep an existing PDF to see the preview here.
                 </div>
               )}
             </div>

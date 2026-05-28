@@ -9,6 +9,7 @@ const initialForm = {
   subjectName: "",
   instructor: "",
   year: "",
+  semester: "",
   department: "",
   driveLink: "",
 };
@@ -17,6 +18,7 @@ export default function AddPaperPage() {
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState({ type: "idle", message: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -27,19 +29,31 @@ export default function AddPaperPage() {
     event.preventDefault();
     setStatus({ type: "idle", message: "" });
 
-    if (!form.subjectCode || !form.subjectName || !form.year || !form.department) {
+    if (
+      !form.subjectCode ||
+      !form.subjectName ||
+      !form.year ||
+      !form.semester ||
+      !form.department
+    ) {
       setStatus({
         type: "error",
-        message: "Subject code, subject name, year, and department are required.",
+        message:
+          "Subject code, subject name, department, year, and semester are required.",
       });
+      return;
+    }
+    if (!selectedFile) {
+      setStatus({ type: "error", message: "Please select a PDF file." });
       return;
     }
 
     setSubmitting(true);
     try {
-      await createPaper(form);
+      await createPaper(form, selectedFile);
       setStatus({ type: "success", message: "Paper added successfully." });
       setForm(initialForm);
+      setSelectedFile(null);
     } catch (error) {
       setStatus({
         type: "error",
@@ -56,7 +70,7 @@ export default function AddPaperPage() {
         <div>
           <h1 className="text-headline-lg">Add Paper</h1>
           <p className="text-body-md">
-            Add a new past paper to the selected Firestore department.
+            Upload a new past paper to Google Drive and save metadata in Neon.
           </p>
         </div>
       </div>
@@ -64,10 +78,12 @@ export default function AddPaperPage() {
       <PaperForm
         form={form}
         onChange={handleChange}
+        onFileChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
         onSubmit={handleSubmit}
         submitLabel="Add Paper"
         submitting={submitting}
         status={status}
+        requireFile
       />
     </section>
   );

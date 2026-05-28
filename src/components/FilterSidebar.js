@@ -7,15 +7,16 @@ const defaultDepartmentOptions = departments.map((dept) => ({
   value: dept.name,
 }));
 
-const defaultYearOptions = ["2026", "2025", "2024", "2023", "2022", "2021", "2020"];
-
 export default function FilterSidebar({
   selectedDepartments = [],
   selectedYears = [],
+  selectedSemesters = [],
   onDepartmentChange,
   onYearChange,
+  onSemesterChange,
   departmentOptions = defaultDepartmentOptions,
-  yearOptions = defaultYearOptions,
+  yearOptions = ["Year 1", "Year 2", "Year 3", "Year 4"],
+  semesterOptions = ["Semester 1", "Semester 2"],
 }) {
   const handleDeptToggle = (value) => {
     if (selectedDepartments.includes(value)) {
@@ -30,6 +31,14 @@ export default function FilterSidebar({
       onYearChange(selectedYears.filter((y) => y !== value));
     } else {
       onYearChange([...selectedYears, value]);
+    }
+  };
+
+  const handleSemesterToggle = (value) => {
+    if (selectedSemesters.includes(value)) {
+      onSemesterChange(selectedSemesters.filter((semester) => semester !== value));
+    } else {
+      onSemesterChange([...selectedSemesters, value]);
     }
   };
 
@@ -79,6 +88,25 @@ export default function FilterSidebar({
                 onChange={() => handleYearToggle(year)}
               />
               {year}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="filter-group">
+        <div className="filter-group-header">
+          <h3>Semester</h3>
+          <span className="material-symbols-outlined filter-icon">school</span>
+        </div>
+        <div className="filter-options">
+          {semesterOptions.map((semester) => (
+            <label key={semester} className="checkbox-wrapper">
+              <input
+                type="checkbox"
+                checked={selectedSemesters.includes(semester)}
+                onChange={() => handleSemesterToggle(semester)}
+              />
+              {semester}
             </label>
           ))}
         </div>
