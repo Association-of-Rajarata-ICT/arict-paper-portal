@@ -181,7 +181,16 @@ function SearchResultsContent() {
       return;
     }
     resultsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [currentPage]);
+  }, [
+    currentPage,
+    selectedDepartments,
+    selectedExamPeriods,
+    selectedAcademicYears,
+    selectedSemesters,
+    query,
+    yearsParam,
+    viewMode,
+  ]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
