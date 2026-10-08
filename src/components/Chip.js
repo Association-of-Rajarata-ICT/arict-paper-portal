@@ -7,10 +7,7 @@ export default function Chip({ children, variant = "default", icon = null }) {
   return (
     <span className={classNames.join(" ")}>
       {icon && (
-        <span
-          className="material-symbols-outlined"
-          style={{ fontSize: "16px" }}
-        >
+        <span className="material-symbols-outlined" aria-hidden="true">
           {icon}
         </span>
       )}

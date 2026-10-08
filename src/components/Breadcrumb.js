@@ -7,17 +7,16 @@ export default function Breadcrumb({ items }) {
         const isLast = index === items.length - 1;
 
         return (
-          <span key={index} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span key={index} className="breadcrumb-item">
             {index > 0 && (
-              <span
-                className="material-symbols-outlined separator"
-                style={{ fontSize: "18px" }}
-              >
+              <span className="material-symbols-outlined separator" aria-hidden="true">
                 chevron_right
               </span>
             )}
             {isLast ? (
-              <span className="current">{item.label}</span>
+              <span className="current" aria-current="page">
+                {item.label}
+              </span>
             ) : (
               <Link href={item.href}>{item.label}</Link>
             )}

@@ -1,4 +1,5 @@
 import { getAboutStats } from "@/lib/server/aboutStats";
+import RequestPaperButton from "@/components/RequestPaperButton";
 
 // Always read fresh stats from Neon (admin updates must show without redeploy)
 export const dynamic = "force-dynamic";
@@ -59,22 +60,30 @@ export default async function AboutPage() {
           </p>
         </div>
 
-        <div className="about-stats">
+        <dl className="about-register" aria-label="Archive in numbers">
           {stats.map((stat) => (
-            <div key={stat.label} className="about-stat">
-              <div className="about-stat-number">{stat.number}</div>
-              <div className="about-stat-label">{stat.label}</div>
+            <div key={stat.label}>
+              <dt>{stat.label}</dt>
+              <dd>{stat.number}</dd>
             </div>
+          ))}
+        </dl>
+
+        <div className="about-sections">
+          {features.map((feature) => (
+            <section key={feature.title} className="about-section">
+              <h2>{feature.title}</h2>
+              <p>{feature.description}</p>
+            </section>
           ))}
         </div>
 
-        <div className="about-grid" style={{ marginTop: "80px" }}>
-          {features.map((feature) => (
-            <div key={feature.title} className="about-card">
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
-            </div>
-          ))}
+        <div className="about-cta">
+          <div>
+            <h2>Missing a past paper?</h2>
+            <p>Tell ARICT which paper you need and the team will look for it.</p>
+          </div>
+          <RequestPaperButton className="btn btn-secondary btn-lg" />
         </div>
       </div>
     </section>

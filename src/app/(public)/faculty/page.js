@@ -39,12 +39,12 @@ export default function FacultyPage() {
           </p>
         </div>
 
-        <div className="about-grid" style={{ marginTop: "48px" }}>
+        <div className="about-sections" style={{ marginTop: 0 }}>
           {highlights.map((item) => (
-            <div key={item.title} className="about-card">
-              <h3>{item.title}</h3>
+            <section key={item.title} className="about-section">
+              <h2>{item.title}</h2>
               <p>{item.description}</p>
-            </div>
+            </section>
           ))}
         </div>
       </div>

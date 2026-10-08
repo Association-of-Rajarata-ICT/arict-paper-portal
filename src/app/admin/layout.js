@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function AdminLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -25,6 +26,9 @@ export default function AdminLayout({ children }) {
           <div className="admin-topbar-meta">
             <span className="admin-topbar-title">ARICT Admin</span>
             <span className="admin-topbar-subtitle">Past Paper Portal</span>
+          </div>
+          <div className="admin-topbar-actions">
+            <ThemeToggle />
           </div>
         </header>
         <div className="admin-content">{children}</div>

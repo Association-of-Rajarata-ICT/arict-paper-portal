@@ -7,8 +7,8 @@ export default function CopyLinkButton({ url, className }) {
 
   const handleCopy = async () => {
     try {
-      const linkToCopy = url 
-        ? new URL(url, window.location.origin).href 
+      const linkToCopy = url
+        ? new URL(url, window.location.origin).href
         : window.location.href;
       await navigator.clipboard.writeText(linkToCopy);
       setCopied(true);
@@ -19,15 +19,11 @@ export default function CopyLinkButton({ url, className }) {
   };
 
   return (
-    <button
-      className={className || "btn"}
-      onClick={handleCopy} 
-      style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
-    >
-      <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+    <button type="button" className={className || "btn"} onClick={handleCopy}>
+      <span className="material-symbols-outlined" aria-hidden="true">
         {copied ? "check" : "link"}
       </span>
-      {copied ? "Copied!" : "Copy Link"}
+      <span aria-live="polite">{copied ? "Copied" : "Copy link"}</span>
     </button>
   );
 }

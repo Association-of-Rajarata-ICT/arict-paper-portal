@@ -7,84 +7,91 @@ export default function PaperCard({ paper, compact = false }) {
   const paperUrl = `/paper/${encodedId}?dept=${encodeURIComponent(paper.departmentFull || paper.department || "")}`;
   const instructorName = paper.instructor && paper.instructor.trim() ? paper.instructor.trim() : "";
   const downloadUrl = getDownloadUrl(paper.driveLink || "");
-  
+  const titleId = `paper-card-title-${paper.id}`;
+
   return (
-    <div
-      className={`card paper-card${compact ? " paper-card-compact" : ""}`}
+    <article
+      className={`paper-card${compact ? " paper-card-compact" : ""}`}
       id={`paper-card-${paper.id}`}
+      aria-labelledby={titleId}
     >
-      <div className="paper-card-body">
-        <div className="paper-card-chips">
-          {paper.examPeriod && <Chip icon="calendar_today">{paper.examPeriod}</Chip>}
-          {paper.academicYear && <Chip>{paper.academicYear}</Chip>}
-          <Chip>{paper.department}</Chip>
-          {paper.type && <Chip variant="accent">{paper.type}</Chip>}
-          {paper.isRestricted && (
-            <span
-              className="material-symbols-outlined"
-              style={{
-                fontSize: "18px",
-                color: "var(--color-secondary)",
-                alignSelf: "center",
-              }}
-            >
-              lock
-            </span>
-          )}
-        </div>
-        <div className="paper-card-code">{paper.courseCode}</div>
-        <h3>{paper.title}</h3>
-        {instructorName && (
-          <p className="paper-card-instructor">
-            Instructor: <span>{instructorName}</span>
-          </p>
-        )}
-        {paper.description && (
-          <p className="paper-card-description">{paper.description}</p>
+      <div className="paper-card-top">
+        <span className="code-tag">{paper.courseCode || "—"}</span>
+        {paper.isRestricted && (
+          <span
+            className="material-symbols-outlined paper-card-lock"
+            role="img"
+            aria-label="Restricted"
+          >
+            lock
+          </span>
         )}
       </div>
-      <div className="paper-card-footer">
+
+      <h3 className="paper-card-title" id={titleId}>
+        <Link href={paperUrl}>{paper.title}</Link>
+      </h3>
+      <p className="paper-card-dept">{paper.departmentFull || paper.department}</p>
+
+      <div className="paper-card-tags">
+        {paper.academicYear && <Chip>{paper.academicYear}</Chip>}
+        {paper.semester && <Chip>{paper.semester}</Chip>}
+        {paper.examPeriod && <Chip icon="calendar_today">{paper.examPeriod}</Chip>}
+        {paper.type && <Chip variant="accent">{paper.type}</Chip>}
+      </div>
+
+      {instructorName && (
+        <p className="paper-card-instructor">
+          <span className="material-symbols-outlined" aria-hidden="true">
+            person
+          </span>
+          {instructorName}
+        </p>
+      )}
+      {paper.description && (
+        <p className="paper-card-description">{paper.description}</p>
+      )}
+
+      <div className="paper-card-actions">
+        <Link
+          href={paperUrl}
+          className="btn btn-secondary btn-sm"
+          id={`view-details-${paper.id}`}
+        >
+          <span className="material-symbols-outlined" aria-hidden="true">
+            visibility
+          </span>
+          View
+        </Link>
         {downloadUrl ? (
           <a
             href={downloadUrl}
-            className="btn btn-primary"
+            className="btn btn-primary btn-sm"
             target="_blank"
             rel="noreferrer"
             id={`download-${paper.id}`}
+            aria-label={`Download ${paper.courseCode} ${paper.title}`}
           >
-            Download
-            <span
-              className="material-symbols-outlined"
-              style={{ fontSize: "18px" }}
-            >
+            <span className="material-symbols-outlined" aria-hidden="true">
               download
             </span>
+            Download
           </a>
         ) : (
-          <button className="btn btn-primary" disabled id={`download-${paper.id}`}>
-            Download
-            <span
-              className="material-symbols-outlined"
-              style={{ fontSize: "18px" }}
-            >
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            disabled
+            id={`download-${paper.id}`}
+            title="No PDF available yet"
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">
               download
             </span>
+            Download
           </button>
         )}
-        <Link
-          href={paperUrl}
-          className="btn btn-secondary"
-          id={`view-details-${paper.id}`}
-        >
-          View Paper
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "18px" }}
-          >
-            arrow_forward
-          </span>
-        </Link>
       </div>
-    </div>
+    </article>
   );
 }
