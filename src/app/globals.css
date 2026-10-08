@@ -894,6 +894,17 @@ input[type="file"].input-field::file-selector-button {
   height: 30px;
 }
 
+/* The logo's own ink (black + maroon) is the brand asset — never recolor it.
+   A small white plate keeps it true on a dark background instead of inverting it. */
+.brand-logo-plate {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: transparent;
+  transition: background-color var(--t-fast);
+}
+
 .brand-label {
   padding-left: var(--s-3);
   border-left: 1px solid var(--rule-strong);
@@ -906,15 +917,16 @@ input[type="file"].input-field::file-selector-button {
   color: var(--ink-2);
 }
 
-/* Logo is black + maroon on transparent: invert it for dark paper */
+/* Logo is black + maroon on transparent: plate it in white on dark paper
+   so the real brand colors show, instead of distorting them with a filter */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .brand-logo {
-    filter: invert(1) hue-rotate(180deg) brightness(1.05);
+  :root:not([data-theme="light"]) .brand-logo-plate {
+    background: #ffffff;
   }
 }
 
-:root[data-theme="dark"] .brand-logo {
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
+:root[data-theme="dark"] .brand-logo-plate {
+  background: #ffffff;
 }
 
 .site-nav {
@@ -1092,14 +1104,19 @@ input[type="file"].input-field::file-selector-button {
   height: auto;
 }
 
+.brand-logo-plate--lg {
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .footer-brand-logo {
-    filter: invert(1) hue-rotate(180deg) brightness(1.05);
+  :root:not([data-theme="light"]) .brand-logo-plate--lg {
+    background: #ffffff;
   }
 }
 
-:root[data-theme="dark"] .footer-brand-logo {
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
+:root[data-theme="dark"] .brand-logo-plate--lg {
+  background: #ffffff;
 }
 
 .footer-text {
@@ -2891,16 +2908,6 @@ a.cover-sheet:hover {
 .admin-sidebar-brand img {
   width: 96px;
   height: auto;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .admin-sidebar-brand img {
-    filter: invert(1) hue-rotate(180deg) brightness(1.05);
-  }
-}
-
-:root[data-theme="dark"] .admin-sidebar-brand img {
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
 }
 
 .admin-sidebar-brand span {

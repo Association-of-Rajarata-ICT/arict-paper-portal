@@ -23,7 +23,9 @@ export default function AdminSidebar({ mobileOpen, onClose }) {
       <aside className={`admin-sidebar ${mobileOpen ? "open" : ""}`}>
         <div className="admin-sidebar-header">
           <Link href="/admin" className="admin-sidebar-brand" onClick={onClose}>
-            <Image src="/logo.png" alt="ARICT Logo" width={120} height={34} />
+            <span className="brand-logo-plate">
+              <Image src="/logo.png" alt="ARICT Logo" width={120} height={34} />
+            </span>
             <span>Admin</span>
           </Link>
           <button
