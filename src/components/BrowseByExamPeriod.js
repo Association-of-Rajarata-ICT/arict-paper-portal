@@ -6,56 +6,41 @@ export default function BrowseByExamPeriod({
   periods = [],
   linkBase = "/search",
   queryParamName = "years",
+  loading = false,
 }) {
   const hasPeriods = periods.length > 0;
   const buildHref = (period) =>
     `${linkBase}?${queryParamName}=${encodeURIComponent(period)}`;
 
   return (
-    <section className="exam-period-section" id="exam-period-section">
-      <div className="exam-period-header">
+    <section className="exam-period-section" id="exam-period-section" aria-labelledby="exam-period-heading">
+      <div className="section-head">
         <div>
-          <h2 className="text-headline-lg">Browse by Examination Period</h2>
-          <p className="text-body-md">Filter papers by exam session.</p>
+          <h2 id="exam-period-heading" className="text-headline-md">
+            Examination periods
+          </h2>
+          <p>Open every paper sat in one exam session.</p>
         </div>
       </div>
-      <div className="exam-period-grid">
-        {hasPeriods ? (
+      <div className="period-grid">
+        {loading ? (
+          Array.from({ length: 4 }, (_, index) => (
+            <span key={index} className="skeleton" style={{ height: 60 }} />
+          ))
+        ) : hasPeriods ? (
           periods.map((period) => (
-            <Link
-              key={period}
-              className="card exam-period-card"
-              href={buildHref(period)}
-            >
-                <div className="exam-period-card-body">
-                  <div className="exam-period-card-avatar">
-                    <div className="exam-period-card-avatar-inner">
-                      <span
-                        className="material-symbols-outlined"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        calendar_month
-                      </span>
-                    </div>
-                  </div>
-                  <h3 className="exam-period-card-title">{period}</h3>
-                  <p className="exam-period-card-desc">
-                    Past papers grouped by this exam session.
-                  </p>
-                  <div className="exam-period-card-cta">
-                    <span className="exam-period-card-cta-text">Browse papers</span>
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: "18px" }}
-                    >
-                      arrow_forward
-                    </span>
-                  </div>
-                </div>
+            <Link key={period} className="period-slip" href={buildHref(period)}>
+              <span className="material-symbols-outlined" aria-hidden="true">
+                event_note
+              </span>
+              <span className="period-slip-text">{period}</span>
+              <span className="material-symbols-outlined period-slip-arrow" aria-hidden="true">
+                arrow_forward
+              </span>
             </Link>
           ))
         ) : (
-          <p className="exam-period-empty">No examination periods available.</p>
+          <p className="period-empty">No examination periods available yet.</p>
         )}
       </div>
     </section>

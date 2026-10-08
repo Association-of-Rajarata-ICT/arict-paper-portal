@@ -20,45 +20,53 @@ export default function SearchBar({ variant = "hero", defaultValue = "" }) {
 
   if (variant === "inline") {
     return (
-      <form className="search-inline" onSubmit={handleSearch} id="inline-search">
-        <span
-          className="material-symbols-outlined search-icon"
-          style={{ fontSize: "20px" }}
-        >
+      <form className="search-inline" onSubmit={handleSearch} id="inline-search" role="search">
+        <span className="material-symbols-outlined" aria-hidden="true">
           search
         </span>
+        <label htmlFor="inline-search-input" className="sr-only">
+          Search papers
+        </label>
         <input
-          type="text"
-          placeholder="Search papers..."
+          type="search"
+          placeholder="Course code or module name"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           id="inline-search-input"
+          enterKeyHint="search"
+          autoComplete="off"
         />
+        <button type="submit" className="search-inline-submit" aria-label="Search">
+          <span className="material-symbols-outlined" aria-hidden="true">
+            arrow_forward
+          </span>
+        </button>
       </form>
     );
   }
 
   return (
-    <form
-      className="hero-search-wrapper"
-      onSubmit={handleSearch}
-      style={{ position: "relative" }}
-      id="hero-search"
-    >
-      <span className="material-symbols-outlined hero-search-icon">
-        search
-      </span>
-      <input
-        type="text"
-        className="input-field"
-        placeholder="Search by course code, module name, or year..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        id="hero-search-input"
-      />
-      <button type="submit" className="btn btn-primary btn-lg" id="hero-search-btn">
-        Search
-      </button>
+    <form className="hero-search" onSubmit={handleSearch} id="hero-search" role="search">
+      <label htmlFor="hero-search-input" className="field-label">
+        Course code, module name or exam year
+      </label>
+      <div className="hero-search-row">
+        <span className="material-symbols-outlined" aria-hidden="true">
+          search
+        </span>
+        <input
+          type="search"
+          placeholder="e.g. ICT3214 or Database Systems"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          id="hero-search-input"
+          enterKeyHint="search"
+          autoComplete="off"
+        />
+        <button type="submit" className="btn btn-primary btn-lg" id="hero-search-btn">
+          Search
+        </button>
+      </div>
     </form>
   );
 }

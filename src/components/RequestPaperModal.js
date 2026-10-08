@@ -42,6 +42,18 @@ export default function RequestPaperModal({ open, onClose }) {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return undefined;
+    const handleKey = (event) => {
+      if (event.key === "Escape" && !submitting) {
+        setStatus({ type: "idle", message: "" });
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open, submitting, onClose]);
+
   if (!open || !mounted) return null;
 
   const handleChange = (event) => {
@@ -133,7 +145,7 @@ export default function RequestPaperModal({ open, onClose }) {
       onClick={handleClose}
     >
       <div
-        className="card request-modal"
+        className="request-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="request-paper-title"
@@ -150,12 +162,12 @@ export default function RequestPaperModal({ open, onClose }) {
           </div>
           <button
             type="button"
-            className="request-modal-close"
+            className="icon-btn request-modal-close"
             onClick={handleClose}
             disabled={submitting}
             aria-label="Close request form"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
         </div>
 

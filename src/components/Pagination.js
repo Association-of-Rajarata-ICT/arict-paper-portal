@@ -27,28 +27,27 @@ export default function Pagination({
   };
 
   return (
-    <nav className="pagination" id="pagination" aria-label="Page navigation">
+    <nav className="pagination" id="pagination" aria-label="Pages">
       <button
+        type="button"
         className="pagination-btn"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         aria-label="Previous page"
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontSize: "20px" }}
-        >
+        <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: "20px" }}>
           chevron_left
         </span>
       </button>
 
       {getPages().map((page, i) =>
         page === "..." ? (
-          <span key={`ellipsis-${i}`} className="pagination-ellipsis">
-            ...
+          <span key={`ellipsis-${i}`} className="pagination-ellipsis" aria-hidden="true">
+            …
           </span>
         ) : (
           <button
+            type="button"
             key={page}
             className={`pagination-btn ${page === currentPage ? "active" : ""}`}
             onClick={() => onPageChange(page)}
@@ -61,15 +60,13 @@ export default function Pagination({
       )}
 
       <button
+        type="button"
         className="pagination-btn"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         aria-label="Next page"
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontSize: "20px" }}
-        >
+        <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: "20px" }}>
           chevron_right
         </span>
       </button>

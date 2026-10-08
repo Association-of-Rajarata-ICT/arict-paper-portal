@@ -1,9 +1,10 @@
 import Link from "next/link";
-import Chip from "./Chip";
 import { getPaperRouteId } from "@/lib/papers";
 
 export default function RelatedPaperCard({ paper }) {
   const encodedId = encodeURIComponent(getPaperRouteId(paper));
+  const meta = [paper.examPeriod || paper.year, paper.semester].filter(Boolean).join(" · ");
+
   return (
     <Link
       href={`/paper/${encodedId}?dept=${encodeURIComponent(
@@ -13,15 +14,13 @@ export default function RelatedPaperCard({ paper }) {
       id={`related-${paper.id}`}
     >
       <div className="related-card-header">
-        {paper.examPeriod ? <Chip>{paper.examPeriod}</Chip> : <Chip>{paper.year}</Chip>}
-        <span className="material-symbols-outlined related-card-download">
-          download
+        <span className="code-tag">{paper.courseCode || "—"}</span>
+        <span className="material-symbols-outlined related-card-arrow" aria-hidden="true">
+          arrow_forward
         </span>
       </div>
       <h3>{paper.title}</h3>
-      <p className="related-card-meta">
-        {paper.courseCode} · {paper.semester}
-      </p>
+      {meta && <p className="related-card-meta">{meta}</p>}
     </Link>
   );
 }
