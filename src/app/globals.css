@@ -894,15 +894,16 @@ input[type="file"].input-field::file-selector-button {
   height: 30px;
 }
 
-/* The logo's own ink (black + maroon) is the brand asset — never recolor it.
-   A small white plate keeps it true on a dark background instead of inverting it. */
-.brand-logo-plate {
+/* Theme-swapped logo pair: "AR" stays black / goes white, "ICT" stays the
+   same maroon in both themes — a real second asset, not a CSS filter. */
+.brand-logo-wrap {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: transparent;
-  transition: background-color var(--t-fast);
+}
+
+.brand-logo--dark {
+  display: none;
 }
 
 .brand-label {
@@ -917,16 +918,22 @@ input[type="file"].input-field::file-selector-button {
   color: var(--ink-2);
 }
 
-/* Logo is black + maroon on transparent: plate it in white on dark paper
-   so the real brand colors show, instead of distorting them with a filter */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .brand-logo-plate {
-    background: #ffffff;
+  :root:not([data-theme="light"]) .brand-logo--light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .brand-logo--dark {
+    display: block;
   }
 }
 
-:root[data-theme="dark"] .brand-logo-plate {
-  background: #ffffff;
+:root[data-theme="dark"] .brand-logo--light {
+  display: none;
+}
+
+:root[data-theme="dark"] .brand-logo--dark {
+  display: block;
 }
 
 .site-nav {
@@ -1102,21 +1109,6 @@ input[type="file"].input-field::file-selector-button {
 .footer-brand-logo {
   width: 160px;
   height: auto;
-}
-
-.brand-logo-plate--lg {
-  padding: 8px 14px;
-  border-radius: 6px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .brand-logo-plate--lg {
-    background: #ffffff;
-  }
-}
-
-:root[data-theme="dark"] .brand-logo-plate--lg {
-  background: #ffffff;
 }
 
 .footer-text {
