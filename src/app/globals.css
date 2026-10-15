@@ -1995,6 +1995,7 @@ a.cover-sheet:hover {
   display: flex;
   align-items: center;
   gap: var(--s-2);
+  flex-wrap: wrap;
 }
 
 .filter-open-btn {
@@ -2046,6 +2047,62 @@ a.cover-sheet:hover {
 .view-toggle-btn.active {
   background: var(--ink);
   color: var(--surface);
+}
+
+/* Sort dropdown — matches the view toggle's frame */
+.sort-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink-2);
+  transition: border-color var(--t-fast);
+}
+
+.sort-select:hover {
+  border-color: var(--ink-3);
+}
+
+.sort-select:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+
+.sort-select .material-symbols-outlined {
+  position: absolute;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.sort-select > .material-symbols-outlined:first-child {
+  left: 10px;
+}
+
+.sort-select-chevron {
+  right: 8px;
+}
+
+.sort-select select {
+  appearance: none;
+  height: 100%;
+  padding: 0 32px 0 34px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+}
+
+.sort-select option {
+  background: var(--surface);
+  color: var(--ink);
 }
 
 /* Active filter chips */
