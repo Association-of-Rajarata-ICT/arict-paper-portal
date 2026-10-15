@@ -242,6 +242,46 @@ export function sortExamPeriods(periods = []) {
   });
 }
 
+const MONTH_INDEX = {
+  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+  jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+};
+
+// "March | May 2026" -> 202603, "August / September 2024" -> 202408, "May 2022" -> 202205.
+// Uses the latest year and the first month named, so sittings order by when they started.
+export function examPeriodSortValue(period = "") {
+  const year = extractYearFromLabel(period);
+  if (!year) return 0;
+  const monthMatch = String(period).toLowerCase().match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b/);
+  return year * 100 + (monthMatch ? MONTH_INDEX[monthMatch[1]] : 0);
+}
+
+export const PAPER_SORT_OPTIONS = [
+  { value: "newest", label: "Newest first" },
+  { value: "oldest", label: "Oldest first" },
+  { value: "subject", label: "Subject (A–Z)" },
+  { value: "code", label: "Course code" },
+];
+
+export function sortPapers(papers = [], sortBy = "newest") {
+  const byText = (a = "", b = "") =>
+    a.localeCompare(b, undefined, { sensitivity: "base", numeric: true });
+  const newestFirst = (a, b) =>
+    examPeriodSortValue(b.examPeriod) - examPeriodSortValue(a.examPeriod);
+
+  const comparators = {
+    newest: (a, b) => newestFirst(a, b) || byText(a.courseCode, b.courseCode),
+    oldest: (a, b) => -newestFirst(a, b) || byText(a.courseCode, b.courseCode),
+    // Same subject stays together, newest sitting first within it.
+    subject: (a, b) =>
+      byText(a.title, b.title) || byText(a.courseCode, b.courseCode) || newestFirst(a, b),
+    code: (a, b) =>
+      byText(a.courseCode, b.courseCode) || newestFirst(a, b) || byText(a.title, b.title),
+  };
+
+  return [...papers].sort(comparators[sortBy] || comparators.newest);
+}
+
 export function sortAcademicYears(years = []) {
   return [...years].sort(
     (a, b) => extractNumberFromLabel(a) - extractNumberFromLabel(b)

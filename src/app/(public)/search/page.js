@@ -11,8 +11,10 @@ import { departments } from "@/data/departments";
 import { filterPapers, papers as localPapers } from "@/data/papers";
 import {
   fetchAllPapers,
+  PAPER_SORT_OPTIONS,
   sortAcademicYears,
   sortExamPeriods,
+  sortPapers,
   sortSemesters,
 } from "@/lib/papers";
 import { openRequestPaper } from "@/lib/requestPaper";
@@ -63,6 +65,7 @@ function SearchResultsContent() {
   const initialDepartments = getDepartmentFilterFromQuery(query);
 
   const [viewMode, setViewMode] = useState("compact"); // compact, list
+  const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDepartments, setSelectedDepartments] = useState(initialDepartments);
   const [selectedExamPeriods, setSelectedExamPeriods] = useState(initialExamPeriods);
@@ -161,8 +164,8 @@ function SearchResultsContent() {
   );
 
   const displayResults = useMemo(
-    () => applyFilters(queryResults),
-    [applyFilters, queryResults]
+    () => sortPapers(applyFilters(queryResults), sortBy),
+    [applyFilters, queryResults, sortBy]
   );
 
   const facetCounts = useMemo(() => {
@@ -215,6 +218,7 @@ function SearchResultsContent() {
     setCurrentPage(1);
   }, [
     viewMode,
+    sortBy,
     selectedDepartments,
     selectedExamPeriods,
     selectedAcademicYears,
@@ -242,6 +246,7 @@ function SearchResultsContent() {
     query,
     yearsParam,
     viewMode,
+    sortBy,
   ]);
 
   const handlePageChange = (page) => {
@@ -390,6 +395,26 @@ function SearchResultsContent() {
                   <span className="filter-badge">{selectedFilterCount}</span>
                 )}
               </button>
+              <label className="sort-select">
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  sort
+                </span>
+                <span className="sr-only">Sort papers</span>
+                <select
+                  id="sort-select"
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value)}
+                >
+                  {PAPER_SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined sort-select-chevron" aria-hidden="true">
+                  expand_more
+                </span>
+              </label>
               <div className="view-toggle" id="view-toggle" role="group" aria-label="Layout">
                 <button
                   type="button"
