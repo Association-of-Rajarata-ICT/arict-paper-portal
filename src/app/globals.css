@@ -2967,6 +2967,50 @@ a.cover-sheet:hover {
   color: var(--ink-3);
 }
 
+.admin-sidebar-logout {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+}
+
+.admin-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--s-4);
+  background: var(--bg);
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.admin-login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+}
+
+.admin-login-card .form-status {
+  margin-top: 0;
+}
+
+.admin-login-submit {
+  width: 100%;
+  justify-content: center;
+}
+
 .admin-main {
   flex: 1;
   min-width: 0;

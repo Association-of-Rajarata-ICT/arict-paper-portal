@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/server/adminAuth";
 import { exchangeGoogleAuthCode } from "@/lib/server/drive";
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
+}
+
 export async function GET(request) {
+  const unauthorized = await requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const error = searchParams.get("error");
 
   if (error) {
     return new NextResponse(
-      `<html><body><h1>Google sign-in failed</h1><p>${error}</p></body></html>`,
+      `<html><body><h1>Google sign-in failed</h1><p>${escapeHtml(error)}</p></body></html>`,
       { headers: { "Content-Type": "text/html" } }
     );
   }
@@ -47,7 +55,7 @@ export async function GET(request) {
     });
   } catch (err) {
     return new NextResponse(
-      `<html><body><h1>Token exchange failed</h1><pre>${err?.message || "Unknown error"}</pre></body></html>`,
+      `<html><body><h1>Token exchange failed</h1><pre>${escapeHtml(err?.message || "Unknown error")}</pre></body></html>`,
       { headers: { "Content-Type": "text/html" }, status: 500 }
     );
   }

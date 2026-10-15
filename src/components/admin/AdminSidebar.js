@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ADMIN_NAV } from "@/lib/constants";
 
 export default function AdminSidebar({ mobileOpen, onClose }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
+    router.replace("/admin/login");
+    router.refresh();
+  };
 
   const isActive = (href) => {
     if (href === "/admin") return pathname === "/admin";
@@ -74,6 +81,14 @@ export default function AdminSidebar({ mobileOpen, onClose }) {
             <span className="material-symbols-outlined">open_in_new</span>
             View Site
           </Link>
+          <button
+            type="button"
+            className="admin-sidebar-link admin-sidebar-link--muted admin-sidebar-logout"
+            onClick={handleLogout}
+          >
+            <span className="material-symbols-outlined">logout</span>
+            Sign out
+          </button>
         </div>
       </aside>
     </>

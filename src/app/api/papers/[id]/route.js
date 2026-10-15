@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { DEPARTMENT_NAMES } from "@/lib/constants";
-import { uploadPaperToDrive } from "@/lib/server/drive";
+import { requireAdmin } from "@/lib/server/adminAuth";
+import { trashDriveFile, uploadPaperToDrive } from "@/lib/server/drive";
 import {
   getPaperById,
   removePaperRecord,
@@ -35,6 +36,8 @@ export async function GET(_request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
+    const unauthorized = await requireAdmin(request);
+    if (unauthorized) return unauthorized;
     const { id } = await params;
     const existing = await getPaperById(id);
     if (!existing) {
@@ -99,11 +102,28 @@ export async function PUT(request, { params }) {
   }
 }
 
-export async function DELETE(_request, { params }) {
+export async function DELETE(request, { params }) {
   try {
+    const unauthorized = await requireAdmin(request);
+    if (unauthorized) return unauthorized;
     const { id } = await params;
+    const existing = await getPaperById(id);
+    if (!existing) {
+      return NextResponse.json({ message: "Paper not found." }, { status: 404 });
+    }
+
+    // Trash (not permanently delete) the PDF so it can be restored from Drive if needed.
+    let driveWarning = "";
+    if (existing.driveFileId) {
+      try {
+        await trashDriveFile(existing.driveFileId);
+      } catch (error) {
+        driveWarning = error?.message || "Could not move the Drive file to trash.";
+      }
+    }
+
     await removePaperRecord(id);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, ...(driveWarning ? { driveWarning } : {}) });
   } catch (error) {
     return NextResponse.json(
       { message: error?.message || "Failed to delete paper." },
