@@ -44,3 +44,6 @@ next-env.d.ts
 # Impeccable / Claude Code local tooling
 /.claude
 /.impeccable
+
+# Bulk upload manifest + log (scripts/bulk-upload-papers.mjs)
+/bulk-upload

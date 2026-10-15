@@ -894,6 +894,18 @@ input[type="file"].input-field::file-selector-button {
   height: 30px;
 }
 
+/* Theme-swapped logo pair: "AR" stays black / goes white, "ICT" stays the
+   same maroon in both themes — a real second asset, not a CSS filter. */
+.brand-logo-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-logo--dark {
+  display: none;
+}
+
 .brand-label {
   padding-left: var(--s-3);
   border-left: 1px solid var(--rule-strong);
@@ -906,15 +918,22 @@ input[type="file"].input-field::file-selector-button {
   color: var(--ink-2);
 }
 
-/* Logo is black + maroon on transparent: invert it for dark paper */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .brand-logo {
-    filter: invert(1) hue-rotate(180deg) brightness(1.05);
+  :root:not([data-theme="light"]) .brand-logo--light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .brand-logo--dark {
+    display: block;
   }
 }
 
-:root[data-theme="dark"] .brand-logo {
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
+:root[data-theme="dark"] .brand-logo--light {
+  display: none;
+}
+
+:root[data-theme="dark"] .brand-logo--dark {
+  display: block;
 }
 
 .site-nav {
@@ -1090,16 +1109,6 @@ input[type="file"].input-field::file-selector-button {
 .footer-brand-logo {
   width: 160px;
   height: auto;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .footer-brand-logo {
-    filter: invert(1) hue-rotate(180deg) brightness(1.05);
-  }
-}
-
-:root[data-theme="dark"] .footer-brand-logo {
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
 }
 
 .footer-text {
@@ -2893,16 +2902,6 @@ a.cover-sheet:hover {
   height: auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .admin-sidebar-brand img {
-    filter: invert(1) hue-rotate(180deg) brightness(1.05);
-  }
-}
-
-:root[data-theme="dark"] .admin-sidebar-brand img {
-  filter: invert(1) hue-rotate(180deg) brightness(1.05);
-}
-
 .admin-sidebar-brand span {
   padding-left: var(--s-3);
   border-left: 1px solid var(--rule-strong);
@@ -2966,6 +2965,50 @@ a.cover-sheet:hover {
 
 .admin-sidebar-link--muted {
   color: var(--ink-3);
+}
+
+.admin-sidebar-logout {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+}
+
+.admin-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--s-4);
+  background: var(--bg);
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.admin-login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+}
+
+.admin-login-card .form-status {
+  margin-top: 0;
+}
+
+.admin-login-submit {
+  width: 100%;
+  justify-content: center;
 }
 
 .admin-main {

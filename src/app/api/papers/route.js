@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { DEPARTMENT_NAMES } from "@/lib/constants";
+import { requireAdmin } from "@/lib/server/adminAuth";
 import { uploadPaperToDrive } from "@/lib/server/drive";
 import { createPaperRecord, listPapers } from "@/lib/server/papersRepository";
 
@@ -52,6 +53,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const unauthorized = await requireAdmin(request);
+    if (unauthorized) return unauthorized;
     const formData = await request.formData();
     const subjectCode = String(formData.get("subjectCode") || "").trim();
     const subjectName = String(formData.get("subjectName") || "").trim();

@@ -73,6 +73,7 @@ Admin routes are **not linked** in the public navigation and are **not protected
 
 | Feature | Route | Description |
 |--------|-------|-------------|
+| **Sign in** | `/admin/login` | Username + password from `ADMIN_USERNAME` / `ADMIN_PASSWORD`; all other admin pages redirect here |
 | **Dashboard** | `/admin` | Total papers, per-department counts, largest department, recent papers table |
 | **Add paper** | `/admin/add-paper` | Upload PDF → Google Drive + save metadata in PostgreSQL |
 | **Manage papers** | `/admin/papers` | Search/filter; view, edit, or delete |
@@ -225,6 +226,7 @@ Path alias: `@/components/Header` → `src/components/Header`.
 
 | Route | File | Purpose |
 |-------|------|---------|
+| `/admin/login` | `src/app/admin/login/page.js` | Admin sign in |
 | `/admin` | `src/app/admin/page.js` | Dashboard |
 | `/admin/add-paper` | `src/app/admin/add-paper/page.js` | Upload new paper |
 | `/admin/papers` | `src/app/admin/papers/page.js` | Manage all papers |
@@ -235,7 +237,7 @@ Path alias: `@/components/Header` → `src/components/Header`.
 
 **Public header:** Departments, Papers, Faculty, About Us, **Request Paper**
 
-**Admin sidebar:** Dashboard, Add Paper, Manage Papers, View Site → `/`
+**Admin sidebar:** Dashboard, Add Paper, Manage Papers, View Site → `/`, Sign out
 
 ---
 
@@ -247,9 +249,13 @@ Path alias: `@/components/Header` → `src/components/Header`.
 | `POST` | `/api/papers` | Create paper. `multipart/form-data`: metadata + required `file` (PDF) |
 | `GET` | `/api/papers/[id]` | Get one paper by UUID |
 | `PUT` | `/api/papers/[id]` | Update paper. Optional new `file` replaces Drive upload |
-| `DELETE` | `/api/papers/[id]` | Delete paper record (does not delete Drive file) |
+| `DELETE` | `/api/papers/[id]` | Delete paper record and move its Drive file to trash |
 | `GET` | `/api/auth/google` | Redirect to Google OAuth (one-time Drive setup) |
 | `GET` | `/api/auth/google/callback` | OAuth callback; displays `GOOGLE_OAUTH_REFRESH_TOKEN` to copy |
+| `POST` | `/api/admin/login` | JSON `{ username, password }` → sets the admin session cookie |
+| `POST` | `/api/admin/logout` | Clears the admin session cookie |
+
+`POST`/`PUT`/`DELETE` on papers, `/api/admin/portal-stats` and `/api/auth/google*` require an admin session (401 otherwise). `GET` on papers stays public. Admin pages are guarded by `src/proxy.js`; API routes check the session themselves via `requireAdmin()` in `src/lib/server/adminAuth.js`.
 
 Implementation:
 
@@ -394,7 +400,7 @@ Uploaded files are made **readable by anyone with the link** (`permissions.creat
 
 ### Admin delete
 
-1. `DELETE /api/papers/{id}` removes the database row only.
+1. `DELETE /api/papers/{id}` moves the Drive file to trash, then removes the database row. If trashing fails the row is still removed and the response includes `driveWarning`.
 
 ---
 
@@ -452,6 +458,17 @@ GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\
 # GOOGLE_DRIVE_USE_SHARED_DRIVE=true
 ```
 
+### Admin login (required)
+
+```env
+ADMIN_USERNAME=arict-admin
+ADMIN_PASSWORD=a-long-random-password
+# At least 32 random characters; signs the session cookie. Changing it signs everyone out.
+ADMIN_SESSION_SECRET=
+```
+
+Generate values with `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`. Set the same variables in Vercel.
+
 ### EmailJS (optional — Request Paper modal)
 
 ```env
@@ -465,7 +482,6 @@ Template should send to `arict@as.rjt.ac.lk` (`ARICT_OFFICIAL_EMAIL` in `src/lib
 | File | Notes |
 |------|--------|
 | `.env.local` | Loaded automatically by Next.js (gitignored) |
-| `env.local` | Also gitignored; prefer `.env.local` |
 
 ---
 
@@ -535,15 +551,11 @@ Uses `src/app/admin/layout.js` (sidebar), not the public header/footer.
 
 ### Delete a paper
 
-1. On `/admin/papers`, **Delete** → confirm. Removes DB row only.
+1. On `/admin/papers`, **Delete** → confirm. Removes the DB row and moves the PDF to Drive trash.
 
 ### Security
 
-There is **no admin login** yet. Restrict access by:
-
-- Not linking `/admin` publicly
-- Network / IP rules on hosting
-- Future auth middleware
+Admin pages and write APIs require signing in at `/admin/login` with `ADMIN_USERNAME` / `ADMIN_PASSWORD`. Sessions are an HttpOnly cookie signed with `ADMIN_SESSION_SECRET` and last 12 hours.
 
 For production, treat `DATABASE_URL` and Google credentials as highly sensitive.
 
@@ -606,6 +618,11 @@ For production, treat `DATABASE_URL` and Google credentials as highly sensitive.
 | `npm run build` | Production build |
 | `npm start` | Production server |
 | `npm run lint` | ESLint |
+| `npm run papers:plan -- "<folder>"` | Build `bulk-upload/manifest.csv` from a `Year N/Semester N/<YYYY Mon-Mon>/<CODE - TITLE>.pdf` folder |
+| `npm run papers:upload -- "<folder>"` | Upload manifest rows through `/api/papers` (signs in with `ADMIN_*`; resumable; `--dry-run`, `--limit N`, `--base-url`) |
+| `npm run papers:purge -- --department Computing --yes` | Remove all papers of a department (DB + Drive trash), with a JSON backup |
+
+Bulk upload output (git-ignored) goes to `bulk-upload/`: `logs/` (one log per run), `results/` (CSV per run with each file's status and failure reason), `backups/`. Run against a local `npm run dev` — Vercel rejects request bodies over 4.5 MB.
 
 ---
 
@@ -626,8 +643,7 @@ Ensure Google Drive root folder and OAuth token belong to an account with suffic
 
 | Area | Current behavior |
 |------|------------------|
-| **Admin auth** | No login; `/admin` URLs are open if known |
-| **Delete** | DB row removed; Drive file is not deleted |
+| **Admin auth** | Single shared admin account from env vars |
 | **Exam period filter UI** | Hidden in sidebar; `?years=` from home still filters |
 | **Fallback data** | Outdated sample departments vs live DB |
 | **Legacy edit URL** | `/admin/papers/[department]/[id]` still present alongside `/edit/[id]` |

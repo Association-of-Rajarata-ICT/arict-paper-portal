@@ -55,14 +55,24 @@ export default function Header() {
       <header className="site-header" id="main-header">
         <div className="container site-header-inner">
           <Link href="/" className="brand" aria-label="ARICT Paper Portal home">
-            <Image
-              src="/logo.png"
-              alt="ARICT"
-              width={103}
-              height={32}
-              className="brand-logo"
-              priority
-            />
+            <span className="brand-logo-wrap">
+              <Image
+                src="/logo.png"
+                alt="ARICT"
+                width={103}
+                height={32}
+                className="brand-logo brand-logo--light"
+                priority
+              />
+              <Image
+                src="/logo-dark.png"
+                alt="ARICT"
+                width={103}
+                height={32}
+                className="brand-logo brand-logo--dark"
+                priority
+              />
+            </span>
             <span className="brand-label">
               Paper
               <br />
@@ -127,7 +137,22 @@ export default function Header() {
       >
         <div className="mobile-menu-header">
           <Link href="/" className="brand" onClick={() => setMobileOpen(false)}>
-            <Image src="/logo.png" alt="ARICT" width={90} height={28} className="brand-logo" />
+            <span className="brand-logo-wrap">
+              <Image
+                src="/logo.png"
+                alt="ARICT"
+                width={90}
+                height={28}
+                className="brand-logo brand-logo--light"
+              />
+              <Image
+                src="/logo-dark.png"
+                alt="ARICT"
+                width={90}
+                height={28}
+                className="brand-logo brand-logo--dark"
+              />
+            </span>
           </Link>
           <button
             type="button"

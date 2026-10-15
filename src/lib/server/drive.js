@@ -290,6 +290,21 @@ export async function uploadPaperToDrive({ file, department, year, semester }) {
   }
 }
 
+export async function trashDriveFile(fileId) {
+  try {
+    const drive = getDriveClient();
+    await drive.files.update({
+      fileId,
+      requestBody: { trashed: true },
+      ...driveFlags(),
+    });
+  } catch (error) {
+    // Already gone from Drive — nothing left to clean up.
+    if (error?.code === 404) return;
+    throw new Error(formatDriveError(error));
+  }
+}
+
 export function getGoogleOAuthClient() {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;

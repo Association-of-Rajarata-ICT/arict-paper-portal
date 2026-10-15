@@ -40,13 +40,22 @@ export default function Footer() {
         <div className="footer-top">
           <div className="footer-brand-block">
             <Link href="/" className="footer-brand-link">
-              <Image
-                src="/logo.png"
-                alt="ARICT Logo"
-                width={180}
-                height={52}
-                className="footer-brand-logo"
-              />
+              <span className="brand-logo-wrap">
+                <Image
+                  src="/logo.png"
+                  alt="ARICT Logo"
+                  width={180}
+                  height={52}
+                  className="footer-brand-logo brand-logo--light"
+                />
+                <Image
+                  src="/logo-dark.png"
+                  alt="ARICT Logo"
+                  width={180}
+                  height={52}
+                  className="footer-brand-logo brand-logo--dark"
+                />
+              </span>
             </Link>
             <p className="footer-text">
               Crafting digital experiences that move people forward.
