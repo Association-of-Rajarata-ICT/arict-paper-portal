@@ -1143,7 +1143,7 @@ input[type="file"].input-field::file-selector-button {
 
 .footer-columns {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-8);
 }
 

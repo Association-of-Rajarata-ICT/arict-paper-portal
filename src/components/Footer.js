@@ -2,32 +2,32 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Linkedin, Facebook, Github, Youtube } from "lucide-react";
+import { Linkedin, Facebook, Github, Instagram } from "lucide-react";
 
 const SOCIAL_LINKS = [
   {
-    href: "https://www.linkedin.com",
-    label: "LinkedIn",
-    className: "social-linkedin",
-    Icon: Linkedin,
-  },
-  {
-    href: "https://www.facebook.com",
-    label: "Facebook",
-    className: "social-facebook",
-    Icon: Facebook,
-  },
-  {
-    href: "https://github.com",
+    href: "https://github.com/Association-of-Rajarata-ICT",
     label: "GitHub",
     className: "social-github",
     Icon: Github,
   },
   {
-    href: "https://www.youtube.com",
-    label: "YouTube",
-    className: "social-youtube",
-    Icon: Youtube,
+    href: "https://www.linkedin.com/company/arict/",
+    label: "LinkedIn",
+    className: "social-linkedin",
+    Icon: Linkedin,
+  },
+  {
+    href: "https://www.facebook.com/arict.rjt",
+    label: "Facebook",
+    className: "social-facebook",
+    Icon: Facebook,
+  },
+  {
+    href: "https://www.instagram.com/arict.rjt/",
+    label: "Instagram",
+    className: "social-instagram",
+    Icon: Instagram,
   },
 ];
 
@@ -95,24 +95,6 @@ export default function Footer() {
                 </Link>
               </div>
             </div>
-            <div className="footer-column">
-              <span className="footer-column-title">Company</span>
-              <div className="footer-column-links">
-                <Link href="/about">About</Link>
-                <Link href="/about">Careers</Link>
-                <Link href="/about">Blog</Link>
-                <Link href="/about">Press</Link>
-              </div>
-            </div>
-            <div className="footer-column">
-              <span className="footer-column-title">Support</span>
-              <div className="footer-column-links">
-                <Link href="/about">Help Center</Link>
-                <Link href="/about">Documentation</Link>
-                <Link href="/about">Status</Link>
-                <Link href="/about">Contact</Link>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -120,11 +102,6 @@ export default function Footer() {
           <span className="footer-bottom-copy">
             {`© ${currentYear} Association of Rajarata Information & Communication Technology. All rights reserved.`}
           </span>
-          <div className="footer-bottom-links">
-            <Link href="/about">Privacy</Link>
-            <Link href="/about">Terms</Link>
-            <Link href="/about">Cookies</Link>
-          </div>
         </div>
       </div>
     </footer>
