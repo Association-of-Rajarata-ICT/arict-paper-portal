@@ -2,29 +2,30 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { ARICT_SOCIAL_LINKS } from "@/lib/constants";
 import { Linkedin, Facebook, Github, Instagram } from "lucide-react";
 
 const SOCIAL_LINKS = [
   {
-    href: "https://github.com/Association-of-Rajarata-ICT",
+    href: ARICT_SOCIAL_LINKS.github,
     label: "GitHub",
     className: "social-github",
     Icon: Github,
   },
   {
-    href: "https://www.linkedin.com/company/arict/",
+    href: ARICT_SOCIAL_LINKS.linkedin,
     label: "LinkedIn",
     className: "social-linkedin",
     Icon: Linkedin,
   },
   {
-    href: "https://www.facebook.com/arict.rjt",
+    href: ARICT_SOCIAL_LINKS.facebook,
     label: "Facebook",
     className: "social-facebook",
     Icon: Facebook,
   },
   {
-    href: "https://www.instagram.com/arict.rjt/",
+    href: ARICT_SOCIAL_LINKS.instagram,
     label: "Instagram",
     className: "social-instagram",
     Icon: Instagram,
@@ -95,6 +96,14 @@ export default function Footer() {
                 </Link>
               </div>
             </div>
+            <div className="footer-column">
+              <span className="footer-column-title">Support</span>
+              <div className="footer-column-links">
+                <Link href="/help">Help Center</Link>
+                <Link href="/contact">Contact</Link>
+                <Link href="/about">About ARICT</Link>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -102,6 +111,10 @@ export default function Footer() {
           <span className="footer-bottom-copy">
             {`© ${currentYear} Association of Rajarata Information & Communication Technology. All rights reserved.`}
           </span>
+          <div className="footer-bottom-links">
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
+          </div>
         </div>
       </div>
     </footer>

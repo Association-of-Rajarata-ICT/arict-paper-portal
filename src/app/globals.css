@@ -1143,7 +1143,7 @@ input[type="file"].input-field::file-selector-button {
 
 .footer-columns {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--s-8);
 }
 
@@ -2836,6 +2836,83 @@ a.cover-sheet:hover {
   background: var(--surface);
   border-color: var(--surface);
   color: var(--ink);
+}
+
+.about-sections--single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 760px;
+}
+
+.about-section p + p {
+  margin-top: var(--s-3);
+}
+
+.about-section a,
+.about-hero a,
+.legal-note a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal-note {
+  margin-top: var(--s-8);
+  font-size: 0.9rem;
+  color: var(--ink-3);
+}
+
+.contact-list {
+  list-style: none;
+  margin-top: var(--s-3);
+  padding: 0;
+}
+
+.contact-list li {
+  display: flex;
+  gap: var(--s-4);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.95rem;
+}
+
+.contact-list li span {
+  min-width: 90px;
+  color: var(--ink-3);
+}
+
+.faq {
+  max-width: 760px;
+}
+
+.faq-group {
+  margin-bottom: var(--s-8);
+}
+
+.faq-group h2 {
+  padding-bottom: var(--s-3);
+  border-bottom: 2px solid var(--ink);
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-variation-settings: "wdth" 108;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--rule);
+}
+
+.faq-item summary {
+  padding: var(--s-4) 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.faq-item p {
+  padding-bottom: var(--s-4);
+  max-width: 62ch;
+  color: var(--ink-2);
+  font-size: 0.95rem;
+  line-height: 1.65;
 }
 
 /* --- Request a paper dialog --------------------------------- */
