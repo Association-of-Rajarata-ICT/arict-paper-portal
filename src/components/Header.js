@@ -7,14 +7,9 @@ import { usePathname } from "next/navigation";
 import RequestPaperModal from "@/components/RequestPaperModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { REQUEST_PAPER_EVENT } from "@/lib/requestPaper";
+import { MAIN_NAV_LINKS } from "@/lib/seo";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/search", label: "Papers" },
-  // Temporarily hidden — uncomment to restore Faculty in navigation
-  // { href: "/faculty", label: "Faculty" },
-  { href: "/about", label: "About Us" },
-];
+const navLinks = MAIN_NAV_LINKS;
 
 function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
@@ -54,7 +49,7 @@ export default function Header() {
       </a>
       <header className="site-header" id="main-header">
         <div className="container site-header-inner">
-          <Link href="/" className="brand" aria-label="ARICT Paper Portal home">
+          <Link href="/" className="brand" aria-label="ARICT Past Paper Portal home">
             <span className="brand-logo-wrap">
               <Image
                 src="/logo.png"

@@ -1,12 +1,9 @@
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import RequestPaperButton from "@/components/RequestPaperButton";
 import { ARICT_OFFICIAL_EMAIL } from "@/lib/constants";
 
-export const metadata = {
-  title: "Help Center | ARICT Past Paper Portal",
-  description:
-    "How to find, open and download past papers on the ARICT Past Paper Portal, and what to do when a paper is missing.",
-};
+export const metadata = pageMetadata("/help");
 
 const faqGroups = [
   {

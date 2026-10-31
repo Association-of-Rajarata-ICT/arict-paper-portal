@@ -7,9 +7,7 @@ export default function RelatedPaperCard({ paper }) {
 
   return (
     <Link
-      href={`/paper/${encodedId}?dept=${encodeURIComponent(
-        paper.departmentFull || paper.department || ""
-      )}`}
+      href={`/paper/${encodedId}`}
       className="related-card"
       id={`related-${paper.id}`}
     >

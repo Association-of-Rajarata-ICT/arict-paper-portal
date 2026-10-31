@@ -1,52 +1,37 @@
-export const metadata = {
-  title: "Faculty | ARICT Past Paper Portal",
-  description:
-    "Meet the faculty and academic teams supporting the ARICT Past Paper Portal.",
-};
+import Link from "next/link";
+import { departments } from "@/data/departments";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata("/faculty");
 
 export default function FacultyPage() {
-  const highlights = [
-    {
-      title: "Department Representatives",
-      description:
-        "Faculty representatives from each department help curate and verify the latest past papers.",
-    },
-    {
-      title: "Academic Coordinators",
-      description:
-        "Coordinators ensure the portal aligns with current curricula and assessment standards.",
-    },
-    {
-      title: "Faculty Advisors",
-      description:
-        "Advisors guide portal improvements and support students with learning resources.",
-    },
-    {
-      title: "Support Team",
-      description:
-        "A dedicated group handles updates, quality checks, and student feedback.",
-    },
-  ];
-
   return (
     <section className="about-page faculty-page" id="faculty-page">
       <div className="container">
         <div className="about-hero">
-          <h1 className="text-headline-xl">Faculty</h1>
+          <h1 className="text-headline-xl">Faculty of Applied Sciences</h1>
           <p className="text-body-lg">
-            The ARICT Past Paper Portal is supported by faculty members and
-            academic teams committed to quality, accuracy, and student success.
+            Browse available past examination papers for the five departments of
+            the Faculty of Applied Sciences at Rajarata University of Sri Lanka.
+            ARICT volunteers organise the archive for students' revision.
           </p>
         </div>
-
         <div className="about-sections" style={{ marginTop: 0 }}>
-          {highlights.map((item) => (
-            <section key={item.title} className="about-section">
-              <h2>{item.title}</h2>
-              <p>{item.description}</p>
+          {departments.map((department) => (
+            <section key={department.id} className="about-section">
+              <h2>{department.name}</h2>
+              <p>{department.description}</p>
+              <p><Link href={"/search?q=" + encodeURIComponent(department.name)}>
+                Browse {department.name} past papers
+              </Link></p>
             </section>
           ))}
         </div>
+        <p className="legal-note">
+          Availability varies by subject and examination period. Read our{" "}
+          <Link href="/help">guide to finding past papers</Link> or{" "}
+          <Link href="/contact">contact ARICT about a missing paper</Link>.
+        </p>
       </div>
     </section>
   );

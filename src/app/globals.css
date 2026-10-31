@@ -940,7 +940,7 @@ input[type="file"].input-field::file-selector-button {
   display: flex;
   align-items: stretch;
   align-self: stretch;
-  gap: var(--s-6);
+  gap: var(--s-4);
 }
 
 .site-nav a {
@@ -3493,6 +3493,11 @@ a.cover-sheet:hover {
 }
 
 /* --- Responsive --------------------------------------------- */
+@media (max-width: 1100px) {
+  .site-nav { display: none; }
+  .header-menu-btn { display: inline-grid; }
+}
+
 @media (max-width: 1100px) {
   .home-hero-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);

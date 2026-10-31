@@ -1,11 +1,8 @@
+import { pageMetadata } from "@/lib/seo";
 import RequestPaperButton from "@/components/RequestPaperButton";
 import { ARICT_OFFICIAL_EMAIL, ARICT_SOCIAL_LINKS } from "@/lib/constants";
 
-export const metadata = {
-  title: "Contact | ARICT Past Paper Portal",
-  description:
-    "Get in touch with the Association of Rajarata Information & Communication Technology (ARICT).",
-};
+export const metadata = pageMetadata("/contact");
 
 const channels = [
   { label: "GitHub", href: ARICT_SOCIAL_LINKS.github, text: "Association-of-Rajarata-ICT" },

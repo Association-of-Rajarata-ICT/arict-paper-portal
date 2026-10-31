@@ -1,11 +1,8 @@
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { ARICT_OFFICIAL_EMAIL } from "@/lib/constants";
 
-export const metadata = {
-  title: "Terms of Use | ARICT Past Paper Portal",
-  description:
-    "The terms for using the ARICT Past Paper Portal, a student-run archive of past examination papers.",
-};
+export const metadata = pageMetadata("/terms");
 
 const sections = [
   {

@@ -628,6 +628,8 @@ Bulk upload output (git-ignored) goes to `bulk-upload/`: `logs/` (one log per ru
 
 ## Deployment
 
+For search appearance, social sharing images, favicon assets and the Google Search Console checklist, see [SEO setup](./docs/SEO.md).
+
 Suited for [Vercel](https://vercel.com) or any Node host running Next.js:
 
 1. Connect the repository.

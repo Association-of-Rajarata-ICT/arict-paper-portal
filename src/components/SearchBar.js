@@ -20,7 +20,7 @@ export default function SearchBar({ variant = "hero", defaultValue = "" }) {
 
   if (variant === "inline") {
     return (
-      <form className="search-inline" onSubmit={handleSearch} id="inline-search" role="search">
+      <form action="/search" method="get" className="search-inline" onSubmit={handleSearch} id="inline-search" role="search">
         <span className="material-symbols-outlined" aria-hidden="true">
           search
         </span>
@@ -29,6 +29,7 @@ export default function SearchBar({ variant = "hero", defaultValue = "" }) {
         </label>
         <input
           type="search"
+          name="q"
           placeholder="Course code or module name"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -46,7 +47,7 @@ export default function SearchBar({ variant = "hero", defaultValue = "" }) {
   }
 
   return (
-    <form className="hero-search" onSubmit={handleSearch} id="hero-search" role="search">
+    <form action="/search" method="get" className="hero-search" onSubmit={handleSearch} id="hero-search" role="search">
       <label htmlFor="hero-search-input" className="field-label">
         Course code, module name or exam year
       </label>
@@ -56,6 +57,7 @@ export default function SearchBar({ variant = "hero", defaultValue = "" }) {
         </span>
         <input
           type="search"
+          name="q"
           placeholder="e.g. ICT3214 or Database Systems"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
