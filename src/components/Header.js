@@ -13,7 +13,8 @@ const navLinks = MAIN_NAV_LINKS;
 
 function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
-  if (href === "/search") return pathname === "/search" || pathname.startsWith("/paper/");
+  if (href === "/search")
+    return pathname === "/search" || pathname.startsWith("/paper/");
   return pathname === href;
 }
 
@@ -49,7 +50,11 @@ export default function Header() {
       </a>
       <header className="site-header" id="main-header">
         <div className="container site-header-inner">
-          <Link href="/" className="brand" aria-label="ARICT Past Paper Portal home">
+          <Link
+            href="/"
+            className="brand"
+            aria-label="ARICT Past Paper Portal home"
+          >
             <span className="brand-logo-wrap">
               <Image
                 src="/logo.png"
@@ -80,7 +85,9 @@ export default function Header() {
               <Link
                 key={link.label}
                 href={link.href}
-                aria-current={isActive(pathname, link.href) ? "page" : undefined}
+                aria-current={
+                  isActive(pathname, link.href) ? "page" : undefined
+                }
               >
                 {link.label}
               </Link>
@@ -178,7 +185,11 @@ export default function Header() {
         </nav>
 
         <div className="mobile-menu-actions">
-          <button type="button" className="btn btn-primary btn-lg btn-block" onClick={openRequestModal}>
+          <button
+            type="button"
+            className="btn btn-primary btn-lg btn-block"
+            onClick={openRequestModal}
+          >
             <span className="material-symbols-outlined" aria-hidden="true">
               note_add
             </span>
@@ -187,7 +198,10 @@ export default function Header() {
         </div>
       </div>
 
-      <RequestPaperModal open={requestOpen} onClose={() => setRequestOpen(false)} />
+      <RequestPaperModal
+        open={requestOpen}
+        onClose={() => setRequestOpen(false)}
+      />
     </>
   );
 }

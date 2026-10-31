@@ -21,6 +21,7 @@ const PREFIX_FIXES = { LCT: "ICT", TCT: "ICT" };
 const RAW_NAME_FIXES = [
   [/^CT1 402\b/, "ICT 1402"],
   [/^B0T\b/, "BOT"],
+  [/^MAT_MAA\b/, "MAT"],
   [/^([A-Za-z]{2,4}) - (?=\d{4}\b)/, "$1 "],
 ];
 const TITLE_FIXES = [

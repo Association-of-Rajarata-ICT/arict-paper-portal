@@ -4,6 +4,7 @@
  * The site lists papers from the database, so a file only shows once it has a row there.
  *
  *   node scripts/sync-drive-papers.mjs "Physical Sciences" [--dry-run]
+ *   node scripts/sync-drive-papers.mjs --all [--dry-run]     every department folder under the Drive root
  *
  * Expected Drive layout under GOOGLE_DRIVE_ROOT_FOLDER_ID:
  *   <Department>/Year N/<Semester folder>/<YYYY Mon-Mon>/<CODE NNNN - TITLE>.pdf
@@ -28,10 +29,11 @@ function loadEnvFile(file = ".env.local") {
   }
 }
 
-const department = process.argv[2];
 const dryRun = process.argv.includes("--dry-run");
-if (!department || department.startsWith("--")) {
-  console.log('Usage: node scripts/sync-drive-papers.mjs "<Department folder name>" [--dry-run]');
+const syncAll = process.argv.includes("--all");
+const department = process.argv[2];
+if (!syncAll && (!department || department.startsWith("--"))) {
+  console.log('Usage: node scripts/sync-drive-papers.mjs "<Department folder name>" | --all  [--dry-run]');
   process.exit(1);
 }
 
@@ -74,69 +76,83 @@ async function crawl(folderId, prefix, out) {
 const normalizeKey = (p) =>
   [p.code, p.period, p.year, p.semester, p.department].map((v) => String(v ?? "").toLowerCase().replace(/\s+/g, "")).join("|");
 
-const root = (await listChildren(process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID)).find(
-  (f) => f.mimeType === FOLDER_MIME && f.name.trim().toLowerCase() === department.trim().toLowerCase()
-);
-if (!root) {
+const db = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+const rootFolders = (await listChildren(process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID)).filter((f) => f.mimeType === FOLDER_MIME);
+const targets = syncAll
+  ? rootFolders
+  : rootFolders.filter((f) => f.name.trim().toLowerCase() === department.trim().toLowerCase());
+if (!targets.length) {
   console.error(`No "${department}" folder under the Drive root.`);
   process.exit(1);
 }
 
-console.log(`Scanning Drive folder "${root.name}" ...`);
-const found = [];
-await crawl(root.id, "", found);
-console.log(`${found.length} PDFs found.`);
+async function syncDepartment(root) {
 
-const idByPath = new Map(found.map((f) => [f.relative, f.id]));
-const deptName = department.trim();
-const rows = buildRows(found.map((f) => f.relative), deptName);
+  console.log(`
+== Scanning Drive folder "${root.name}" ...`);
+  const found = [];
+  await crawl(root.id, "", found);
+  console.log(`${found.length} PDFs found.`);
 
-const db = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
-const { rows: existing } = await db.query(`SELECT subject_code, exam_period, year, semester, department, drive_file_id FROM papers WHERE department = $1`, [deptName]);
-const knownFileIds = new Set(existing.map((r) => r.drive_file_id));
-const knownKeys = new Set(existing.map((r) => normalizeKey({ code: r.subject_code, period: r.exam_period, year: r.year, semester: r.semester, department: r.department })));
+  const idByPath = new Map(found.map((f) => [f.relative, f.id]));
+  const deptName = root.name.trim();
+  const rows = buildRows(found.map((f) => f.relative), deptName);
 
-const stats = { added: 0, alreadyThere: 0, skipped: 0, failed: 0 };
-for (const row of rows) {
-  const fileId = idByPath.get(row.file);
-  const missing = ["subjectCode", "subjectName", "examPeriod", "year", "semester"].filter((k) => !row[k]);
-  if (missing.length) {
-    stats.skipped++;
-    console.warn(`skip ${row.file}: could not read ${missing.join(", ")}`);
-    continue;
+  const { rows: existing } = await db.query(`SELECT subject_code, exam_period, year, semester, department, drive_file_id FROM papers WHERE department = $1`, [deptName]);
+  const knownFileIds = new Set(existing.map((r) => r.drive_file_id));
+  // Same code + session is only a duplicate when the existing row came from somewhere else (e.g. the bulk
+  // uploader). Several PDFs inside this Drive folder can legitimately share it (Part I / Part II, rescans).
+  const driveIds = new Set(found.map((f) => f.id));
+  const knownKeys = new Set(existing.filter((r) => !driveIds.has(r.drive_file_id)).map((r) => normalizeKey({ code: r.subject_code, period: r.exam_period, year: r.year, semester: r.semester, department: r.department })));
+
+  const stats = { added: 0, alreadyThere: 0, skipped: 0, failed: 0 };
+  for (const row of rows) {
+    const fileId = idByPath.get(row.file);
+    if (knownFileIds.has(fileId)) {
+      stats.alreadyThere++;
+      continue;
+    }
+    const missing = ["subjectCode", "subjectName", "examPeriod", "year", "semester"].filter((k) => !row[k]);
+    if (missing.length) {
+      stats.skipped++;
+      console.warn(`skip ${row.file}: could not read ${missing.join(", ")}`);
+      continue;
+    }
+    const key = normalizeKey({ code: row.subjectCode, period: row.examPeriod, year: row.year, semester: row.semester, department: row.department });
+    if (knownFileIds.has(fileId) || knownKeys.has(key)) {
+      stats.alreadyThere++;
+      continue;
+    }
+    if (dryRun) {
+      stats.added++;
+      console.log(`would add ${row.subjectCode} · ${row.examPeriod} · Y${row.year}S${row.semester} — ${row.subjectName}`);
+      continue;
+    }
+    try {
+      // Anyone-with-link so the portal's preview/download works for visitors.
+      await drive.permissions.create({ fileId, requestBody: { type: "anyone", role: "reader" } });
+      await db.query(
+        `INSERT INTO papers (id, subject_code, subject_name, instructor, department, year, semester, exam_period,
+                             drive_file_id, drive_link, drive_preview_link, drive_folder_path)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        [
+          randomUUID(), row.subjectCode, row.subjectName, "", row.department, Number(row.year), Number(row.semester), row.examPeriod,
+          fileId, `https://drive.google.com/file/d/${fileId}/view`, `https://drive.google.com/file/d/${fileId}/preview`,
+          [row.department, `Year ${row.year}`, `Semester ${row.semester}`].join(" / "),
+        ]
+      );
+      knownFileIds.add(fileId);
+      stats.added++;
+      if (stats.added % 25 === 0) console.log(`  ${stats.added} added ...`);
+    } catch (error) {
+      stats.failed++;
+      console.error(`fail ${row.file}: ${error.message}`);
+    }
   }
-  const key = normalizeKey({ code: row.subjectCode, period: row.examPeriod, year: row.year, semester: row.semester, department: row.department });
-  if (knownFileIds.has(fileId) || knownKeys.has(key)) {
-    stats.alreadyThere++;
-    continue;
-  }
-  if (dryRun) {
-    stats.added++;
-    console.log(`would add ${row.subjectCode} · ${row.examPeriod} · Y${row.year}S${row.semester} — ${row.subjectName}`);
-    continue;
-  }
-  try {
-    // Anyone-with-link so the portal's preview/download works for visitors.
-    await drive.permissions.create({ fileId, requestBody: { type: "anyone", role: "reader" } });
-    await db.query(
-      `INSERT INTO papers (id, subject_code, subject_name, instructor, department, year, semester, exam_period,
-                           drive_file_id, drive_link, drive_preview_link, drive_folder_path)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
-      [
-        randomUUID(), row.subjectCode, row.subjectName, "", row.department, Number(row.year), Number(row.semester), row.examPeriod,
-        fileId, `https://drive.google.com/file/d/${fileId}/view`, `https://drive.google.com/file/d/${fileId}/preview`,
-        [row.department, `Year ${row.year}`, `Semester ${row.semester}`].join(" / "),
-      ]
-    );
-    knownFileIds.add(fileId);
-    knownKeys.add(key);
-    stats.added++;
-    if (stats.added % 25 === 0) console.log(`  ${stats.added} added ...`);
-  } catch (error) {
-    stats.failed++;
-    console.error(`fail ${row.file}: ${error.message}`);
-  }
+
+  console.log(`${dryRun ? "[dry run] " : ""}${root.name.trim()} done: ${stats.added} ${dryRun ? "to add" : "added"}, ${stats.alreadyThere} already in portal, ${stats.skipped} skipped, ${stats.failed} failed`);
 }
 
+for (const root of targets) await syncDepartment(root);
+
 await db.end();
-console.log(`${dryRun ? "[dry run] " : ""}done: ${stats.added} ${dryRun ? "to add" : "added"}, ${stats.alreadyThere} already in portal, ${stats.skipped} skipped, ${stats.failed} failed`);
