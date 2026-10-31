@@ -1,0 +1,29 @@
+# ARICT Past Paper Portal
+
+> A student-run archive of past examination papers for the Faculty of Applied Sciences at Rajarata University of Sri Lanka, maintained by the Association of Rajarata Information & Communication Technology (ARICT).
+
+Canonical website: https://papers.arict.lk/
+
+Students can search by subject code or subject name, filter by department, academic year and semester, preview available papers, download PDFs, and share paper links. A student account is not required. The portal also provides a form to request missing papers.
+
+The five departments are Biological Sciences, Chemical Sciences, Computing, Health Promotion, and Physical Sciences. Academic year means the student's year of study (Years 1–4); examination period identifies the exam session. Availability varies by subject and examination period. Refer to the current paper pages for titles, course codes, examination periods and download links; this file does not contain the paper catalogue or PDF contents.
+
+ARICT volunteers collect and organise these resources for study. The portal is not an official university examination notice service. Past papers do not predict future exams; students should confirm the current syllabus and examination format with their department. Paper requests do not guarantee availability.
+
+For contributions, corrections and general enquiries, contact arict@as.rjt.ac.lk. Include the paper link or subject code where relevant. Papers are provided for personal, non-commercial study; consult the Terms of Use for details.
+
+## Main pages
+
+- [Home](https://papers.arict.lk/): Portal overview, search, department browsing and examination periods.
+- [Past papers](https://papers.arict.lk/search): Search the available archive and open individual paper pages for metadata, PDF previews and downloads.
+- [Faculty of Applied Sciences](https://papers.arict.lk/faculty): The five departments and links to their available papers.
+- [About ARICT](https://papers.arict.lk/about): The student association, the archive's purpose and community contributions.
+- [Help Center](https://papers.arict.lk/help): How to find, preview, download and share papers, request missing papers and report errors.
+- [Contact ARICT](https://papers.arict.lk/contact): Contact details, paper contributions, corrections and ARICT social profiles.
+
+## Optional
+
+- [XML sitemap](https://papers.arict.lk/sitemap.xml): Canonical public page URLs and available paper URLs, generated from the archive. During a database outage, only the main pages may be listed.
+- [Privacy Policy](https://papers.arict.lk/privacy): Handling of paper request details, browser preferences and third-party services.
+- [Terms of Use](https://papers.arict.lk/terms): Personal study use, acceptable use, contributions and corrections.
+- [Robots.txt](https://papers.arict.lk/robots.txt): Public crawler directives and the sitemap location.

@@ -3,6 +3,7 @@ import { getPublicPapers } from "@/lib/server/publicPapers";
 
 export const dynamic = "force-dynamic";
 
+// Next.js serves this metadata route as /sitemap.xml; no public/sitemap.xml is needed.
 export default async function sitemap() {
   const pages = Object.keys(PUBLIC_PAGES).map((path) => ({ url: new URL(path, SITE_URL).href }));
   try {
