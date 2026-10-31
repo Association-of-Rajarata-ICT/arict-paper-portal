@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@vercel/analytics": "^2.0.1",
     "googleapis": "^172.0.0",
     "lucide-react": "^0.474.0",
     "next": "16.2.6",
