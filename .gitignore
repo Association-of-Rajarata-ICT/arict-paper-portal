@@ -47,3 +47,7 @@ next-env.d.ts
 
 # Bulk upload manifest + log (scripts/bulk-upload-papers.mjs)
 /bulk-upload
+
+# Promotional video sources, assets, and renders
+/promo/
+content/*

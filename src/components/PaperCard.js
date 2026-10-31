@@ -4,7 +4,7 @@ import { getDownloadUrl, getPaperRouteId } from "@/lib/papers";
 
 export default function PaperCard({ paper, compact = false }) {
   const encodedId = encodeURIComponent(getPaperRouteId(paper));
-  const paperUrl = `/paper/${encodedId}?dept=${encodeURIComponent(paper.departmentFull || paper.department || "")}`;
+  const paperUrl = `/paper/${encodedId}`;
   const instructorName = paper.instructor && paper.instructor.trim() ? paper.instructor.trim() : "";
   const downloadUrl = getDownloadUrl(paper.driveLink || "");
   const titleId = `paper-card-title-${paper.id}`;

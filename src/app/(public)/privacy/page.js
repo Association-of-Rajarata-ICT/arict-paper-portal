@@ -1,11 +1,8 @@
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { ARICT_OFFICIAL_EMAIL } from "@/lib/constants";
 
-export const metadata = {
-  title: "Privacy Policy | ARICT Past Paper Portal",
-  description:
-    "What information the ARICT Past Paper Portal collects, how it is used and how to contact us about it.",
-};
+export const metadata = pageMetadata("/privacy");
 
 const sections = [
   {

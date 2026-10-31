@@ -1,8 +1,7 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { ARICT_SOCIAL_LINKS } from "@/lib/constants";
+import { MAIN_NAV_LINKS } from "@/lib/seo";
 import { Linkedin, Facebook, Github, Instagram } from "lucide-react";
 
 const SOCIAL_LINKS = [
@@ -59,7 +58,8 @@ export default function Footer() {
               </span>
             </Link>
             <p className="footer-text">
-              Crafting digital experiences that move people forward.
+              ARICT Past Paper Portal. A student-run examination paper archive
+              for Rajarata University of Sri Lanka.
             </p>
             <div className="footer-social">
               {SOCIAL_LINKS.map(({ href, label, className, Icon }) => (
@@ -97,12 +97,10 @@ export default function Footer() {
               </div>
             </div>
             <div className="footer-column">
-              <span className="footer-column-title">Support</span>
-              <div className="footer-column-links">
-                <Link href="/help">Help Center</Link>
-                <Link href="/contact">Contact</Link>
-                <Link href="/about">About ARICT</Link>
-              </div>
+              <span className="footer-column-title">Explore the portal</span>
+              <nav className="footer-column-links" aria-label="Footer">
+                {MAIN_NAV_LINKS.map(({ href, label }) => <Link key={href} href={href}>{label}</Link>)}
+              </nav>
             </div>
           </div>
         </div>

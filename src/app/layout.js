@@ -1,5 +1,6 @@
 import { Archivo, Martian_Mono } from "next/font/google";
 import "./globals.css";
+import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -16,24 +17,19 @@ const martianMono = Martian_Mono({
 });
 
 export const metadata = {
-  title: "ARICT Past Paper Portal",
-  description:
-    "Search past examination papers for ARICT students, organized by department, course code, academic year and semester. Association of Rajarata Information & Communication Technology.",
-  keywords: [
-    "ARICT",
-    "past papers",
-    "examination",
-    "university",
-    "Rajarata",
-    "ICT",
-    "computer science",
-  ],
-  openGraph: {
-    title: "ARICT Past Paper Portal",
-    description:
-      "Search past examination papers organized by department, course code, academic year and semester.",
-    type: "website",
+  ...pageMetadata("/"),
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  icons: {
+    icon: [
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export const viewport = {

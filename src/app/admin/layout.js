@@ -1,42 +1,12 @@
-"use client";
+import AdminShell from "./AdminShell";
+import { pageMetadata } from "@/lib/seo";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import ThemeToggle from "@/components/ThemeToggle";
+export const metadata = pageMetadata("/admin", {
+  title: "Admin",
+  description: "Sign in to the ARICT administration area to maintain the Rajarata University past paper archive, update paper details and manage contributions.",
+  noIndex: true,
+});
 
 export default function AdminLayout({ children }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
-
-  if (pathname === "/admin/login") return children;
-
-  return (
-    <div className="admin-shell">
-      <AdminSidebar
-        mobileOpen={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-      />
-      <div className="admin-main">
-        <header className="admin-topbar">
-          <button
-            type="button"
-            className="admin-topbar-menu"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open admin menu"
-          >
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-          <div className="admin-topbar-meta">
-            <span className="admin-topbar-title">ARICT Admin</span>
-            <span className="admin-topbar-subtitle">Past Paper Portal</span>
-          </div>
-          <div className="admin-topbar-actions">
-            <ThemeToggle />
-          </div>
-        </header>
-        <div className="admin-content">{children}</div>
-      </div>
-    </div>
-  );
+  return <AdminShell>{children}</AdminShell>;
 }

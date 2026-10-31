@@ -1,14 +1,12 @@
+import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
 import { getAboutStats } from "@/lib/server/aboutStats";
 import RequestPaperButton from "@/components/RequestPaperButton";
 
 // Always read fresh stats from Neon (admin updates must show without redeploy)
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "About Us | ARICT Past Paper Portal",
-  description:
-    "Learn about the Association of Rajarata Information & Communication Technology (ARICT) and our mission to provide academic resources.",
-};
+export const metadata = pageMetadata("/about");
 
 const features = [
   {
@@ -24,12 +22,12 @@ const features = [
   {
     title: "Community Driven",
     description:
-      "ARICT brings together students, faculty, and industry partners to build a vibrant ICT community. Our portal is maintained by dedicated volunteers and faculty members who believe in open access to educational resources.",
+      "The portal is maintained by ARICT volunteers. Students, staff and alumni can help grow the archive by sharing past papers and reporting missing or incorrect details.",
   },
   {
-    title: "Quality Assured",
+    title: "Help Improve the Archive",
     description:
-      "Every paper in our archive undergoes verification to ensure accuracy and completeness. We work closely with university departments to maintain an up-to-date repository that reflects the current curriculum and examination standards.",
+      "Papers are organised by subject, department, academic year and semester. If you notice a wrong title, examination period or file, contact ARICT with the paper link so the team can review it.",
   },
 ];
 
@@ -78,6 +76,10 @@ export default async function AboutPage() {
           ))}
         </div>
 
+        <p className="legal-note">
+          <Link href="/search">Explore the past paper archive</Link> or{" "}
+          <Link href="/contact">contact ARICT to contribute papers or corrections</Link>.
+        </p>
         <div className="about-cta">
           <div>
             <h2>Missing a past paper?</h2>
