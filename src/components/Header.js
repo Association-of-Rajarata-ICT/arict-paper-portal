@@ -9,7 +9,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { REQUEST_PAPER_EVENT } from "@/lib/requestPaper";
 import { MAIN_NAV_LINKS } from "@/lib/seo";
 
-const navLinks = MAIN_NAV_LINKS;
+// "About ARICT" lives in the footer only.
+const navLinks = MAIN_NAV_LINKS.filter(({ href }) => href !== "/about");
 
 function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
