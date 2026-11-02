@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Request a missing examination paper
+    url: https://papers.arict.lk/
+    about: Use Request a paper on the portal, or email arict@as.rjt.ac.lk if the form is unavailable.
+  - name: Report a security vulnerability privately
+    url: https://github.com/Association-of-Rajarata-ICT/arict-paper-portal/blob/master/SECURITY.md
+    about: Follow the security policy instead of opening a public issue.
+  - name: Report sensitive content or misconduct privately
+    url: https://github.com/Association-of-Rajarata-ICT/arict-paper-portal/blob/master/CONTENT_REPORTING.md
+    about: Find the private contact route for privacy, copyright, harmful content and conduct concerns.

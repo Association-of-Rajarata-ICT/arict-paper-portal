@@ -19,6 +19,8 @@ We are committed to a welcoming and respectful community. By participating in th
 
 If you experience or witness unacceptable behavior, contact the maintainers at:
 
-- contact@arict-portal.example
+- [arict@as.rjt.ac.lk](mailto:arict@as.rjt.ac.lk)
 
 All reports will be reviewed and handled with care.
+
+See [Content Reporting](./CONTENT_REPORTING.md) for private reporting guidance and GitHub's repository-admin reporting option. Avoid sharing sensitive details in a public issue.

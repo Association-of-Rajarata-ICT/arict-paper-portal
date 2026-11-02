@@ -1,0 +1,45 @@
+name: Accessibility barrier
+description: Report difficulty using the portal with a keyboard, assistive technology or another access need.
+title: "[Accessibility]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A short description is enough to start. You do not need to identify a WCAG criterion or disclose a disability or diagnosis.
+        This issue will be public. If the form is difficult to use or you prefer a private report, email **arict@as.rjt.ac.lk**.
+        Read our [accessibility guidance](https://github.com/Association-of-Rajarata-ICT/arict-paper-portal/blob/master/ACCESSIBILITY.md).
+  - type: textarea
+    id: barrier
+    attributes:
+      label: What were you trying to do, and what got in the way?
+      placeholder: "Example: I could open the paper request form, but could not reach its fields using the keyboard."
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page URL or paper reference
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to encounter the barrier
+      description: Include the result you expected, if helpful.
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, device and assistive technology
+      description: Optional. Include versions if known; it is fine to leave this blank.
+  - type: dropdown
+    id: impact
+    attributes:
+      label: How does this affect your task?
+      options:
+        - "I cannot complete the task"
+        - "I can complete it with difficulty or a workaround"
+        - "It is inconvenient or inconsistent"
+        - "I am not sure"
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else that would help?
+      description: Optional workaround, screenshot or recording. Remove personal details before posting.

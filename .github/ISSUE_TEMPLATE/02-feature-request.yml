@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an improvement that helps students or volunteers use the portal.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe a useful outcome for students or ARICT volunteers. A technical solution is not required.
+        To request an examination paper, use **Request a paper** on https://papers.arict.lk/ instead.
+  - type: textarea
+    id: need
+    attributes:
+      label: What would you like to improve?
+      description: Explain who encounters the problem and what they are trying to do.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested change
+      description: Describe the behaviour you would find helpful, if you have a solution in mind.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Current workaround or alternatives
+  - type: textarea
+    id: context
+    attributes:
+      label: Examples or additional context
+      description: Include relevant public links or sketches. Do not share private student information.

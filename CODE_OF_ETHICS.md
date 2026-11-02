@@ -14,4 +14,6 @@ This project supports academic integrity and responsible use of educational mate
 
 If you see content or behavior that violates these principles, notify the maintainers:
 
-- contact@arict-portal.example
+- [arict@as.rjt.ac.lk](mailto:arict@as.rjt.ac.lk)
+
+Follow [Content Reporting](./CONTENT_REPORTING.md) for privacy, copyright or harmful-content concerns, and [Accessibility](./ACCESSIBILITY.md) for barriers to using the portal.
