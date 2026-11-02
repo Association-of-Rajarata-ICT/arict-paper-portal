@@ -1,0 +1,109 @@
+<!-- Paste this entire file into the EmailJS "Past paper request" template's HTML code editor.
+     Subject: Past paper request: {{subject_code}} – {{subject_name}}
+     To: {{to_email}}   Reply To: {{reply_to}}   From name: {{from_name}} -->
+<div lang="en" dir="ltr" style="margin: 0; padding: 0; background-color: #f7f7f7; color: #0b0b0b; font-family: Arial, Helvetica, sans-serif; -webkit-text-size-adjust: 100%;">
+  <div style="display: none; font-size: 1px; line-height: 1px; color: #f7f7f7; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all;">{{student_name}} is asking for {{subject_code}} – {{subject_name}} ({{exam_year}})</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f7f7f7" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 32px 12px;">
+        <!--[if mso]>
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td>
+        <![endif]-->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width: 100%; max-width: 600px; table-layout: fixed; border: 1px solid #eaeaea; border-collapse: separate; border-spacing: 0; border-radius: 12px;">
+          <tr>
+            <td height="5" bgcolor="#a00000" style="height: 5px; font-size: 0; line-height: 0; border-radius: 12px 12px 0 0;">&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="padding: 32px 28px 24px; border-bottom: 1px solid #eaeaea;">
+              <a href="https://papers.arict.lk" style="color: #0b0b0b; text-decoration: none;">
+                <img src="https://arict.lk/brand/arict-wordmark.png" width="178" height="32" alt="ARICT" border="0" style="display: block; width: 178px; height: 32px; max-width: 100%; color: #0b0b0b; font-size: 28px; font-weight: bold;">
+              </a>
+              <p style="margin: 12px 0 0; color: #6b7280; font-size: 12px; line-height: 18px;">Past Paper Portal &middot; Rajarata University of Sri Lanka</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 28px 0;">
+              <p style="margin: 0 0 12px; color: #a00000; font-size: 11px; line-height: 16px; font-weight: bold; letter-spacing: 2px;">PAST PAPER REQUEST</p>
+              <h1 style="margin: 0; color: #0b0b0b; font-size: 28px; line-height: 36px; font-weight: bold; letter-spacing: -0.6px;">A student needs a past paper.</h1>
+              <p style="margin: 12px 0 24px; color: #6b7280; font-size: 15px; line-height: 24px; overflow-wrap: anywhere; word-break: break-word;"><strong style="color: #0b0b0b;">{{student_name}}</strong> couldn&rsquo;t find this paper in the archive and asked ARICT for it.</p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#fbeeee" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 16px 20px; border-left: 3px solid #a00000; overflow-wrap: anywhere; word-break: break-word;">
+                    <p style="margin: 0 0 6px; color: #a00000; font-size: 10px; line-height: 16px; font-weight: bold; letter-spacing: 1.6px;">REQUESTED PAPER</p>
+                    <p style="margin: 0; color: #0b0b0b; font-size: 18px; line-height: 26px; font-weight: bold;">{{subject_code}}</p>
+                    <p style="margin: 2px 0 0; color: #1c1c1c; font-size: 15px; line-height: 22px;">{{subject_name}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px; line-height: 22px;">
+                <tr>
+                  <td width="128" valign="top" style="width: 128px; padding: 0 12px 10px 0; color: #6b7280;">Department</td>
+                  <td valign="top" style="padding: 0 0 10px; color: #0b0b0b; font-weight: bold; overflow-wrap: anywhere; word-break: break-word;">{{department}}</td>
+                </tr>
+                <tr>
+                  <td width="128" valign="top" style="width: 128px; padding: 0 12px 10px 0; color: #6b7280;">Exam period</td>
+                  <td valign="top" style="padding: 0 0 10px; color: #0b0b0b; font-weight: bold; overflow-wrap: anywhere; word-break: break-word;">{{exam_year}}</td>
+                </tr>
+                <tr>
+                  <td width="128" valign="top" style="width: 128px; padding: 0 12px 10px 0; color: #6b7280;">Student</td>
+                  <td valign="top" style="padding: 0 0 10px; color: #0b0b0b; overflow-wrap: anywhere; word-break: break-word;">{{student_name}}</td>
+                </tr>
+                <tr>
+                  <td width="128" valign="top" style="width: 128px; padding: 0 12px 0 0; color: #6b7280;">Email</td>
+                  <td valign="top" style="padding: 0; overflow-wrap: anywhere; word-break: break-word;"><a href="mailto:{{student_email}}" style="color: #a00000; text-decoration: underline;">{{student_email}}</a></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 28px;">
+              <p style="margin: 0 0 10px; color: #6b7280; font-size: 10px; line-height: 16px; font-weight: bold; letter-spacing: 1.6px;">ADDITIONAL DETAILS</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f7f7f7" style="width: 100%; table-layout: fixed; border: 1px solid #eaeaea; border-collapse: separate; border-spacing: 0; border-radius: 8px;">
+                <tr>
+                  <td style="padding: 20px; color: #1c1c1c; font-size: 15px; line-height: 26px; overflow-wrap: anywhere; word-break: break-word;"><div style="margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;">{{message}}</div></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 28px 28px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: separate; border-spacing: 0;">
+                <tr>
+                  <td align="center" bgcolor="#a00000" style="padding: 14px 24px; border-radius: 6px; mso-padding-alt: 14px 24px;">
+                    <a href="mailto:{{reply_to}}" style="display: inline-block; color: #ffffff; font-size: 14px; line-height: 20px; font-weight: bold; text-decoration: none;">Reply to student &rarr;</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 12px 0 0; color: #6b7280; font-size: 12px; line-height: 20px;">Found the paper? <a href="https://papers.arict.lk/admin/add-paper" style="color: #a00000; text-decoration: underline;">Add it to the archive</a>, then let the student know.</p>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#fafafa" style="padding: 20px 28px; border-top: 1px solid #eaeaea; border-radius: 0 0 12px 12px;">
+              <p style="margin: 0 0 4px; color: #6b7280; font-size: 11px; line-height: 18px; font-weight: bold;">Source</p>
+              <p style="margin: 0; color: #374151; font-size: 12px; line-height: 20px; overflow-wrap: anywhere; word-break: break-word;">Request a Paper form &middot; papers.arict.lk</p>
+            </td>
+          </tr>
+        </table>
+        <!--[if mso]>
+        </td></tr></table>
+        <![endif]-->
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 600px; border-collapse: collapse;">
+          <tr>
+            <td align="center" style="padding: 20px 20px 0; color: #6b7280; font-size: 11px; line-height: 18px;">
+              <p style="margin: 0 0 4px; font-weight: bold;">ARICT &middot; Learn. Build. Lead.</p>
+              <p style="margin: 0;">Association of Rajarata Information &amp; Communication Technology</p>
+              <p style="margin: 8px 0 0;"><a href="https://papers.arict.lk" style="color: #a00000; text-decoration: underline;">papers.arict.lk</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>

@@ -7,17 +7,16 @@ const config = {
   publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "",
   requestTemplateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "",
   submissionTemplateId: process.env.NEXT_PUBLIC_EMAILJS_SUBMISSION_TEMPLATE_ID || "",
+  // Optional second EmailJS account for submission alerts (the free plan allows 2 templates and
+  // 200 emails a month per account). Falls back to the main account's service and key.
+  submissionServiceId: process.env.NEXT_PUBLIC_EMAILJS_SUBMISSION_SERVICE_ID || "",
+  submissionPublicKey: process.env.NEXT_PUBLIC_EMAILJS_SUBMISSION_PUBLIC_KEY || "",
 };
 
 export const isEmailConfigured = Boolean(config.serviceId && config.publicKey && config.requestTemplateId);
 
-function send(templateId, params) {
-  return emailjs.send(
-    config.serviceId,
-    templateId,
-    { to_email: ARICT_OFFICIAL_EMAIL, ...params },
-    { publicKey: config.publicKey }
-  );
+function send(templateId, params, { serviceId = config.serviceId, publicKey = config.publicKey } = {}) {
+  return emailjs.send(serviceId, templateId, { to_email: ARICT_OFFICIAL_EMAIL, ...params }, { publicKey });
 }
 
 export function sendPaperRequestEmail(params) {
@@ -44,6 +43,9 @@ export function sendSubmissionEmail(submission) {
       file_name: submission.fileName,
       notes: submission.notes || "No notes.",
       review_link: reviewLink,
+    }, {
+      serviceId: config.submissionServiceId || config.serviceId,
+      publicKey: config.submissionPublicKey || config.publicKey,
     });
   }
 
