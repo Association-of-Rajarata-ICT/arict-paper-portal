@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a problem with the portal's search, previews, downloads or other features.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us what prevented you from using the portal. This issue will be public.
+        Report security vulnerabilities privately using [SECURITY.md](https://github.com/Association-of-Rajarata-ICT/arict-paper-portal/blob/master/SECURITY.md).
+        Remove passwords, tokens, student details and other private information from examples and screenshots.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the task you were trying to complete and the problem you encountered.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How can we reproduce it?
+      placeholder: |
+        1. Open ...
+        2. Search for or select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+  - type: input
+    id: page
+    attributes:
+      label: Page URL or subject code
+      description: Include the affected public page or paper, if relevant.
+  - type: input
+    id: environment
+    attributes:
+      label: Device and browser
+      placeholder: "Example: Android phone, Chrome; Windows laptop, Firefox"
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Additional details
+      description: Optional screenshots, error text or a workaround. Share only information safe to make public.

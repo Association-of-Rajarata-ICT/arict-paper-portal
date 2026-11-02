@@ -30,13 +30,13 @@ No additional image files are required for this change.
 | Repository file | Public URL | Dimensions |
 | --- | --- | --- |
 | public/og-image.png | /og-image.png | 1200 × 630 |
-| public/favicon-48x48.png | /favicon-48x48.png | 48 × 48 |
-| public/favicon-192x192.png | /favicon-192x192.png | 192 × 192 |
-| public/apple-touch-icon.png | /apple-touch-icon.png | 180 × 180 |
+| public/icon-192.png | /icon-192.png | 192 × 192 |
+| public/icon-512.png | /icon-512.png | 512 × 512 |
+| public/icon-maskable-512.png | /icon-maskable-512.png | 512 × 512 |
 | src/app/favicon.ico | /favicon.ico | ICO containing 16, 32 and 48 px images |
 | public/logo.png | /logo.png | Existing organization logo |
 
-The icons adapt the existing ARICT wordmark into a square without changing its letter shapes. Regenerate them with `node scripts/generate-icons.mjs`. Root-layout metadata adds the icon links to every page. Keep these URLs stable and crawlable; see [Google's favicon guidance](https://developers.google.com/search/docs/appearance/favicon-in-search).
+The icons adapt the existing ARICT wordmark into a square without changing its letter shapes. Root-layout metadata adds the icon links to every page, including the maskable icon for installable contexts. Keep these URLs stable and crawlable; see [Google's favicon guidance](https://developers.google.com/search/docs/appearance/favicon-in-search).
 
 The sharing image was created with the built-in imagegen tool, then resized to 1200 × 630 and saved inside this repository. Exact generation prompt:
 

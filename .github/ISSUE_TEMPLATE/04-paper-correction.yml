@@ -1,0 +1,41 @@
+name: Paper correction
+description: Report incorrect paper details, a broken download or an unreadable file.
+title: "[Paper]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for non-sensitive corrections to papers already in the archive.
+        For copyright, privacy, harmful content or misconduct concerns, follow the private route in [CONTENT_REPORTING.md](https://github.com/Association-of-Rajarata-ICT/arict-paper-portal/blob/master/CONTENT_REPORTING.md).
+        To request a missing paper, use **Request a paper** on https://papers.arict.lk/.
+  - type: input
+    id: reference
+    attributes:
+      label: Paper link or subject code and examination period
+      description: Help us identify the correct record.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: What needs attention?
+      options:
+        - "Incorrect title, subject code, department, year or semester"
+        - "Incorrect examination period"
+        - "Wrong PDF attached"
+        - "Broken preview or download"
+        - "Unreadable or incomplete paper"
+        - "Another correction"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Describe the problem
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Suggested correction or supporting reference
+      description: Optional. Link to a public source where possible; do not upload material you lack permission to share.

@@ -660,6 +660,10 @@ Ensure Google Drive root folder and OAuth token belong to an account with suffic
 | [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) | Community standards |
 | [CODE_OF_ETHICS.md](./CODE_OF_ETHICS.md) | Project ethics |
 | [SECURITY.md](./SECURITY.md) | Reporting vulnerabilities |
+| [ACCESSIBILITY.md](./ACCESSIBILITY.md) | Accessibility target, checks, reporting and known limitations |
+| [CONTENT_REPORTING.md](./CONTENT_REPORTING.md) | Private content reports and GitHub moderation setup |
+
+Use the [issue templates](https://github.com/Association-of-Rajarata-ICT/arict-paper-portal/issues/new/choose) for bugs, feature requests, accessibility barriers and paper corrections. Pull requests use the [PR template](./.github/pull_request_template.md). GitHub activates these templates after they are added to the repository's default branch.
 
 ---
 
