@@ -20,13 +20,13 @@ export const metadata = {
   ...pageMetadata("/"),
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
+  // The maskable icon is listed only in manifest.js; its safe-zone padding is wrong for browser tabs.
   icons: {
     icon: [
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-      { url: "/icon-maskable-512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   ...(process.env.GOOGLE_SITE_VERIFICATION
     ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
