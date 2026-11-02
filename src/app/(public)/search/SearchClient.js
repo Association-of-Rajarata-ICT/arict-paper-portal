@@ -11,6 +11,8 @@ import { departments } from "@/data/departments";
 import { filterPapers } from "@/data/papers";
 import {
   fetchAllPapers,
+  mergeSharedPapers,
+  paperDepartments,
   PAPER_SORT_OPTIONS,
   sortAcademicYears,
   sortExamPeriods,
@@ -124,18 +126,19 @@ function SearchResultsContent({ initialPapers }) {
     };
   }, [initialPapers]);
 
-  const queryResults = useMemo(() => filterPapers(papers, query), [papers, query]);
+  // One entry per shared paper, tagged with every department that offers it.
+  const mergedPapers = useMemo(() => mergeSharedPapers(papers), [papers]);
+  const queryResults = useMemo(() => filterPapers(mergedPapers, query), [mergedPapers, query]);
 
   // Applies every selected filter group except `skip`, so facet counts show
   // how many papers each option would add given the other selections.
   const applyFilters = useCallback(
     (list, skip = null) =>
       list.filter((p) => {
-        if (
-          skip !== "departments" &&
-          selectedDepartments.length > 0 &&
-          !selectedDepartments.includes(p.departmentFull || p.department)
-        ) {
+        const variants = p.variants || [p];
+        const anySelected = (selected, values) =>
+          selected.length === 0 || values.some((value) => selected.includes(value));
+        if (skip !== "departments" && !anySelected(selectedDepartments, paperDepartments(p))) {
           return false;
         }
         if (
@@ -147,16 +150,11 @@ function SearchResultsContent({ initialPapers }) {
         }
         if (
           skip !== "academicYears" &&
-          selectedAcademicYears.length > 0 &&
-          !selectedAcademicYears.includes(p.academicYear)
+          !anySelected(selectedAcademicYears, variants.map((v) => v.academicYear))
         ) {
           return false;
         }
-        if (
-          skip !== "semesters" &&
-          selectedSemesters.length > 0 &&
-          !selectedSemesters.includes(p.semester)
-        ) {
+        if (skip !== "semesters" && !anySelected(selectedSemesters, variants.map((v) => v.semester))) {
           return false;
         }
         return true;
@@ -170,18 +168,21 @@ function SearchResultsContent({ initialPapers }) {
   );
 
   const facetCounts = useMemo(() => {
-    const tally = (skip, getValue) => {
+    // getValues returns every value a (merged) paper carries; each is counted once per paper.
+    const tally = (skip, getValues) => {
       const counts = {};
       applyFilters(queryResults, skip).forEach((paper) => {
-        const value = (getValue(paper) || "").trim();
-        if (value) counts[value] = (counts[value] || 0) + 1;
+        new Set(getValues(paper).map((value) => (value || "").trim())).forEach((value) => {
+          if (value) counts[value] = (counts[value] || 0) + 1;
+        });
       });
       return counts;
     };
+    const fromVariants = (key) => (p) => (p.variants || [p]).map((v) => v[key]);
     return {
-      departments: tally("departments", (p) => p.departmentFull || p.department),
-      academicYears: tally("academicYears", (p) => p.academicYear),
-      semesters: tally("semesters", (p) => p.semester),
+      departments: tally("departments", paperDepartments),
+      academicYears: tally("academicYears", fromVariants("academicYear")),
+      semesters: tally("semesters", fromVariants("semester")),
     };
   }, [applyFilters, queryResults]);
 

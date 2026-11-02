@@ -7,13 +7,8 @@ import DepartmentCard from "@/components/DepartmentCard";
 import BrowseByExamPeriod from "@/components/BrowseByExamPeriod";
 import CodeBoxes from "@/components/CodeBoxes";
 import { departments } from "@/data/departments";
-import {
-  applyDepartmentStats,
-  fetchAllPapers,
-  getPaperRouteId,
-  sortExamPeriods,
-  sortPapersByDate,
-} from "@/lib/papers";
+import { summarizeArchive } from "@/lib/archiveSummary";
+import { fetchAllPapers, getPaperRouteId } from "@/lib/papers";
 
 function getPaperHref(paper) {
   const encodedId = encodeURIComponent(getPaperRouteId(paper));
@@ -92,41 +87,28 @@ function CoverSheet({ paper, loading }) {
   );
 }
 
-export default function Home({ initialPapers = null }) {
-  const initialPeriods = [...new Set((initialPapers || []).map((paper) => paper.examPeriod).filter(Boolean))];
-  const [departmentList, setDepartmentList] = useState(() => initialPapers ? applyDepartmentStats(departments, initialPapers) : departments);
-  const [examPeriods, setExamPeriods] = useState(() => sortExamPeriods(initialPeriods));
-  const [statsLoading, setStatsLoading] = useState(initialPapers === null);
-  const [latestPaper, setLatestPaper] = useState(() => sortPapersByDate(initialPapers || [])[0] || null);
-  const [tally, setTally] = useState(() => initialPapers ? {
-    papers: initialPapers.length,
-    subjects: new Set(initialPapers.map((paper) => paper.courseCode).filter(Boolean)).size,
-    periods: initialPeriods.length,
-  } : null);
+export default function Home({ summary = null }) {
+  const [departmentList, setDepartmentList] = useState(() => summary?.departmentList || departments);
+  const [examPeriods, setExamPeriods] = useState(() => summary?.examPeriods || []);
+  const [statsLoading, setStatsLoading] = useState(summary === null);
+  const [latestPaper, setLatestPaper] = useState(() => summary?.latestPaper || null);
+  const [tally, setTally] = useState(() => summary?.tally || null);
 
   useEffect(() => {
-    if (initialPapers !== null) return;
+    if (summary !== null) return;
     let isMounted = true;
 
     const fetchCounts = async () => {
       setStatsLoading(true);
       try {
         const papers = await fetchAllPapers();
-        const periodSet = new Set(
-          papers.map((paper) => paper.examPeriod).filter(Boolean)
-        );
-        const newest = sortPapersByDate(papers)[0];
-
         if (!isMounted) return;
 
-        setDepartmentList(applyDepartmentStats(departments, papers));
-        setExamPeriods(sortExamPeriods(Array.from(periodSet)));
-        setLatestPaper(newest && newest.createdAt ? newest : null);
-        setTally({
-          papers: papers.length,
-          subjects: new Set(papers.map((paper) => paper.courseCode).filter(Boolean)).size,
-          periods: periodSet.size,
-        });
+        const next = summarizeArchive(papers);
+        setDepartmentList(next.departmentList);
+        setExamPeriods(next.examPeriods);
+        setLatestPaper(next.latestPaper);
+        setTally(next.tally);
       } catch (error) {
         if (isMounted) {
           setDepartmentList(
@@ -152,7 +134,7 @@ export default function Home({ initialPapers = null }) {
     return () => {
       isMounted = false;
     };
-  }, [initialPapers]);
+  }, [summary]);
 
   return (
     <>
@@ -249,7 +231,7 @@ export default function Home({ initialPapers = null }) {
           </p>
           <p>
             Learn <Link href="/about">about ARICT and the archive</Link> or{" "}
-            <Link href="/contact">contact ARICT to contribute a past paper</Link>.
+            <Link href="/contribute">upload a past paper you have</Link>.
           </p>
         </div>
       </section>

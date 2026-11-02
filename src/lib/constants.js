@@ -15,4 +15,5 @@ export const ADMIN_NAV = [
   { href: "/admin", label: "Dashboard", icon: "dashboard" },
   { href: "/admin/add-paper", label: "Add Paper", icon: "add_circle" },
   { href: "/admin/papers", label: "Manage Papers", icon: "description" },
+  { href: "/admin/submissions", label: "Submissions", icon: "inbox" },
 ];

@@ -1,4 +1,5 @@
 import HomeClient from "./HomeClient";
+import { summarizeArchive } from "@/lib/archiveSummary";
 import { ARICT_SOCIAL_LINKS } from "@/lib/constants";
 import { pageMetadata, PUBLIC_PAGES, serializeJsonLd, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { getPublicPapers } from "@/lib/server/publicPapers";
@@ -7,9 +8,9 @@ export const dynamic = "force-dynamic";
 export const metadata = pageMetadata("/");
 
 export default async function HomePage() {
-  let papers = null;
+  let summary = null;
   try {
-    papers = await getPublicPapers();
+    summary = summarizeArchive(await getPublicPapers());
   } catch {
     console.error("The home page could not load the paper archive.");
   }
@@ -38,6 +39,6 @@ export default async function HomePage() {
   };
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
-    <HomeClient initialPapers={papers} />
+    <HomeClient summary={summary} />
   </>;
 }

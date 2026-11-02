@@ -15,6 +15,7 @@ const sections = [
     title: "Information you send us",
     body: [
       "When you submit the Request a paper form we receive your name, your email address, the paper details you enter (subject code, subject name, department, exam year) and any message you add. We use these only to find the paper, reply to you and see which papers are in demand.",
+      "When you upload a paper on the Contribute page we receive your name, your email address, the paper details and the PDF. The PDF stays private until the ARICT team reviews it. Your name and email are used only to contact you about the submission and are never shown on the portal. A one-way hash of your IP address is stored to limit how many uploads can be sent in a day.",
       "The form is delivered to ARICT's official mailbox through EmailJS, a third-party email service. Emails you send us directly are handled in the same mailbox.",
     ],
   },

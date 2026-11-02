@@ -33,7 +33,7 @@ const sections = [
   {
     title: "Contributions and takedowns",
     body: [
-      "If you share a paper with ARICT you confirm you are allowed to do so. If you are a rights holder and want a paper removed or corrected, email us and we will review it promptly.",
+      "If you share or upload a paper to ARICT you confirm you are allowed to do so, and that it contains no personal details such as names or index numbers. ARICT may edit its details or decline to publish it. If you are a rights holder and want a paper removed or corrected, email us and we will review it promptly.",
     ],
   },
   {

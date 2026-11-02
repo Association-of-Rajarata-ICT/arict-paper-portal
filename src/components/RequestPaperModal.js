@@ -174,7 +174,8 @@ export default function RequestPaperModal({ open, onClose }) {
         <p className="text-body-md request-modal-intro">
           Cannot find a past paper? Submit a request and the ARICT team at{" "}
           <a href={`mailto:${ARICT_OFFICIAL_EMAIL}`}>{ARICT_OFFICIAL_EMAIL}</a>{" "}
-          will review it.
+          will review it. Already have the paper?{" "}
+          <a href="/contribute">Upload it on the Contribute page</a>.
         </p>
 
         <form className="request-modal-form" onSubmit={handleSubmit}>

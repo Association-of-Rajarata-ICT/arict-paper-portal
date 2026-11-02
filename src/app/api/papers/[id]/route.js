@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { DEPARTMENT_NAMES } from "@/lib/constants";
 import { requireAdmin } from "@/lib/server/adminAuth";
-import { trashDriveFile, uploadPaperToDrive } from "@/lib/server/drive";
+import { paperFileName } from "@/lib/paperNaming.mjs";
+import { renameDriveFile, trashDriveFile, uploadPaperToDrive } from "@/lib/server/drive";
 import {
   getPaperById,
   removePaperRecord,
@@ -69,17 +70,33 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ message: "Semester must be 1 or 2." }, { status: 400 });
     }
 
+    const targetYear = year ?? existing.yearNumber;
+    const targetSemester = semester ?? existing.semesterNumber;
+    const fileName = paperFileName({
+      subjectCode: subjectCode ?? existing.courseCode,
+      subjectName: subjectName ?? existing.title,
+      examPeriod: examPeriod ?? existing.examPeriod,
+      year: targetYear,
+      semester: targetSemester,
+    });
+
     let uploadPayload = {};
+    let driveWarning = "";
     if (file && typeof file !== "string") {
-      const targetDepartment = department || existing.department;
-      const targetYear = year ?? existing.yearNumber;
-      const targetSemester = semester ?? existing.semesterNumber;
       uploadPayload = await uploadPaperToDrive({
         file,
-        department: targetDepartment,
+        department: department || existing.department,
         year: targetYear,
         semester: targetSemester,
+        fileName,
       });
+    } else if (existing.driveFileId) {
+      // Keep the download name in step with the edited details.
+      try {
+        await renameDriveFile(existing.driveFileId, fileName);
+      } catch (error) {
+        driveWarning = error?.message || "Could not rename the Drive file.";
+      }
     }
 
     const paper = await updatePaperRecord(id, {
@@ -93,7 +110,7 @@ export async function PUT(request, { params }) {
       ...uploadPayload,
     });
 
-    return NextResponse.json({ paper });
+    return NextResponse.json({ paper, ...(driveWarning ? { driveWarning } : {}) });
   } catch (error) {
     return NextResponse.json(
       { message: error?.message || "Failed to update paper." },

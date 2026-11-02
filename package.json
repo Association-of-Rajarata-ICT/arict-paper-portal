@@ -9,7 +9,9 @@
     "lint": "eslint",
     "papers:plan": "node scripts/bulk-upload-papers.mjs plan",
     "papers:upload": "node scripts/bulk-upload-papers.mjs upload",
-    "papers:purge": "node scripts/bulk-upload-papers.mjs purge"
+    "papers:purge": "node scripts/bulk-upload-papers.mjs purge",
+    "papers:sync": "node scripts/sync-drive-papers.mjs --all",
+    "papers:rename": "node scripts/rename-drive-papers.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

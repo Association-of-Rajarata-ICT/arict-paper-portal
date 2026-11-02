@@ -1,6 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import PaperDetailClient from "./PaperDetailClient";
-import { getPaperRouteId } from "@/lib/papers";
+import { getPaperRouteId, mergeSharedPapers } from "@/lib/papers";
 import { paperMetadata, pageMetadata } from "@/lib/seo";
 import { getPublicPaper, getPublicPapers } from "@/lib/server/publicPapers";
 
@@ -25,12 +25,16 @@ export default async function PaperPage({ params }) {
   if (id !== canonicalId) permanentRedirect("/paper/" + encodeURIComponent(canonicalId));
 
   let relatedPapers = [];
+  let departments = [paper.department];
   try {
-    relatedPapers = (await getPublicPapers()).filter(
-      (item) => item.department === paper.department && item.id !== paper.id
-    ).slice(0, 3);
+    const merged = mergeSharedPapers(await getPublicPapers());
+    const own = merged.find((item) => item.variants.some((variant) => variant.docId === paper.docId));
+    if (own) departments = own.departments;
+    relatedPapers = merged
+      .filter((item) => item !== own && item.departments.includes(paper.department))
+      .slice(0, 3);
   } catch {
     console.error("Related papers are temporarily unavailable.");
   }
-  return <PaperDetailClient paper={paper} relatedPapers={relatedPapers} />;
+  return <PaperDetailClient paper={{ ...paper, departments }} relatedPapers={relatedPapers} />;
 }

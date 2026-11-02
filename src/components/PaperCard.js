@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Chip from "./Chip";
-import { getDownloadUrl, getPaperRouteId } from "@/lib/papers";
+import { getDownloadUrl, getPaperRouteId, paperDepartments } from "@/lib/papers";
 
 export default function PaperCard({ paper, compact = false }) {
   const encodedId = encodeURIComponent(getPaperRouteId(paper));
@@ -31,7 +31,7 @@ export default function PaperCard({ paper, compact = false }) {
       <h3 className="paper-card-title" id={titleId}>
         <Link href={paperUrl}>{paper.title}</Link>
       </h3>
-      <p className="paper-card-dept">{paper.departmentFull || paper.department}</p>
+      <p className="paper-card-dept">{paperDepartments(paper).join(" · ")}</p>
 
       <div className="paper-card-tags">
         {paper.academicYear && <Chip>{paper.academicYear}</Chip>}

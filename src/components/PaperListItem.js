@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Chip from "./Chip";
-import { getDownloadUrl, getPaperRouteId } from "@/lib/papers";
+import { getDownloadUrl, getPaperRouteId, paperDepartments } from "@/lib/papers";
 
 export default function PaperListItem({ paper }) {
   const encodedId = encodeURIComponent(getPaperRouteId(paper));
@@ -9,7 +9,7 @@ export default function PaperListItem({ paper }) {
   const downloadUrl = getDownloadUrl(paper.driveLink || "");
 
   const meta = [
-    paper.departmentFull || paper.department,
+    paperDepartments(paper).join(" · "),
     paper.academicYear,
     paper.semester,
     paper.examPeriod,

@@ -53,7 +53,7 @@ const faqGroups = [
       },
       {
         q: "Can I contribute papers?",
-        a: "Yes. If you have a past paper that is not on the portal, get in touch through the Contact page and the team will arrange how to add it.",
+        a: "Yes. Upload the PDF on the Contribute page with the subject code, department, year, semester and exam period. The ARICT team reviews every submission before it appears in the archive.",
       },
     ],
   },

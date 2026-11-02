@@ -1,3 +1,5 @@
+import { textMatchesQuery } from "@/lib/papers";
+
 export const papers = [
   {
     id: "cs305",
@@ -205,15 +207,18 @@ export function filterPapers(sourcePapers = [], query, filters = {}) {
   let results = [...sourcePapers];
 
   if (query) {
-    const q = query.toLowerCase();
-    results = results.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.courseCode.toLowerCase().includes(q) ||
-        p.departmentFull.toLowerCase().includes(q) ||
-        (p.department || "").toLowerCase().includes(q) ||
-        (p.description || "").toLowerCase().includes(q) ||
-        (p.instructor || "").toLowerCase().includes(q)
+    results = results.filter((p) =>
+      textMatchesQuery(
+        [
+          p.title,
+          p.courseCode,
+          ...(p.departments || [p.departmentFull]),
+          p.department,
+          p.description,
+          p.instructor,
+        ],
+        query
+      )
     );
   }
 

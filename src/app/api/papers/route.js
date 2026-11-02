@@ -1,33 +1,10 @@
 import { NextResponse } from "next/server";
-import { DEPARTMENT_NAMES } from "@/lib/constants";
 import { requireAdmin } from "@/lib/server/adminAuth";
+import { paperFileName } from "@/lib/paperNaming.mjs";
 import { uploadPaperToDrive } from "@/lib/server/drive";
+import { toPositiveInt, validatePaperFields } from "@/lib/server/paperFields";
 import { createPaperRecord, listPapers } from "@/lib/server/papersRepository";
-
-function toPositiveInt(value) {
-  const parsed = Number.parseInt(String(value), 10);
-  return Number.isFinite(parsed) ? parsed : NaN;
-}
-
-function validatePayload({ subjectCode, subjectName, department, year, semester, examPeriod }) {
-  if (!subjectCode || !subjectName || !department || !year || !semester || !examPeriod) {
-    return "Subject code, subject name, department, academic year, semester, and examination period are required.";
-  }
-
-  if (!DEPARTMENT_NAMES.includes(department)) {
-    return "Invalid department.";
-  }
-
-  if (!Number.isInteger(year) || year < 1 || year > 4) {
-    return "Year must be between 1 and 4.";
-  }
-
-  if (![1, 2].includes(semester)) {
-    return "Semester must be 1 or 2.";
-  }
-
-  return "";
-}
+import { getPublicPapers } from "@/lib/server/publicPapers";
 
 export async function GET(request) {
   try {
@@ -41,7 +18,8 @@ export async function GET(request) {
     if (yearParam) filters.year = toPositiveInt(yearParam);
     if (semesterParam) filters.semester = toPositiveInt(semesterParam);
 
-    const papers = await listPapers(filters);
+    // The unfiltered list is the cached one the pages use; filters are for scripts and read Neon.
+    const papers = Object.keys(filters).length ? await listPapers(filters) : await getPublicPapers();
     return NextResponse.json({ papers });
   } catch (error) {
     return NextResponse.json(
@@ -65,7 +43,7 @@ export async function POST(request) {
     const examPeriod = String(formData.get("examPeriod") || "").trim();
     const file = formData.get("file");
 
-    const validationError = validatePayload({
+    const validationError = validatePaperFields({
       subjectCode,
       subjectName,
       department,
@@ -86,6 +64,7 @@ export async function POST(request) {
       department,
       year,
       semester,
+      fileName: paperFileName({ subjectCode, subjectName, examPeriod, year, semester }),
     });
 
     const paper = await createPaperRecord({

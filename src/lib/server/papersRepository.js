@@ -1,5 +1,22 @@
 import { randomUUID } from "crypto";
+import { revalidateTag } from "next/cache";
 import { ensureSchema, query } from "@/lib/server/db";
+
+export const PAPERS_CACHE_TAG = "papers";
+
+// Lists are cached (see publicPapers.js); call this after any change so edits show up at once.
+function invalidatePapersCache() {
+  try {
+    revalidateTag(PAPERS_CACHE_TAG, { expire: 0 });
+  } catch {
+    // Not running inside Next (e.g. a script): the cache simply expires on its own.
+  }
+}
+
+// Columns a list needs. Everything else (preview link, folder path, ...) is only read for a
+// single paper, which keeps every full listing — and the data Neon sends out — small.
+const LIST_COLUMNS = `id, subject_code, subject_name, instructor, department, year, semester,
+  exam_period, drive_file_id, created_at, updated_at`;
 
 function rowToPaper(row) {
   return {
@@ -15,7 +32,8 @@ function rowToPaper(row) {
     semester: `Semester ${row.semester}`,
     yearNumber: row.year,
     semesterNumber: row.semester,
-    driveLink: row.drive_link,
+    // Lists skip drive_link; every link has the same shape as the file id's view URL.
+    driveLink: row.drive_link || (row.drive_file_id ? `https://drive.google.com/file/d/${row.drive_file_id}/view` : ""),
     drivePreviewLink: row.drive_preview_link || "",
     driveFileId: row.drive_file_id,
     driveFolderPath: row.drive_folder_path,
@@ -45,7 +63,7 @@ export async function listPapers(filters = {}) {
     conditions.push(`semester = $${values.length}`);
   }
 
-  let sql = `SELECT * FROM papers`;
+  let sql = `SELECT ${LIST_COLUMNS} FROM papers`;
   if (conditions.length) {
     sql += ` WHERE ${conditions.join(" AND ")}`;
   }
@@ -88,6 +106,7 @@ export async function createPaperRecord(payload) {
     ]
   );
 
+  invalidatePapersCache();
   return getPaperById(id);
 }
 
@@ -142,10 +161,12 @@ export async function updatePaperRecord(id, payload) {
     ]
   );
 
+  invalidatePapersCache();
   return getPaperById(id);
 }
 
 export async function removePaperRecord(id) {
   await ensureSchema();
   await query(`DELETE FROM papers WHERE id = $1`, [id]);
+  invalidatePapersCache();
 }

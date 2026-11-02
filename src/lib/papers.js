@@ -1,4 +1,69 @@
 import { DEPARTMENT_NAMES } from "@/lib/constants";
+import { compactText } from "@/lib/paperNaming.mjs";
+
+// True when any of the values contains the query, ignoring case. Spaces, dashes and
+// slashes are ignored too, so "com 1201", "COM-1201" and "com1201" all find COM1201.
+export function textMatchesQuery(values = [], query = "") {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const compactQuery = compactText(q);
+  return values.some((value) => {
+    const text = String(value || "").toLowerCase();
+    if (!text) return false;
+    return text.includes(q) || (compactQuery && compactText(text).includes(compactQuery));
+  });
+}
+
+export function paperDepartments(paper = {}) {
+  return paper.departments || [paper.departmentFull || paper.department].filter(Boolean);
+}
+
+// Shared courses (e.g. IDC/FDN subjects) are filed once per department, so the same sitting
+// shows up several times. Collapse copies of one course code + exam period that sit in
+// different departments into a single entry tagged with every department. Copies inside the
+// same department (Part I / Part II, rescans) stay separate: the n-th copy of each department
+// (ordered by title) joins the n-th merged entry.
+export function mergeSharedPapers(papers = []) {
+  const groups = new Map();
+  for (const paper of papers) {
+    const code = compactText(paper.courseCode);
+    const key = code ? `${code}|${compactText(paper.examPeriod)}` : `id|${paper.id}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(paper);
+  }
+
+  const merged = [];
+  for (const group of groups.values()) {
+    const byDepartment = new Map();
+    for (const paper of group) {
+      const department = paper.departmentFull || paper.department || "";
+      if (!byDepartment.has(department)) byDepartment.set(department, []);
+      byDepartment.get(department).push(paper);
+    }
+    const lists = [...byDepartment.values()].map((list) =>
+      [...list].sort((a, b) => compactText(a.title).localeCompare(compactText(b.title)))
+    );
+    const layers = Math.max(...lists.map((list) => list.length));
+
+    for (let layer = 0; layer < layers; layer++) {
+      const copies = lists.map((list) => list[layer]).filter(Boolean);
+      const [primary] = copies;
+      const departments = [...new Set(copies.map((p) => p.departmentFull || p.department).filter(Boolean))].sort();
+      merged.push({
+        ...primary,
+        departments,
+        variants: copies.map((p) => ({
+          id: p.id,
+          docId: p.docId || p.id,
+          department: p.departmentFull || p.department,
+          academicYear: p.academicYear,
+          semester: p.semester,
+        })),
+      });
+    }
+  }
+  return merged;
+}
 
 export const extractDriveId = (url = "") => {
   if (!url) return "";
@@ -332,16 +397,19 @@ export function filterAdminPapers(papers, { query = "", department = "" } = {}) 
   }
 
   if (query.trim()) {
-    const q = query.trim().toLowerCase();
-    results = results.filter(
-      (paper) =>
-        paper.courseCode.toLowerCase().includes(q) ||
-        paper.title.toLowerCase().includes(q) ||
-        (paper.instructor || "").toLowerCase().includes(q) ||
-        (paper.examPeriod || "").toLowerCase().includes(q) ||
-        (paper.academicYear || "").toLowerCase().includes(q) ||
-        (paper.year || "").toLowerCase().includes(q) ||
-        (paper.departmentFull || paper.department || "").toLowerCase().includes(q)
+    results = results.filter((paper) =>
+      textMatchesQuery(
+        [
+          paper.courseCode,
+          paper.title,
+          paper.instructor,
+          paper.examPeriod,
+          paper.academicYear,
+          paper.year,
+          paper.departmentFull || paper.department,
+        ],
+        query
+      )
     );
   }
 

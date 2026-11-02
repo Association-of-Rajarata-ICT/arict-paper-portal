@@ -24,6 +24,10 @@ export const PUBLIC_PAGES = {
     title: "Faculty of Applied Sciences",
     description: "Explore the five Applied Sciences departments at Rajarata University and find their available past exam papers in the ARICT student-run archive.",
   },
+  "/contribute": {
+    title: "Contribute a Paper",
+    description: "Upload a Rajarata University past paper that is missing from the ARICT archive. The ARICT team reviews every submission before it is published.",
+  },
   "/help": {
     title: "Help Center",
     description: "Learn how to search, preview, download and share past papers on the ARICT portal, request missing papers, and report incorrect paper details.",
@@ -47,6 +51,7 @@ export const MAIN_NAV_LINKS = [
   { href: "/search", label: "Past Papers" },
   { href: "/faculty", label: "Faculty" },
   { href: "/about", label: "About ARICT" },
+  { href: "/contribute", label: "Contribute" },
   { href: "/help", label: "Help" },
   { href: "/contact", label: "Contact" },
 ];

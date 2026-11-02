@@ -27,6 +27,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { buildRows } from "./lib/paper-names.mjs";
+import { paperFileName } from "../src/lib/paperNaming.mjs";
 
 const OUT_DIR = path.resolve("bulk-upload");
 const MANIFEST_PATH = path.join(OUT_DIR, "manifest.csv");
@@ -86,11 +87,6 @@ function normalizeKey(paper) {
   return [paper.subjectCode, paper.examPeriod, paper.year, paper.semester, paper.department].map(clean).join("|");
 }
 
-function driveFileName(row) {
-  const period = row.examPeriod.replace(/\s*\|\s*/g, "-");
-  return `${row.subjectCode.replace(/\s*\/\s*/g, "_")} - ${row.subjectName} - ${period}.pdf`.replace(/[\\/:*?"<>|]/g, "");
-}
-
 async function fetchPapers(baseUrl, department) {
   const response = await fetch(`${baseUrl}/api/papers?department=${encodeURIComponent(department)}`, { cache: "no-store" });
   if (!response.ok) throw new Error(`Could not list existing papers (${response.status}).`);
@@ -122,7 +118,7 @@ async function postPaper(baseUrl, cookie, row, filePath) {
   body.set("year", String(row.year));
   body.set("semester", String(row.semester));
   body.set("examPeriod", row.examPeriod);
-  body.set("file", new File([fs.readFileSync(filePath)], driveFileName(row), { type: "application/pdf" }));
+  body.set("file", new File([fs.readFileSync(filePath)], paperFileName(row), { type: "application/pdf" }));
 
   let response;
   try {
@@ -198,7 +194,7 @@ async function upload(root, options) {
   for (const [index, row] of batch.entries()) {
     const label = `[${index + 1}/${batch.length}] ${row.subjectCode} · ${row.examPeriod} · Y${row.year}S${row.semester}`;
     if (dryRun) {
-      log(`${label}  (would upload ${row.file} as "${driveFileName(row)}")`);
+      log(`${label}  (would upload ${row.file} as "${paperFileName(row)}")`);
       record(row, { status: "dry-run", reason: "would upload" });
       continue;
     }

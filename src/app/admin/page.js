@@ -15,6 +15,14 @@ export default function AdminDashboardPage() {
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pendingSubmissions, setPendingSubmissions] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/admin/submissions?status=pending", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : { submissions: [] }))
+      .then((payload) => setPendingSubmissions(payload.submissions?.length || 0))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -73,6 +81,18 @@ export default function AdminDashboardPage() {
       {error ? (
         <div className="form-status form-status--error">{error}</div>
       ) : null}
+
+      {pendingSubmissions > 0 && (
+        <div className="notice" role="status">
+          <span className="material-symbols-outlined" aria-hidden="true">
+            inbox
+          </span>
+          <span>
+            {pendingSubmissions} student submission{pendingSubmissions === 1 ? " is" : "s are"} waiting for review.{" "}
+            <Link href="/admin/submissions">Review now</Link>
+          </span>
+        </div>
+      )}
 
       <div className="admin-stats-grid">
         <StatsCard

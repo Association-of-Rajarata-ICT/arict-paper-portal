@@ -2880,6 +2880,133 @@ a.cover-sheet:hover {
   color: var(--ink-3);
 }
 
+/* --- Contribute a paper ------------------------------------- */
+.contribute-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--s-10);
+  align-items: start;
+  padding-bottom: var(--s-16);
+}
+
+.contribute-steps {
+  padding-top: var(--s-4);
+  border-top: 2px solid var(--ink);
+}
+
+.contribute-steps h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-variation-settings: "wdth" 108;
+}
+
+.contribute-steps ol {
+  margin-top: var(--s-4);
+  padding-left: 1.25rem;
+  color: var(--ink-2);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.contribute-steps li + li {
+  margin-top: var(--s-2);
+}
+
+.contribute-steps p {
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+/* Honeypot field: off-screen for people, still in the DOM for bots. */
+.contribute-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.upload-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-5);
+}
+
+.upload-progress-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.upload-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  transition: width var(--t-fast);
+}
+
+.upload-progress-label {
+  min-width: 9rem;
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1023px) {
+  .contribute-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- Admin: student submissions ----------------------------- */
+.submission-list {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.submission-card {
+  padding: var(--s-6);
+}
+
+.submission-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--rule);
+}
+
+.submission-card-meta {
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.submission-card-notes {
+  margin-top: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+  border-left: 3px solid var(--rule-strong);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}
+
+.submission-tabs {
+  display: flex;
+  gap: var(--s-2);
+  margin-bottom: var(--s-5);
+}
+
 .faq {
   max-width: 760px;
 }

@@ -7,7 +7,7 @@ import Chip from "@/components/Chip";
 import CodeBoxes from "@/components/CodeBoxes";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import RelatedPaperCard from "@/components/RelatedPaperCard";
-import { getDownloadUrl, getPreviewUrl } from "@/lib/papers";
+import { getDownloadUrl, getPreviewUrl, paperDepartments } from "@/lib/papers";
 
 export default function PaperDetailClient({ paper, relatedPapers = [] }) {
   const [shareMessage, setShareMessage] = useState("");
@@ -34,8 +34,9 @@ export default function PaperDetailClient({ paper, relatedPapers = [] }) {
   const downloadUrl = getDownloadUrl(paper.driveLink || "");
   const instructorName = paper.instructor && paper.instructor.trim() ? paper.instructor.trim() : "";
 
+  const departments = paperDepartments(paper);
   const fields = [
-    { label: "Department", value: paper.departmentFull },
+    { label: departments.length > 1 ? "Departments" : "Department", value: departments.join(", ") },
     { label: "Academic year", value: paper.academicYear },
     { label: "Semester", value: paper.semester },
     { label: "Exam period", value: paper.examPeriod },

@@ -17,6 +17,7 @@ import { randomUUID } from "node:crypto";
 import { google } from "googleapis";
 import pg from "pg";
 import { buildRows } from "./lib/paper-names.mjs";
+import { paperFileName } from "../src/lib/paperNaming.mjs";
 
 const FOLDER_MIME = "application/vnd.google-apps.folder";
 
@@ -131,6 +132,8 @@ async function syncDepartment(root) {
     try {
       // Anyone-with-link so the portal's preview/download works for visitors.
       await drive.permissions.create({ fileId, requestBody: { type: "anyone", role: "reader" } });
+      // The Drive name is what browsers save on download.
+      await drive.files.update({ fileId, requestBody: { name: paperFileName(row) } });
       await db.query(
         `INSERT INTO papers (id, subject_code, subject_name, instructor, department, year, semester, exam_period,
                              drive_file_id, drive_link, drive_preview_link, drive_folder_path)

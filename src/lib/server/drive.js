@@ -235,7 +235,8 @@ async function makeFileShareable(drive, fileId) {
   });
 }
 
-export async function uploadPaperToDrive({ file, department, year, semester }) {
+// fileName: the name Drive stores, which is also the name browsers save on download.
+export async function uploadPaperToDrive({ file, department, year, semester, fileName }) {
   try {
     const drive = getDriveClient();
     const { folderId, folderPath } = await ensureNestedFolder(
@@ -251,7 +252,7 @@ export async function uploadPaperToDrive({ file, department, year, semester }) {
 
     const uploadResponse = await drive.files.create({
       requestBody: {
-        name: file.name,
+        name: fileName || file.name,
         parents: [folderId],
       },
       media: {
@@ -285,6 +286,113 @@ export async function uploadPaperToDrive({ file, department, year, semester }) {
       drivePreviewLink: `https://drive.google.com/file/d/${fileId}/preview`,
       driveFolderPath: folderPath,
     };
+  } catch (error) {
+    throw new Error(formatDriveError(error));
+  }
+}
+
+function driveLinks(fileId, folderPath) {
+  return {
+    driveFileId: fileId,
+    driveLink: `https://drive.google.com/file/d/${fileId}/view`,
+    drivePreviewLink: `https://drive.google.com/file/d/${fileId}/preview`,
+    driveFolderPath: folderPath,
+  };
+}
+
+export async function renameDriveFile(fileId, name) {
+  try {
+    await getDriveClient().files.update({ fileId, requestBody: { name }, ...driveFlags() });
+  } catch (error) {
+    throw new Error(formatDriveError(error));
+  }
+}
+
+const SUBMISSIONS_FOLDER_NAME = "Pending student submissions";
+
+// Student uploads land here, private, until an admin approves or rejects them.
+export async function getSubmissionsFolderId() {
+  const rootId = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID;
+  if (!rootId) throw new Error("GOOGLE_DRIVE_ROOT_FOLDER_ID is not configured.");
+  const drive = getDriveClient();
+  return (
+    (await findFolderIdByName(drive, rootId, SUBMISSIONS_FOLDER_NAME)) ||
+    createFolder(drive, rootId, SUBMISSIONS_FOLDER_NAME)
+  );
+}
+
+// Starts a resumable upload so the student's browser sends the PDF straight to Drive
+// (Vercel functions cap request bodies at 4.5 MB). Google allows the browser PUT from
+// `origin` because the session is created with that Origin header. Returns the upload URL.
+export async function createResumableUpload({ name, size, folderId, origin }) {
+  const { token } = await getDriveAuth().getAccessToken();
+  const params = new URLSearchParams({ uploadType: "resumable", fields: "id,name,size,mimeType" });
+  if (driveFlags().supportsAllDrives) params.set("supportsAllDrives", "true");
+
+  const response = await fetch(`https://www.googleapis.com/upload/drive/v3/files?${params}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json; charset=UTF-8",
+      "X-Upload-Content-Type": "application/pdf",
+      "X-Upload-Content-Length": String(size),
+      Origin: origin,
+    },
+    body: JSON.stringify({ name, parents: [folderId], mimeType: "application/pdf" }),
+  });
+  const uploadUrl = response.headers.get("location");
+  if (!response.ok || !uploadUrl) {
+    throw new Error(`Could not start the upload (Drive answered ${response.status}).`);
+  }
+  return uploadUrl;
+}
+
+export async function getDriveFileInfo(fileId) {
+  try {
+    const { data } = await getDriveClient().files.get({
+      fileId,
+      fields: "id, name, size, mimeType, parents, trashed",
+      ...driveFlags(),
+    });
+    return data;
+  } catch (error) {
+    if (error?.code === 404) return null;
+    throw new Error(formatDriveError(error));
+  }
+}
+
+// First bytes of a file, to check an upload really is a PDF ("%PDF").
+export async function readDriveFileStart(fileId, length = 5) {
+  const { data } = await getDriveClient().files.get(
+    { fileId, alt: "media", ...driveFlags() },
+    { responseType: "arraybuffer", headers: { Range: `bytes=0-${length - 1}` } }
+  );
+  return Buffer.from(data).subarray(0, length);
+}
+
+export async function streamDriveFile(fileId) {
+  const { data } = await getDriveClient().files.get(
+    { fileId, alt: "media", ...driveFlags() },
+    { responseType: "stream" }
+  );
+  return Readable.toWeb(data);
+}
+
+// Moves an approved submission into <Department>/Year N/Semester N, renames it and makes it public.
+export async function publishSubmittedFile({ fileId, department, year, semester, name }) {
+  try {
+    const drive = getDriveClient();
+    const { folderId, folderPath } = await ensureNestedFolder(department, year, semester);
+    const { data } = await drive.files.get({ fileId, fields: "parents", ...driveFlags() });
+    await drive.files.update({
+      fileId,
+      addParents: folderId,
+      removeParents: (data.parents || []).join(","),
+      requestBody: { name },
+      ...driveFlags(),
+    });
+    await makeFileShareable(drive, fileId);
+    return driveLinks(fileId, folderPath);
   } catch (error) {
     throw new Error(formatDriveError(error));
   }
