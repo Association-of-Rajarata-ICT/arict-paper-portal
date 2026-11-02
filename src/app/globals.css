@@ -3699,6 +3699,25 @@ a.cover-sheet:hover {
   color: #fff;
 }
 
+.submit-success-dialog {
+  text-align: center;
+}
+
+.submit-success-icon {
+  font-size: 48px;
+  color: var(--success);
+  font-variation-settings: "FILL" 1;
+}
+
+.submit-success-dialog .admin-dialog-actions {
+  justify-content: center;
+}
+
+.submit-success-dialog .admin-dialog-actions .btn-primary {
+  background: var(--brand-solid);
+  color: var(--on-brand);
+}
+
 /* --- Responsive --------------------------------------------- */
 @media (max-width: 1100px) {
   .site-nav { display: none; }

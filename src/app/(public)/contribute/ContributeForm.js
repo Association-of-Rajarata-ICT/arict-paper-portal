@@ -59,6 +59,7 @@ export default function ContributeForm() {
   const [previewStatus, setPreviewStatus] = useState("loading");
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState({ type: "idle", message: "" });
+  const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef(null);
   const submitting = progress !== null;
 
@@ -120,11 +121,7 @@ export default function ContributeForm() {
         );
       }
 
-      setStatus({
-        type: "success",
-        message:
-          "Thank you! Your paper is in the review queue. Once the ARICT team checks it, it will appear in the archive.",
-      });
+      setSubmitted(true);
       // Keep the contributor's name and email for their next upload.
       setForm((prev) => ({
         ...initialForm,
@@ -344,6 +341,34 @@ export default function ContributeForm() {
           {submitting ? "Uploading…" : "Submit for review"}
         </button>
       </div>
+
+      {submitted && (
+        <div className="admin-dialog-overlay" role="presentation" onClick={() => setSubmitted(false)}>
+          <div
+            className="card admin-dialog submit-success-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="submit-success-title"
+            aria-describedby="submit-success-message"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className="material-symbols-outlined submit-success-icon" aria-hidden="true">
+              check_circle
+            </span>
+            <h2 id="submit-success-title" className="text-headline-sm">
+              Thank you!
+            </h2>
+            <p id="submit-success-message" className="text-body-md admin-dialog-message">
+              Your paper is in the review queue. Once the ARICT team checks it, it will appear in the archive.
+            </p>
+            <div className="admin-dialog-actions">
+              <button type="button" className="btn btn-primary" autoFocus onClick={() => setSubmitted(false)}>
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
