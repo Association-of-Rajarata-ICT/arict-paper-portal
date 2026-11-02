@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import PdfPreview from "@/components/PdfPreview";
 import { DEPARTMENT_NAMES } from "@/lib/constants";
+import { isEmailConfigured, sendSubmissionEmail } from "@/lib/emailjs";
 import { SUBMISSION_MAX_BYTES, SUBMISSION_MAX_MB } from "@/lib/submissionLimits";
 
 const initialForm = {
@@ -54,6 +56,8 @@ export default function ContributeForm() {
   const [form, setForm] = useState(initialForm);
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(null);
+  const [previewStatus, setPreviewStatus] = useState("loading");
+  const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState({ type: "idle", message: "" });
   const fileInputRef = useRef(null);
   const submitting = progress !== null;
@@ -79,12 +83,22 @@ export default function ContributeForm() {
       return;
     }
     setFile(chosen);
+    setPreviewStatus("loading");
+    setConfirmed(false);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!file) {
       setStatus({ type: "error", message: "Choose the PDF of the paper to upload." });
+      return;
+    }
+    if (previewStatus === "error") {
+      setStatus({ type: "error", message: "This PDF can't be opened. Choose a different file." });
+      return;
+    }
+    if (!confirmed) {
+      setStatus({ type: "error", message: "Check the preview and tick the box to confirm it's the right paper." });
       return;
     }
 
@@ -99,6 +113,13 @@ export default function ContributeForm() {
       const fileId = await uploadToDrive(uploadUrl, file, setProgress);
       await postJson(`/api/submissions/${encodeURIComponent(id)}/complete`, { token, fileId });
 
+      // The paper is safely queued; a failed alert email must not look like a failed upload.
+      if (isEmailConfigured) {
+        sendSubmissionEmail({ ...form, id, fileName: file.name }).catch((error) =>
+          console.error("Submission saved, but the alert email to ARICT failed:", error)
+        );
+      }
+
       setStatus({
         type: "success",
         message:
@@ -111,6 +132,7 @@ export default function ContributeForm() {
         submitterEmail: prev.submitterEmail,
       }));
       setFile(null);
+      setConfirmed(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       setStatus({ type: "error", message: error.message });
@@ -251,6 +273,22 @@ export default function ContributeForm() {
             required
           />
         </div>
+        {file && (
+          <div className="form-field form-field--full">
+            <PdfPreview file={file} onStatusChange={setPreviewStatus} />
+            {previewStatus === "ready" && (
+              <label className="confirm-check">
+                <input
+                  type="checkbox"
+                  className="tickbox"
+                  checked={confirmed}
+                  onChange={(event) => setConfirmed(event.target.checked)}
+                />
+                I checked the preview. This is the right paper and it is complete.
+              </label>
+            )}
+          </div>
+        )}
         <div className="form-field form-field--full">
           <label htmlFor="notes">Notes for the reviewers</label>
           <textarea
@@ -295,7 +333,11 @@ export default function ContributeForm() {
       )}
 
       <div className="form-actions">
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={submitting || (file && (previewStatus !== "ready" || !confirmed))}
+        >
           <span className="material-symbols-outlined" aria-hidden="true">
             upload_file
           </span>

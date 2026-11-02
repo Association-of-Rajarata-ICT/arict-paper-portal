@@ -2959,6 +2959,79 @@ a.cover-sheet:hover {
   font-variant-numeric: tabular-nums;
 }
 
+.pdf-preview {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sheet);
+  background: var(--surface-2);
+}
+
+.pdf-preview-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  font-size: 0.875rem;
+}
+
+.pdf-preview-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.pdf-preview-count {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.pdf-preview-pages {
+  display: grid;
+  gap: var(--s-3);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.pdf-preview-page {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+}
+
+.pdf-preview-message {
+  color: var(--ink-2);
+  font-size: 0.875rem;
+}
+
+.pdf-preview-message--error {
+  color: var(--error);
+}
+
+.pdf-preview .btn {
+  justify-self: start;
+}
+
+.confirm-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.confirm-check .tickbox {
+  margin-top: 1px;
+}
+
 @media (max-width: 1023px) {
   .contribute-layout {
     grid-template-columns: minmax(0, 1fr);
@@ -2973,6 +3046,13 @@ a.cover-sheet:hover {
 
 .submission-card {
   padding: var(--s-6);
+  scroll-margin-top: var(--s-6);
+}
+
+/* The submission opened from the alert email's link. */
+.submission-card.is-focused {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
 }
 
 .submission-card-head {

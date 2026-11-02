@@ -18,6 +18,7 @@ import { google } from "googleapis";
 import pg from "pg";
 import { buildRows } from "./lib/paper-names.mjs";
 import { paperFileName } from "../src/lib/paperNaming.mjs";
+import { departments } from "../src/data/departments.js";
 
 const FOLDER_MIME = "application/vnd.google-apps.folder";
 
@@ -79,8 +80,10 @@ const normalizeKey = (p) =>
 
 const db = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 const rootFolders = (await listChildren(process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID)).filter((f) => f.mimeType === FOLDER_MIME);
+// --all only covers real departments, so the private "Pending student submissions" folder is never indexed.
+const knownDepartments = new Set(departments.map((dept) => dept.name.toLowerCase()));
 const targets = syncAll
-  ? rootFolders
+  ? rootFolders.filter((f) => knownDepartments.has(f.name.trim().toLowerCase()))
   : rootFolders.filter((f) => f.name.trim().toLowerCase() === department.trim().toLowerCase());
 if (!targets.length) {
   console.error(`No "${department}" folder under the Drive root.`);

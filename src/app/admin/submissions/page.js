@@ -34,7 +34,7 @@ async function reviewSubmission(id, body) {
   return payload;
 }
 
-function PendingSubmission({ submission, onReviewed, onReject }) {
+function PendingSubmission({ submission, focused, onReviewed, onReject }) {
   const [fields, setFields] = useState(() =>
     Object.fromEntries(EDITABLE_FIELDS.map((key) => [key, String(submission[key] ?? "")]))
   );
@@ -60,7 +60,10 @@ function PendingSubmission({ submission, onReviewed, onReject }) {
   };
 
   return (
-    <article className="card submission-card">
+    <article
+      className={`card submission-card${focused ? " is-focused" : ""}`}
+      id={`submission-${submission.id}`}
+    >
       <div className="submission-card-head">
         <div className="submission-card-meta">
           <strong>{submission.submitterName}</strong> &lt;{submission.submitterEmail}&gt;
@@ -172,6 +175,8 @@ export default function SubmissionsPage() {
   const [notice, setNotice] = useState({ type: "idle", message: "" });
   const [pendingReject, setPendingReject] = useState(null);
   const [rejecting, setRejecting] = useState(false);
+  // ?id=... comes from the "new submission" email; that card is highlighted and scrolled to.
+  const [focusId, setFocusId] = useState("");
 
   const load = useCallback(async (status) => {
     setLoading(true);
@@ -180,6 +185,7 @@ export default function SubmissionsPage() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.message || "Failed to load submissions.");
       setSubmissions(payload.submissions || []);
+      setFocusId(new URLSearchParams(window.location.search).get("id") || "");
     } catch (err) {
       setNotice({ type: "error", message: err.message });
       setSubmissions([]);
@@ -191,6 +197,10 @@ export default function SubmissionsPage() {
   useEffect(() => {
     load(tab);
   }, [tab, load]);
+
+  useEffect(() => {
+    if (focusId) document.getElementById(`submission-${focusId}`)?.scrollIntoView({ block: "start" });
+  }, [focusId, submissions]);
 
   const removeFromList = (id, message) => {
     setSubmissions((prev) => prev.filter((item) => item.id !== id));
@@ -259,6 +269,7 @@ export default function SubmissionsPage() {
               <PendingSubmission
                 key={submission.id}
                 submission={submission}
+                focused={submission.id === focusId}
                 onReviewed={removeFromList}
                 onReject={setPendingReject}
               />

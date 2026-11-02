@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import emailjs from "@emailjs/browser";
 import { ARICT_OFFICIAL_EMAIL, DEPARTMENT_NAMES } from "@/lib/constants";
+import { isEmailConfigured, sendPaperRequestEmail } from "@/lib/emailjs";
 
 const initialForm = {
   studentName: "",
@@ -13,12 +13,6 @@ const initialForm = {
   department: "",
   examYear: "",
   message: "",
-};
-
-const emailJsConfig = {
-  serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
-  templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "",
-  publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "",
 };
 
 export default function RequestPaperModal({ open, onClose }) {
@@ -86,11 +80,7 @@ export default function RequestPaperModal({ open, onClose }) {
       return;
     }
 
-    if (
-      !emailJsConfig.serviceId ||
-      !emailJsConfig.templateId ||
-      !emailJsConfig.publicKey
-    ) {
+    if (!isEmailConfigured) {
       setStatus({
         type: "error",
         message:
@@ -101,23 +91,17 @@ export default function RequestPaperModal({ open, onClose }) {
 
     setSubmitting(true);
     try {
-      await emailjs.send(
-        emailJsConfig.serviceId,
-        emailJsConfig.templateId,
-        {
-          to_email: ARICT_OFFICIAL_EMAIL,
-          from_name: form.studentName,
-          reply_to: form.studentEmail,
-          student_name: form.studentName,
-          student_email: form.studentEmail,
-          subject_code: form.subjectCode,
-          subject_name: form.subjectName,
-          department: form.department,
-          exam_year: form.examYear,
-          message: form.message || "No additional details provided.",
-        },
-        { publicKey: emailJsConfig.publicKey },
-      );
+      await sendPaperRequestEmail({
+        from_name: form.studentName,
+        reply_to: form.studentEmail,
+        student_name: form.studentName,
+        student_email: form.studentEmail,
+        subject_code: form.subjectCode,
+        subject_name: form.subjectName,
+        department: form.department,
+        exam_year: form.examYear,
+        message: form.message || "No additional details provided.",
+      });
 
       setStatus({
         type: "success",
