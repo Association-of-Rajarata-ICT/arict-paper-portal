@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ARICT_SOCIAL_LINKS } from "@/lib/constants";
+import { ARICT_SOCIAL_LINKS, GPA_CALCULATOR_URL } from "@/lib/constants";
 import { MAIN_NAV_LINKS } from "@/lib/seo";
 import { Linkedin, Facebook, Github, Instagram } from "lucide-react";
 
@@ -100,6 +100,9 @@ export default function Footer() {
               <span className="footer-column-title">Explore the portal</span>
               <nav className="footer-column-links" aria-label="Footer">
                 {MAIN_NAV_LINKS.map(({ href, label }) => <Link key={href} href={href}>{label}</Link>)}
+                <a href={GPA_CALCULATOR_URL} target="_blank" rel="noopener">
+                  GPA Calculator ↗
+                </a>
               </nav>
             </div>
           </div>

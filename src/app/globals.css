@@ -979,6 +979,22 @@ input[type="file"].input-field::file-selector-button {
   transform: scaleX(1);
 }
 
+/* Link to another ARICT site (the GPA calculator): the arrow marks it as leaving the portal. */
+.site-nav .site-nav-external {
+  gap: 2px;
+}
+
+.site-nav .site-nav-external .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--ink-3);
+  transition: transform var(--t-fast), color var(--t-fast);
+}
+
+.site-nav .site-nav-external:hover .material-symbols-outlined {
+  color: var(--brand);
+  transform: translate(1px, -1px);
+}
+
 .site-header-actions {
   margin-left: auto;
   display: flex;

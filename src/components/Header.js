@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import RequestPaperModal from "@/components/RequestPaperModal";
 import ThemeToggle from "@/components/ThemeToggle";
+import { GPA_CALCULATOR_URL } from "@/lib/constants";
 import { REQUEST_PAPER_EVENT } from "@/lib/requestPaper";
 import { MAIN_NAV_LINKS } from "@/lib/seo";
 
@@ -93,6 +94,12 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            <a href={GPA_CALCULATOR_URL} target="_blank" rel="noopener" className="site-nav-external">
+              GPA Calculator
+              <span className="material-symbols-outlined" aria-hidden="true">
+                arrow_outward
+              </span>
+            </a>
           </nav>
 
           <div className="site-header-actions">
@@ -182,6 +189,17 @@ export default function Header() {
               </span>
             </Link>
           ))}
+          <a
+            href={GPA_CALCULATOR_URL}
+            target="_blank"
+            rel="noopener"
+            onClick={() => setMobileOpen(false)}
+          >
+            GPA Calculator
+            <span className="material-symbols-outlined" aria-hidden="true">
+              arrow_outward
+            </span>
+          </a>
         </nav>
 
         <div className="mobile-menu-actions">

@@ -2,6 +2,9 @@ import { departments } from "@/data/departments";
 
 export const ARICT_OFFICIAL_EMAIL = "arict@as.rjt.ac.lk";
 
+// ARICT's GPA calculator, a separate site (arict-gpa-calculator repo).
+export const GPA_CALCULATOR_URL = "https://gpa.arict.lk";
+
 export const ARICT_SOCIAL_LINKS = {
   github: "https://github.com/Association-of-Rajarata-ICT",
   linkedin: "https://www.linkedin.com/company/arict/",
