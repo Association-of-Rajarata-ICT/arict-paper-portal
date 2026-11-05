@@ -16,6 +16,10 @@ export const PUBLIC_PAGES = {
     title: "Past Papers",
     description: "Browse and search Rajarata University past exam papers. Filter by department, academic year and semester, then preview or download your paper.",
   },
+  "/courses": {
+    title: "Courses",
+    description: "Pick your Rajarata University Applied Sciences department, year and semester to see its courses, then open a course for every past paper.",
+  },
   "/about": {
     title: "About ARICT",
     description: "Learn about ARICT, the student association behind Rajarata University's past paper archive, and how volunteers help students prepare for exams.",
@@ -49,6 +53,7 @@ export const PUBLIC_PAGES = {
 export const MAIN_NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/search", label: "Past Papers" },
+  { href: "/courses", label: "Courses" },
   { href: "/faculty", label: "Faculty" },
   { href: "/about", label: "About ARICT" },
   { href: "/contribute", label: "Contribute" },

@@ -2456,6 +2456,271 @@ a.cover-sheet:hover {
   color: var(--ink-3);
 }
 
+/* --- Courses (department → year → semester → course) ------- */
+.courses-page,
+.course-page {
+  padding-bottom: var(--s-16);
+}
+
+.courses-head,
+.course-head {
+  padding-top: var(--s-10);
+  padding-bottom: var(--s-8);
+}
+
+.course-head {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+}
+
+.course-head-aliases {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+.courses-body,
+.course-body {
+  padding-top: var(--s-8);
+}
+
+/* Picker: three rows of tick-style options, like the boxes on a cover sheet */
+.course-picker {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-5) var(--s-6);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sheet);
+  background: var(--surface);
+}
+
+.course-picker-row {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.course-picker-row + .course-picker-row {
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--rule);
+}
+
+.course-picker-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.course-picker-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.course-picker-option {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: border-color var(--t-fast), background-color var(--t-fast), color var(--t-fast);
+}
+
+.course-picker-option:hover {
+  border-color: var(--ink-2);
+  background: var(--surface-2);
+}
+
+.course-picker-option.is-active {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  color: var(--brand);
+}
+
+.course-picker-option:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+
+.courses-hint {
+  margin-top: var(--s-8);
+  color: var(--ink-2);
+}
+
+.courses-section-head {
+  margin-top: var(--s-10);
+}
+
+/* Course ledger */
+.course-index {
+  list-style: none;
+  margin-bottom: var(--s-6);
+}
+
+.course-row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) auto 24px;
+  align-items: center;
+  gap: var(--s-5);
+  padding: var(--s-4) var(--s-2);
+  border-bottom: 1px solid var(--rule);
+  transition: background-color var(--t-fast);
+}
+
+.course-row:hover {
+  background: var(--surface);
+}
+
+.course-row .code-tag {
+  justify-self: start;
+}
+
+.course-row-title,
+.course-row-note {
+  display: block;
+}
+
+.course-row-title {
+  font-weight: 700;
+  font-variation-settings: "wdth" 104;
+  color: var(--ink);
+}
+
+.course-row:hover .course-row-title {
+  color: var(--brand);
+}
+
+.course-row-note {
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.course-row-count {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.course-row-count strong {
+  font-family: var(--ff-mono);
+  font-variation-settings: "wdth" 87.5;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.course-row-arrow {
+  color: var(--ink-3);
+  transition: transform var(--t-med), color var(--t-fast);
+}
+
+.course-row:hover .course-row-arrow {
+  color: var(--brand);
+  transform: translateX(4px);
+}
+
+/* Other papers: a folded sheet under the confirmed list */
+.other-papers {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sheet);
+  background: var(--surface);
+}
+
+.other-papers summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  cursor: pointer;
+  list-style: none;
+}
+
+.other-papers summary::-webkit-details-marker {
+  display: none;
+}
+
+.other-papers summary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-ring);
+  border-radius: var(--r-sheet);
+}
+
+.other-papers-chevron {
+  color: var(--ink-3);
+  transition: transform var(--t-med);
+}
+
+.other-papers[open] .other-papers-chevron {
+  transform: rotate(180deg);
+}
+
+.other-papers-title {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.other-papers-count {
+  font-family: var(--ff-mono);
+  font-variation-settings: "wdth" 87.5;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.other-papers-hint {
+  flex-basis: 100%;
+  padding-left: 36px;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.other-papers .course-index {
+  margin: 0;
+  padding: 0 var(--s-3) var(--s-2);
+  border-top: 1px solid var(--rule);
+}
+
+.other-papers .course-row:last-child {
+  border-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .course-picker {
+    padding: var(--s-4);
+  }
+
+  .course-picker-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2);
+  }
+
+  .course-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s-2) var(--s-3);
+  }
+
+  .course-row-text {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .course-row .course-row-arrow {
+    display: none;
+  }
+}
+
 /* --- Paper detail ------------------------------------------- */
 .breadcrumb {
   display: flex;

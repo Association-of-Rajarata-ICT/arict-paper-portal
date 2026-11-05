@@ -16,6 +16,7 @@ function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
   if (href === "/search")
     return pathname === "/search" || pathname.startsWith("/paper/");
+  if (href === "/courses") return pathname === "/courses" || pathname.startsWith("/courses/");
   return pathname === href;
 }
 
