@@ -277,7 +277,7 @@ function CourseView({ view, loading, backLabel, onBack }) {
         ) : papers.length > 0 ? (
           <div className="results-list">
             {papers.map((paper) => (
-              <PaperListItem key={paper.id} paper={paper} />
+              <PaperListItem key={paper.id} paper={paper} courseTitle={title} />
             ))}
           </div>
         ) : (
@@ -466,8 +466,9 @@ function SearchResultsContent({ initialPapers }) {
     return sortSemesters(Array.from(new Set(semesters)));
   }, [papers]);
 
-  // Course view: ?course=ICT3301, a searched course code (old codes too), or a search that names
-  // exactly one course ("human computer interaction"). Department-name searches are filters.
+  // Course view: ?course=ICT3301 or a full course code in the search (old codes too). A search by
+  // name lists the matching courses to pick from, since several can share words ("Mathematics I",
+  // "Mathematics II"). Department-name searches are filters.
   const searchText = query.trim();
   const searchIsDepartment = getDepartmentFilterFromQuery(searchText).length > 0;
   const matchingCourses = useMemo(
@@ -476,10 +477,9 @@ function SearchResultsContent({ initialPapers }) {
   );
   const activeCourse = useMemo(() => {
     if (courseParam) return courseView(papers, courseParam);
-    if (!searchText || searchIsDepartment) return null;
-    if (normalizeCourseCode(searchText)) return courseView(papers, searchText);
-    return matchingCourses.length === 1 ? courseView(papers, matchingCourses[0].code) : null;
-  }, [papers, courseParam, searchText, searchIsDepartment, matchingCourses]);
+    if (!searchText || searchIsDepartment || !normalizeCourseCode(searchText)) return null;
+    return courseView(papers, searchText);
+  }, [papers, courseParam, searchText, searchIsDepartment]);
 
   // Course lists: one department and one year selected (and no search), grouped by semester.
   const courseDepartment = selectedDepartments.length === 1 ? selectedDepartments[0] : null;
@@ -817,7 +817,7 @@ function SearchResultsContent({ initialPapers }) {
             </div>
           )}
 
-          {!loading && matchingCourses.length > 1 && (
+          {!loading && matchingCourses.length > 0 && (
             <section className="matching-courses" aria-labelledby="matching-courses-heading">
               <h2 className="matching-courses-title" id="matching-courses-heading">
                 Matching courses
