@@ -1,15 +1,9 @@
 import Link from "next/link";
 import Chip from "./Chip";
-import { compactText } from "@/lib/paperNaming.mjs";
 import { getDownloadUrl, getPaperRouteId, paperDepartments } from "@/lib/papers";
 
-// "Differential Equations I" and "Differential Equations 1" are the same paper title.
-const ROMAN = { I: 1, II: 2, III: 3, IV: 4 };
-const titleKey = (title) =>
-  compactText(String(title).replace(/\b(IV|I{1,3})\s*$/i, (numeral) => ROMAN[numeral.toUpperCase()]));
-
-// Inside a course view (courseTitle given) the course is already in the page heading, so each row
-// leads with its exam period, and names the paper only when it differs (e.g. under an old code).
+// Inside a course view (courseTitle given) each row leads with its exam period; the course name,
+// department, year and semester sit under it.
 export default function PaperListItem({ paper, courseTitle = "" }) {
   const encodedId = encodeURIComponent(getPaperRouteId(paper));
   const paperUrl = `/paper/${encodedId}`;
@@ -20,7 +14,7 @@ export default function PaperListItem({ paper, courseTitle = "" }) {
 
   const meta = (
     inCourse
-      ? [titleKey(paper.title) !== titleKey(courseTitle) && paper.title, paperDepartments(paper).join(" · ")]
+      ? [paper.title, paperDepartments(paper).join(" · "), paper.academicYear, paper.semester]
       : [paperDepartments(paper).join(" · "), paper.academicYear, paper.semester, paper.examPeriod]
   ).filter(Boolean);
 
