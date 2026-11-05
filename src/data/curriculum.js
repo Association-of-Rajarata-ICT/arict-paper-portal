@@ -397,12 +397,27 @@ export const OLD_CODES = {
   ZOO4203: "BDC3204",
 };
 
-// Which course codes each department lists. FDN and IDC courses are shared by every department.
-export const DEPARTMENT_PREFIXES = {
-  "Biological Sciences": ["BIO", "BOT", "ZOO", "MIB", "BDC"],
-  "Chemical Sciences": ["CHE"],
-  Computing: ["ICT"],
-  "Health Promotion": ["HPT"],
-  "Physical Sciences": ["MAT", "STA", "PHY", "COM"],
+// Which courses each department lists: every course with one of its own code prefixes, plus the
+// shared courses its students sit. Shared lists come from the EIS subject lists (IT 21/22 and
+// Bio 22/23 batches) where we have them. The archive files common papers (FDN, IDC, some BIO and
+// STA) under every department, so where a paper is filed is not evidence of who takes the course.
+// Papers filed under a department for a course it doesn't list show under "Others" there.
+const ALL_FOUNDATION = ["FDN1201", "FDN1202", "FDN1203", "FDN1204", "FDN1205", "FDN1306"];
+// IT takes IDC 3201 in Year 3; the other Year 3 IDC courses are for the other departments.
+const INTERDISCIPLINARY = ["IDC1201", "IDC1202", "IDC2201", "IDC2202", "IDC2203", "IDC3203", "IDC3209", "IDC3211", "IDC3212"];
+
+export const DEPARTMENT_COURSES = {
+  "Biological Sciences": {
+    prefixes: ["BIO", "BOT", "ZOO", "MIB", "BDC"],
+    // Bio 22/23 EIS: these foundation courses and the Year 1 Chemistry courses.
+    shared: ["FDN1201", "FDN1202", "FDN1204", ...INTERDISCIPLINARY, "CHE1104", "CHE1105", "CHE1201", "CHE1203", "CHE1302"],
+  },
+  "Chemical Sciences": { prefixes: ["CHE"], shared: [...ALL_FOUNDATION, ...INTERDISCIPLINARY] },
+  Computing: {
+    prefixes: ["ICT"],
+    // IT 21/22 EIS.
+    shared: ["FDN1201", "FDN1205", "FDN1306", "IDC1201", "IDC1202", "IDC2201", "IDC2203", "IDC3201"],
+  },
+  "Health Promotion": { prefixes: ["HPT"], shared: [...ALL_FOUNDATION, ...INTERDISCIPLINARY] },
+  "Physical Sciences": { prefixes: ["MAT", "STA", "PHY", "COM"], shared: [...ALL_FOUNDATION, ...INTERDISCIPLINARY] },
 };
-export const SHARED_PREFIXES = ["FDN", "IDC"];

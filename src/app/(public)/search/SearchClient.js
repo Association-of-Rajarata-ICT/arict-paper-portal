@@ -492,7 +492,7 @@ function SearchResultsContent({ initialPapers }) {
     if (activeCourse || searchText || !courseDepartment || !courseYear) return null;
     return courseSemesters.map((semester) => ({
       semester,
-      courses: coursesFor(papers, courseDepartment, courseYear, semester).map((course) => ({
+      courses: coursesFor(courseDepartment, courseYear, semester).map((course) => ({
         ...course,
         count: papersForCourse(papers, course.code).length,
       })),

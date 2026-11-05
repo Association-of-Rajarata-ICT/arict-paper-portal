@@ -1,4 +1,4 @@
-import { COURSES, DEPARTMENT_PREFIXES, OLD_CODES, SHARED_PREFIXES } from "@/data/curriculum";
+import { COURSES, DEPARTMENT_COURSES, OLD_CODES } from "@/data/curriculum";
 import { compactText } from "@/lib/paperNaming.mjs";
 import { mergeSharedPapers, sortPapers } from "@/lib/papers";
 
@@ -54,46 +54,17 @@ export function oldCodesFor(code) {
 
 const codePrefix = (code) => code.replace(/\d+$/, "");
 
-function homeDepartment(code) {
-  return Object.keys(DEPARTMENT_PREFIXES).find((department) =>
-    DEPARTMENT_PREFIXES[department].includes(codePrefix(code))
-  );
+export function departmentListsCourse(department, code) {
+  const entry = DEPARTMENT_COURSES[department];
+  return Boolean(entry && (entry.prefixes.includes(codePrefix(code)) || entry.shared.includes(code)));
 }
 
-function departmentOwnsCode(department, code) {
-  return SHARED_PREFIXES.includes(codePrefix(code)) || homeDepartment(code) === department;
-}
-
-// Another department's courses that this department shares: the same sitting is filed under both
-// departments (e.g. the Chemistry courses Biological Sciences students sit). Papers filed under
-// just one other department are treated as misfiled, not shared.
-function sharedCourseCodes(papers, department) {
-  const sittings = new Set();
-  for (const paper of papers) {
-    for (const course of paperCourses(paper)) {
-      sittings.add(`${course.code}|${paper.examPeriod}|${paper.departmentFull || paper.department}`);
-    }
-  }
-  const shared = new Set();
-  for (const paper of papers) {
-    if ((paper.departmentFull || paper.department) !== department) continue;
-    for (const course of paperCourses(paper)) {
-      const home = homeDepartment(course.code);
-      if (home && home !== department && sittings.has(`${course.code}|${paper.examPeriod}|${home}`)) {
-        shared.add(course.code);
-      }
-    }
-  }
-  return shared;
-}
-
-export function coursesFor(papers, department, year, semester) {
-  const shared = sharedCourseCodes(papers, department);
+export function coursesFor(department, year, semester) {
   return COURSES.filter(
     (course) =>
       course.year === year &&
       course.semesters.includes(semester) &&
-      (departmentOwnsCode(department, course.code) || shared.has(course.code))
+      departmentListsCourse(department, course.code)
   );
 }
 
@@ -103,17 +74,19 @@ export function papersForCourse(papers, code) {
   return sortPapers(mergeSharedPapers(own), "newest");
 }
 
-// Papers on this department / year / semester that match no current course. Their codes are old
-// or still unconfirmed, so the year and semester the paper was filed under are all we have.
-// Returns one group per code, sorted by code.
+// Papers filed under this department / year / semester that don't belong to one of the
+// department's listed courses: old or unconfirmed codes, and courses the department isn't known to
+// take (e.g. a copy of a Biology paper filed under Computing). For these, the year and semester
+// the paper was filed under are all we have. Returns one group per code, sorted by code.
 export function otherPaperGroups(papers, department, year, semester) {
   const groups = new Map();
   for (const paper of papers) {
     if ((paper.departmentFull || paper.department) !== department) continue;
     if (paper.yearNumber !== year || paper.semesterNumber !== semester) continue;
-    if (paperCourses(paper).length) continue;
+    const courses = paperCourses(paper);
+    if (courses.some((course) => departmentListsCourse(department, course.code))) continue;
     const own = paperCourseCodes(paper.courseCode)[0] || "";
-    const code = own && canonicalCode(own);
+    const code = courses[0]?.code || (own && canonicalCode(own));
     const key = code || paper.courseCode || paper.title;
     if (!groups.has(key)) groups.set(key, { code, papers: [] });
     groups.get(key).papers.push(paper);
@@ -121,7 +94,7 @@ export function otherPaperGroups(papers, department, year, semester) {
   return [...groups.values()]
     .map(({ code, papers: list }) => ({
       code,
-      title: titleFromPapers(list, code),
+      title: COURSE_BY_CODE.get(code)?.title || titleFromPapers(list, code),
       papers: sortPapers(mergeSharedPapers(list), "newest"),
     }))
     .sort((a, b) => a.code.localeCompare(b.code) || a.title.localeCompare(b.title));
