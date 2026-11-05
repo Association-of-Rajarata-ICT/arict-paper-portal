@@ -7,10 +7,21 @@ import FilterSidebar from "@/components/FilterSidebar";
 import PaperCard from "@/components/PaperCard";
 import PaperListItem from "@/components/PaperListItem";
 import Pagination from "@/components/Pagination";
+import CodeBoxes from "@/components/CodeBoxes";
 import { departments } from "@/data/departments";
 import { filterPapers } from "@/data/papers";
 import {
+  courseView,
+  coursesFor,
+  findCourses,
+  formatCourseCode,
+  normalizeCourseCode,
+  otherPaperGroups,
+  papersForCourse,
+} from "@/lib/curriculum";
+import {
   fetchAllPapers,
+  getPaperRouteId,
   mergeSharedPapers,
   paperDepartments,
   PAPER_SORT_OPTIONS,
@@ -55,10 +66,256 @@ function ResultsSkeleton({ viewMode }) {
   );
 }
 
+const semesterLabel = (semester) => `Semester ${semester === 1 ? "I" : "II"}`;
+const numberFrom = (label = "") => Number.parseInt(String(label).match(/\d+/)?.[0], 10) || null;
+
+// One course in a ledger. Opening a course stays on this page (see openCourse).
+function CourseRow({ code, title, note, count, href, onOpen }) {
+  const handleClick = (event) => {
+    if (!onOpen || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    onOpen(code);
+  };
+  return (
+    <li>
+      <a href={href} className="course-row" onClick={handleClick}>
+        <span className="code-tag">{code ? formatCourseCode(code) : "—"}</span>
+        <span className="course-row-text">
+          <span className="course-row-title">{title}</span>
+          {note && <span className="course-row-note">{note}</span>}
+        </span>
+        <span className={`course-row-count${count === 0 ? " is-empty" : ""}`}>
+          {count === 0 ? (
+            "No papers yet"
+          ) : (
+            <>
+              <strong>{count}</strong> paper{count === 1 ? "" : "s"}
+            </>
+          )}
+        </span>
+        <span className="material-symbols-outlined course-row-arrow" aria-hidden="true">
+          arrow_forward
+        </span>
+      </a>
+    </li>
+  );
+}
+
+const courseHref = (code) => `/search?course=${encodeURIComponent(code)}`;
+
+// A semester's confirmed courses, then a fold with the papers we could not match to one.
+function SemesterCourses({ semester, courses, others, onOpenCourse }) {
+  const otherCount = others.reduce((sum, group) => sum + group.papers.length, 0);
+  return (
+    <section className="semester-block" aria-labelledby={`semester-${semester}-heading`}>
+      <div className="section-head semester-block-head">
+        <h2 className="text-headline-sm" id={`semester-${semester}-heading`}>
+          {semesterLabel(semester)}
+        </h2>
+        <p>
+          {courses.length === 0
+            ? "Course list not confirmed yet"
+            : `${courses.length} course${courses.length === 1 ? "" : "s"}`}
+        </p>
+      </div>
+
+      {courses.length > 0 ? (
+        <ul className="course-index">
+          {courses.map((course) => (
+            <CourseRow
+              key={course.code}
+              code={course.code}
+              title={course.title}
+              note={
+                course.preSemester
+                  ? "Pre-semester course"
+                  : course.semesters.length > 1
+                    ? "Runs in both semesters"
+                    : ""
+              }
+              count={course.count}
+              href={courseHref(course.code)}
+              onOpen={onOpenCourse}
+            />
+          ))}
+        </ul>
+      ) : (
+        <p className="semester-block-empty">
+          The course list for this semester hasn&rsquo;t been confirmed yet.
+          {otherCount > 0 ? " Papers filed here are under Others." : ""}
+        </p>
+      )}
+
+      {others.length > 0 && (
+        <details className="other-papers" open={courses.length === 0}>
+          <summary>
+            <span className="material-symbols-outlined other-papers-chevron" aria-hidden="true">
+              expand_more
+            </span>
+            <span className="other-papers-title">Others</span>
+            <span className="other-papers-count">{otherCount}</span>
+            <span className="other-papers-hint">
+              Papers filed under this semester that we couldn&rsquo;t match to a current course,
+              such as older course codes
+            </span>
+          </summary>
+          <ul className="course-index">
+            {others.map((group) => (
+              <CourseRow
+                key={group.code || group.title}
+                code={group.code}
+                title={group.title}
+                count={group.papers.length}
+                href={
+                  group.code
+                    ? courseHref(group.code)
+                    : `/paper/${encodeURIComponent(getPaperRouteId(group.papers[0]))}`
+                }
+                onOpen={group.code ? onOpenCourse : null}
+              />
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
+  );
+}
+
+// Every paper of one course, with a button that downloads them all as one zip.
+function CourseView({ view, loading, backLabel, onBack }) {
+  const { code, course, title, papers, oldCodes } = view;
+  const facts = course
+    ? [
+        `Year ${course.year}`,
+        course.preSemester ? "Pre-semester" : course.semesters.map(semesterLabel).join(" and "),
+      ]
+    : [];
+  const handleBack = (event) => {
+    if (!onBack || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    onBack();
+  };
+
+  return (
+    <section className="search-page course-view" id="course-view">
+      <div className="page-head">
+        <div className="container course-head">
+          <div className="course-head-main">
+            <nav className="breadcrumb" aria-label="Breadcrumb">
+              <span className="breadcrumb-item">
+                <a href="/search" onClick={handleBack}>
+                  {backLabel}
+                </a>
+              </span>
+              <span className="breadcrumb-item">
+                <span className="material-symbols-outlined separator" aria-hidden="true">
+                  chevron_right
+                </span>
+                <span className="current" aria-current="page">
+                  {formatCourseCode(code)}
+                </span>
+              </span>
+            </nav>
+            <CodeBoxes code={code} size="lg" />
+            <h1 className="text-headline-lg">{title}</h1>
+            <p className="page-head-meta">
+              {facts.length > 0 && <>{facts.join(" · ")} · </>}
+              {loading ? (
+                "Loading papers…"
+              ) : (
+                <>
+                  <strong>{papers.length}</strong> past paper{papers.length === 1 ? "" : "s"}
+                </>
+              )}
+            </p>
+            {oldCodes.length > 0 && (
+              <p className="course-head-aliases">
+                Includes papers under the older code{oldCodes.length === 1 ? "" : "s"}
+                {oldCodes.map((old) => (
+                  <span key={old} className="code-tag">
+                    {formatCourseCode(old)}
+                  </span>
+                ))}
+              </p>
+            )}
+          </div>
+
+          {!loading && papers.length > 0 && (
+            <div className="course-head-actions">
+              <a
+                href={`/api/course-zip/${encodeURIComponent(code)}`}
+                className="btn btn-primary btn-lg"
+                download
+                id="course-download-all"
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  folder_zip
+                </span>
+                Download all ({papers.length})
+              </a>
+              <p className="course-head-actions-note">Every paper in one .zip file</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="container course-body">
+        {!course && (
+          <div className="notice" role="status">
+            <span className="material-symbols-outlined" aria-hidden="true">
+              history
+            </span>
+            <span>
+              This code isn&rsquo;t in the 2026 timetables. It may be an older course, or one we
+              are still matching to the current curriculum.
+            </span>
+          </div>
+        )}
+
+        {loading ? (
+          <ResultsSkeleton viewMode="list" />
+        ) : papers.length > 0 ? (
+          <div className="results-list">
+            {papers.map((paper) => (
+              <PaperListItem key={paper.id} paper={paper} />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span className="empty-state-icon" aria-hidden="true">
+              <span className="material-symbols-outlined">description</span>
+            </span>
+            <h2>No papers for this course yet</h2>
+            <p>
+              If you have a {formatCourseCode(code)} past paper, please contribute it, or request it
+              and ARICT will try to add it.
+            </p>
+            <div className="empty-state-actions">
+              <a href="/contribute" className="btn btn-secondary">
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  upload_file
+                </span>
+                Contribute a paper
+              </a>
+              <button type="button" className="btn btn-primary" onClick={openRequestPaper}>
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  note_add
+                </span>
+                Request this paper
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function SearchResultsContent({ initialPapers }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
+  const courseParam = searchParams.get("course") || "";
   const yearsParam = searchParams.get("years") || "";
   const initialExamPeriods = yearsParam
     .split(",")
@@ -79,6 +336,8 @@ function SearchResultsContent({ initialPapers }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const resultsTopRef = useRef(null);
   const skipScrollRef = useRef(true);
+  // True once a course was opened from this page, so "back" can return to the list as it was.
+  const [openedCourse, setOpenedCourse] = useState(false);
 
   useEffect(() => {
     setSelectedDepartments(getDepartmentFilterFromQuery(query));
@@ -207,6 +466,55 @@ function SearchResultsContent({ initialPapers }) {
     return sortSemesters(Array.from(new Set(semesters)));
   }, [papers]);
 
+  // Course view: ?course=ICT3301, a searched course code (old codes too), or a search that names
+  // exactly one course ("human computer interaction"). Department-name searches are filters.
+  const searchText = query.trim();
+  const searchIsDepartment = getDepartmentFilterFromQuery(searchText).length > 0;
+  const matchingCourses = useMemo(
+    () => (courseParam || !searchText || searchIsDepartment || normalizeCourseCode(searchText) ? [] : findCourses(searchText)),
+    [courseParam, searchText, searchIsDepartment]
+  );
+  const activeCourse = useMemo(() => {
+    if (courseParam) return courseView(papers, courseParam);
+    if (!searchText || searchIsDepartment) return null;
+    if (normalizeCourseCode(searchText)) return courseView(papers, searchText);
+    return matchingCourses.length === 1 ? courseView(papers, matchingCourses[0].code) : null;
+  }, [papers, courseParam, searchText, searchIsDepartment, matchingCourses]);
+
+  // Course lists: one department and one year selected (and no search), grouped by semester.
+  const courseDepartment = selectedDepartments.length === 1 ? selectedDepartments[0] : null;
+  const courseYear = selectedAcademicYears.length === 1 ? numberFrom(selectedAcademicYears[0]) : null;
+  const courseSemesters = useMemo(
+    () => (selectedSemesters.length === 1 ? [numberFrom(selectedSemesters[0])].filter(Boolean) : [1, 2]),
+    [selectedSemesters]
+  );
+  const semesterBlocks = useMemo(() => {
+    if (activeCourse || searchText || !courseDepartment || !courseYear) return null;
+    return courseSemesters.map((semester) => ({
+      semester,
+      courses: coursesFor(papers, courseDepartment, courseYear, semester).map((course) => ({
+        ...course,
+        count: papersForCourse(papers, course.code).length,
+      })),
+      others: otherPaperGroups(papers, courseDepartment, courseYear, semester),
+    }));
+  }, [papers, activeCourse, searchText, courseDepartment, courseYear, courseSemesters]);
+  const courseCount = semesterBlocks?.reduce((sum, block) => sum + block.courses.length, 0) || 0;
+
+  const openCourse = useCallback((code) => {
+    setOpenedCourse(true);
+    window.history.pushState(null, "", courseHref(code));
+    window.scrollTo({ top: 0 });
+  }, []);
+  const closeCourse = useCallback(() => {
+    if (openedCourse) {
+      setOpenedCourse(false);
+      window.history.back();
+    } else {
+      router.push("/search");
+    }
+  }, [openedCourse, router]);
+
   const totalResults = displayResults.length;
   const pageSize = viewMode === "list" ? LIST_PAGE_SIZE : COMPACT_PAGE_SIZE;
   const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
@@ -314,6 +622,21 @@ function SearchResultsContent({ initialPapers }) {
   const rangeStart = totalResults === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const rangeEnd = Math.min(currentPage * pageSize, totalResults);
 
+  if (activeCourse) {
+    const backLabel =
+      openedCourse && courseDepartment && courseYear
+        ? `${courseDepartment} · Year ${courseYear}`
+        : "Past Papers";
+    return (
+      <CourseView
+        view={activeCourse}
+        loading={loading}
+        backLabel={backLabel}
+        onBack={courseParam ? closeCourse : null}
+      />
+    );
+  }
+
   return (
     <section className="search-page" id="search-page">
       <div className="page-head" ref={resultsTopRef}>
@@ -329,6 +652,11 @@ function SearchResultsContent({ initialPapers }) {
             <p className="page-head-meta">
               {loading ? (
                 "Loading the archive…"
+              ) : semesterBlocks ? (
+                <>
+                  <strong>{courseCount}</strong> course{courseCount === 1 ? "" : "s"} in{" "}
+                  {courseDepartment} · Year {courseYear}
+                </>
               ) : (
                 <>
                   <strong>{totalResults.toLocaleString()}</strong> past paper
@@ -372,6 +700,8 @@ function SearchResultsContent({ initialPapers }) {
             <p className="results-toolbar-count" aria-live="polite">
               {loading ? (
                 "Loading…"
+              ) : semesterBlocks ? (
+                "Pick a course to see all of its past papers"
               ) : totalResults > 0 ? (
                 <>
                   Showing <strong>{rangeStart}–{rangeEnd}</strong> of{" "}
@@ -397,6 +727,8 @@ function SearchResultsContent({ initialPapers }) {
                   <span className="filter-badge">{selectedFilterCount}</span>
                 )}
               </button>
+              {!semesterBlocks && (
+              <>
               <label className="sort-select">
                 <span className="material-symbols-outlined" aria-hidden="true">
                   sort
@@ -443,6 +775,8 @@ function SearchResultsContent({ initialPapers }) {
                   <span className="view-toggle-label">List</span>
                 </button>
               </div>
+              </>
+              )}
             </div>
           </div>
 
@@ -483,8 +817,41 @@ function SearchResultsContent({ initialPapers }) {
             </div>
           )}
 
+          {!loading && matchingCourses.length > 1 && (
+            <section className="matching-courses" aria-labelledby="matching-courses-heading">
+              <h2 className="matching-courses-title" id="matching-courses-heading">
+                Matching courses
+              </h2>
+              <ul className="course-index">
+                {matchingCourses.slice(0, 8).map((course) => (
+                  <CourseRow
+                    key={course.code}
+                    code={course.code}
+                    title={course.title}
+                    note={`Year ${course.year} · ${course.semesters.map(semesterLabel).join(" and ")}`}
+                    count={papersForCourse(papers, course.code).length}
+                    href={courseHref(course.code)}
+                    onOpen={openCourse}
+                  />
+                ))}
+              </ul>
+              {matchingCourses.length > 8 && (
+                <p className="matching-courses-more">
+                  {matchingCourses.length - 8} more courses match. Add more of the course name or
+                  code to narrow it down.
+                </p>
+              )}
+            </section>
+          )}
+
           {loading ? (
-            <ResultsSkeleton viewMode={viewMode} />
+            <ResultsSkeleton viewMode={semesterBlocks ? "list" : viewMode} />
+          ) : semesterBlocks ? (
+            <div className="semester-blocks">
+              {semesterBlocks.map((block) => (
+                <SemesterCourses key={block.semester} {...block} onOpenCourse={openCourse} />
+              ))}
+            </div>
           ) : displayResults.length === 0 ? (
             <div className="empty-state">
               <span className="empty-state-icon" aria-hidden="true">
@@ -531,7 +898,7 @@ function SearchResultsContent({ initialPapers }) {
             </div>
           )}
 
-          {!loading && totalPages > 1 && (
+          {!loading && !semesterBlocks && totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

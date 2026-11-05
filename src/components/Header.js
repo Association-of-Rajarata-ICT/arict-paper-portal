@@ -16,7 +16,6 @@ function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
   if (href === "/search")
     return pathname === "/search" || pathname.startsWith("/paper/");
-  if (href === "/courses") return pathname === "/courses" || pathname.startsWith("/courses/");
   return pathname === href;
 }
 
@@ -98,17 +97,16 @@ export default function Header() {
 
           <div className="site-header-actions">
             <ThemeToggle />
-            <button
-              type="button"
+            <Link
+              href="/request-or-contribute"
               className="btn btn-primary btn-sm header-request"
               id="request-paper-btn"
-              onClick={openRequestModal}
             >
               <span className="material-symbols-outlined" aria-hidden="true">
                 note_add
               </span>
-              Request a paper
-            </button>
+              Request / Contribute
+            </Link>
             <button
               type="button"
               className="icon-btn header-menu-btn"
@@ -187,16 +185,16 @@ export default function Header() {
         </nav>
 
         <div className="mobile-menu-actions">
-          <button
-            type="button"
+          <Link
+            href="/request-or-contribute"
             className="btn btn-primary btn-lg btn-block"
-            onClick={openRequestModal}
+            onClick={() => setMobileOpen(false)}
           >
             <span className="material-symbols-outlined" aria-hidden="true">
               note_add
             </span>
-            Request a paper
-          </button>
+            Request / Contribute
+          </Link>
         </div>
       </div>
 

@@ -2456,22 +2456,25 @@ a.cover-sheet:hover {
   color: var(--ink-3);
 }
 
-/* --- Courses (department → year → semester → course) ------- */
-.courses-page,
-.course-page {
+/* --- Courses inside Past Papers ------------------------------ */
+.course-view {
   padding-bottom: var(--s-16);
-}
-
-.courses-head,
-.course-head {
-  padding-top: var(--s-10);
-  padding-bottom: var(--s-8);
 }
 
 .course-head {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s-8);
+  padding-top: var(--s-8);
+  padding-bottom: var(--s-8);
+}
+
+.course-head-main {
+  display: grid;
   justify-items: start;
   gap: var(--s-3);
+  min-width: 0;
 }
 
 .course-head-aliases {
@@ -2483,82 +2486,55 @@ a.cover-sheet:hover {
   color: var(--ink-2);
 }
 
-.courses-body,
+.course-head-actions {
+  display: grid;
+  justify-items: end;
+  gap: var(--s-2);
+}
+
+.course-head-actions-note {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
 .course-body {
   padding-top: var(--s-8);
 }
 
-/* Picker: three rows of tick-style options, like the boxes on a cover sheet */
-.course-picker {
+.semester-blocks {
   display: grid;
-  gap: var(--s-4);
-  padding: var(--s-5) var(--s-6);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-sheet);
-  background: var(--surface);
+  gap: var(--s-10);
 }
 
-.course-picker-row {
-  display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
-  align-items: center;
-  gap: var(--s-4);
+.semester-block-head {
+  align-items: baseline;
 }
 
-.course-picker-row + .course-picker-row {
-  padding-top: var(--s-4);
-  border-top: 1px solid var(--rule);
-}
-
-.course-picker-label {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--ink-2);
-}
-
-.course-picker-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-2);
-}
-
-.course-picker-option {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0 var(--s-4);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--r-control);
-  background: var(--surface);
-  color: var(--ink);
+.semester-block-empty {
+  padding: var(--s-4) var(--s-2);
+  margin-bottom: var(--s-4);
   font-size: 0.9375rem;
-  font-weight: 600;
-  transition: border-color var(--t-fast), background-color var(--t-fast), color var(--t-fast);
-}
-
-.course-picker-option:hover {
-  border-color: var(--ink-2);
-  background: var(--surface-2);
-}
-
-.course-picker-option.is-active {
-  border-color: var(--brand);
-  background: var(--brand-tint);
-  color: var(--brand);
-}
-
-.course-picker-option:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--brand-ring);
-}
-
-.courses-hint {
-  margin-top: var(--s-8);
   color: var(--ink-2);
 }
 
-.courses-section-head {
-  margin-top: var(--s-10);
+.matching-courses {
+  margin-bottom: var(--s-8);
+}
+
+.matching-courses-title {
+  padding-bottom: var(--s-3);
+  border-bottom: 2px solid var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.matching-courses .course-index {
+  margin-bottom: var(--s-3);
+}
+
+.matching-courses-more {
+  font-size: 0.875rem;
+  color: var(--ink-3);
 }
 
 /* Course ledger */
@@ -2697,13 +2673,13 @@ a.cover-sheet:hover {
 }
 
 @media (max-width: 767px) {
-  .course-picker {
-    padding: var(--s-4);
+  .course-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-5);
   }
 
-  .course-picker-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-2);
+  .course-head-actions {
+    justify-items: stretch;
   }
 
   .course-row {
@@ -3143,6 +3119,76 @@ a.cover-sheet:hover {
 .contact-list li span {
   min-width: 90px;
   color: var(--ink-3);
+}
+
+/* --- Request or contribute: two sheets side by side ---------- */
+.paper-choice {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6);
+  padding-bottom: var(--s-16);
+}
+
+.paper-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-4);
+  padding: var(--s-8);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sheet);
+  background: var(--surface);
+}
+
+.paper-choice-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--brand-tint-strong);
+  border-radius: var(--r-control);
+  background: var(--brand-tint);
+  color: var(--brand);
+}
+
+.paper-choice-card h2 {
+  font-size: 1.375rem;
+  font-weight: 800;
+  font-variation-settings: "wdth" 110;
+  letter-spacing: -0.015em;
+}
+
+.paper-choice-card p {
+  color: var(--ink-2);
+}
+
+.paper-choice-card ul {
+  display: grid;
+  gap: var(--s-2);
+  width: 100%;
+  margin-bottom: var(--s-2);
+  padding: var(--s-4) 0 0 1.25rem;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+}
+
+.paper-choice-card .btn {
+  margin-top: auto;
+}
+
+@media (max-width: 767px) {
+  .paper-choice {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .paper-choice-card {
+    padding: var(--s-6);
+  }
+
+  .paper-choice-card .btn {
+    width: 100%;
+  }
 }
 
 /* --- Contribute a paper ------------------------------------- */

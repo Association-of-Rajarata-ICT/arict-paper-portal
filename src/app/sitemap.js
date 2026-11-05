@@ -11,7 +11,7 @@ export default async function sitemap() {
   try {
     const papers = await getPublicPapers();
     const courses = COURSES.filter((course) => papersForCourse(papers, course.code).length > 0)
-      .map((course) => ({ url: `${SITE_URL}/courses/${course.code}` }));
+      .map((course) => ({ url: `${SITE_URL}/search?course=${course.code}` }));
     return [...pages, ...courses, ...papers.map((paper) => ({
       url: `${SITE_URL}/paper/${encodeURIComponent(paper.docId || paper.id)}`,
       ...(paper.updatedAt || paper.createdAt ? { lastModified: paper.updatedAt || paper.createdAt } : {}),
