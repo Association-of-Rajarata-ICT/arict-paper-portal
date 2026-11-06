@@ -370,6 +370,61 @@ code {
   outline: none;
 }
 
+/* --- Page transitions ---------------------------------------
+   Leaving: a maroon bar runs along the top and the old page dims.
+   Arriving: the new page rises 10px and fades in (360ms).
+   ------------------------------------------------------------ */
+.nav-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 3px;
+  z-index: calc(var(--z-modal) + 10);
+  pointer-events: none;
+  background: var(--brand);
+  box-shadow: 0 0 10px var(--brand-ring);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  opacity: 0;
+}
+
+.nav-progress[data-state="loading"] {
+  opacity: 1;
+  transform: scaleX(0.85);
+  transition:
+    transform 2.6s cubic-bezier(0.08, 0.75, 0.2, 1),
+    opacity 100ms linear;
+}
+
+.nav-progress[data-state="done"] {
+  opacity: 0;
+  transform: scaleX(1);
+  transition:
+    transform 220ms var(--ease-out),
+    opacity 240ms linear 140ms;
+}
+
+.page-transition {
+  transition: opacity 180ms var(--ease-out);
+}
+
+/* The short delay keeps instant (prefetched) navigations from flickering. */
+html[data-navigating] .page-transition {
+  opacity: 0.5;
+  transition-delay: 70ms;
+}
+
+/* Fill mode "backwards" drops the transform once finished, so fixed and sticky children behave normally. */
+.page-transition.is-entering {
+  animation: page-enter 360ms var(--ease-out) backwards;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 .divider {
   border: none;
   height: 1px;
