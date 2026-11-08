@@ -1,5 +1,6 @@
 import { Archivo, Martian_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/seo";
 
@@ -61,6 +62,7 @@ export default function RootLayout({ children }) {
       <body suppressHydrationWarning>
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
