@@ -2577,6 +2577,15 @@ a.cover-sheet:hover {
   gap: var(--s-10);
 }
 
+.year-blocks {
+  display: grid;
+  gap: var(--s-12);
+}
+
+.year-block-title {
+  margin-bottom: var(--s-6);
+}
+
 .semester-block-head {
   align-items: baseline;
 }

@@ -43,6 +43,7 @@ function getDepartmentFilterFromQuery(searchQuery = "") {
 
 const LIST_PAGE_SIZE = 5;
 const COMPACT_PAGE_SIZE = 9;
+const ALL_COURSE_YEARS = [1, 2, 3, 4];
 
 function ResultsSkeleton({ viewMode }) {
   const count = viewMode === "list" ? 4 : 6;
@@ -104,12 +105,13 @@ function CourseRow({ code, title, note, count, href, onOpen }) {
 const courseHref = (code) => `/search?course=${encodeURIComponent(code)}`;
 
 // A semester's confirmed courses, then a fold with the papers we could not match to one.
-function SemesterCourses({ semester, courses, others, onOpenCourse }) {
+function SemesterCourses({ year, semester, courses, others, onOpenCourse }) {
   const otherCount = others.reduce((sum, group) => sum + group.papers.length, 0);
+  const headingId = `semester-${year}-${semester}-heading`;
   return (
-    <section className="semester-block" aria-labelledby={`semester-${semester}-heading`}>
+    <section className="semester-block" aria-labelledby={headingId}>
       <div className="section-head semester-block-head">
-        <h2 className="text-headline-sm" id={`semester-${semester}-heading`}>
+        <h2 className="text-headline-sm" id={headingId}>
           {semesterLabel(semester)}
         </h2>
         <p>
@@ -481,25 +483,43 @@ function SearchResultsContent({ initialPapers }) {
     return courseView(papers, searchText);
   }, [papers, courseParam, searchText, searchIsDepartment]);
 
-  // Course lists: one department and one year selected (and no search), grouped by semester.
+  // Course lists: one department selected (and no search), grouped by year and semester. Picking
+  // years or a semester narrows the lists; with none picked, every year is listed.
   const courseDepartment = selectedDepartments.length === 1 ? selectedDepartments[0] : null;
   const courseYear = selectedAcademicYears.length === 1 ? numberFrom(selectedAcademicYears[0]) : null;
+  const courseYears = useMemo(() => {
+    const picked = selectedAcademicYears.map(numberFrom).filter(Boolean);
+    return picked.length > 0 ? picked.sort((a, b) => a - b) : ALL_COURSE_YEARS;
+  }, [selectedAcademicYears]);
   const courseSemesters = useMemo(
     () => (selectedSemesters.length === 1 ? [numberFrom(selectedSemesters[0])].filter(Boolean) : [1, 2]),
     [selectedSemesters]
   );
-  const semesterBlocks = useMemo(() => {
-    if (activeCourse || searchText || !courseDepartment || !courseYear) return null;
-    return courseSemesters.map((semester) => ({
-      semester,
-      courses: coursesFor(courseDepartment, courseYear, semester).map((course) => ({
-        ...course,
-        count: papersForCourse(papers, course.code).length,
+  const yearBlocks = useMemo(() => {
+    if (activeCourse || searchText || !courseDepartment) return null;
+    const blocks = courseYears.map((year) => ({
+      year,
+      semesters: courseSemesters.map((semester) => ({
+        semester,
+        courses: coursesFor(courseDepartment, year, semester).map((course) => ({
+          ...course,
+          count: papersForCourse(papers, course.code).length,
+        })),
+        others: otherPaperGroups(papers, courseDepartment, year, semester),
       })),
-      others: otherPaperGroups(papers, courseDepartment, courseYear, semester),
     }));
-  }, [papers, activeCourse, searchText, courseDepartment, courseYear, courseSemesters]);
-  const courseCount = semesterBlocks?.reduce((sum, block) => sum + block.courses.length, 0) || 0;
+    // A year nobody has courses or papers for is noise, unless it was picked explicitly.
+    return blocks.filter(
+      (block) =>
+        selectedAcademicYears.length > 0 ||
+        block.semesters.some((s) => s.courses.length > 0 || s.others.length > 0)
+    );
+  }, [papers, activeCourse, searchText, courseDepartment, courseYears, courseSemesters, selectedAcademicYears]);
+  const courseCount =
+    yearBlocks?.reduce(
+      (sum, block) => sum + block.semesters.reduce((n, s) => n + s.courses.length, 0),
+      0
+    ) || 0;
 
   const openCourse = useCallback((code) => {
     setOpenedCourse(true);
@@ -624,8 +644,10 @@ function SearchResultsContent({ initialPapers }) {
 
   if (activeCourse) {
     const backLabel =
-      openedCourse && courseDepartment && courseYear
-        ? `${courseDepartment} · Year ${courseYear}`
+      openedCourse && courseDepartment
+        ? courseYear
+          ? `${courseDepartment} · Year ${courseYear}`
+          : courseDepartment
         : "Past Papers";
     return (
       <CourseView
@@ -652,10 +674,11 @@ function SearchResultsContent({ initialPapers }) {
             <p className="page-head-meta">
               {loading ? (
                 "Loading the archive…"
-              ) : semesterBlocks ? (
+              ) : yearBlocks ? (
                 <>
                   <strong>{courseCount}</strong> course{courseCount === 1 ? "" : "s"} in{" "}
-                  {courseDepartment} · Year {courseYear}
+                  {courseDepartment}
+                  {courseYear ? ` · Year ${courseYear}` : ""}
                 </>
               ) : (
                 <>
@@ -700,7 +723,7 @@ function SearchResultsContent({ initialPapers }) {
             <p className="results-toolbar-count" aria-live="polite">
               {loading ? (
                 "Loading…"
-              ) : semesterBlocks ? (
+              ) : yearBlocks ? (
                 "Pick a course to see all of its past papers"
               ) : totalResults > 0 ? (
                 <>
@@ -727,7 +750,7 @@ function SearchResultsContent({ initialPapers }) {
                   <span className="filter-badge">{selectedFilterCount}</span>
                 )}
               </button>
-              {!semesterBlocks && (
+              {!yearBlocks && (
               <>
               <label className="sort-select">
                 <span className="material-symbols-outlined" aria-hidden="true">
@@ -845,11 +868,25 @@ function SearchResultsContent({ initialPapers }) {
           )}
 
           {loading ? (
-            <ResultsSkeleton viewMode={semesterBlocks ? "list" : viewMode} />
-          ) : semesterBlocks ? (
-            <div className="semester-blocks">
-              {semesterBlocks.map((block) => (
-                <SemesterCourses key={block.semester} {...block} onOpenCourse={openCourse} />
+            <ResultsSkeleton viewMode={yearBlocks ? "list" : viewMode} />
+          ) : yearBlocks ? (
+            <div className="year-blocks">
+              {yearBlocks.map(({ year, semesters }) => (
+                <div className="year-block" key={year}>
+                  {!courseYear && (
+                    <h2 className="year-block-title text-headline-md">Year {year}</h2>
+                  )}
+                  <div className="semester-blocks">
+                    {semesters.map((block) => (
+                      <SemesterCourses
+                        key={block.semester}
+                        year={year}
+                        {...block}
+                        onOpenCourse={openCourse}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           ) : displayResults.length === 0 ? (
@@ -898,7 +935,7 @@ function SearchResultsContent({ initialPapers }) {
             </div>
           )}
 
-          {!loading && !semesterBlocks && totalPages > 1 && (
+          {!loading && !yearBlocks && totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
