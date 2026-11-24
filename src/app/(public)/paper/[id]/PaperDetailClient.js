@@ -159,6 +159,26 @@ export default function PaperDetailClient({ paper, relatedPapers = [] }) {
           </aside>
         </div>
 
+        <section className="paper-about" aria-labelledby="paper-about-heading">
+          <h2 id="paper-about-heading" className="text-headline-md">
+            About this past paper
+          </h2>
+          <p>
+            This is the {paper.examPeriod} examination paper for {paper.courseCode} {paper.title}
+            {paper.academicYear ? `, a ${paper.academicYear}` : ""}
+            {paper.semester ? ` ${paper.semester}` : ""} course offered by the Department of{" "}
+            {departments.join(" and ")}, Faculty of Applied Sciences, Rajarata University of Sri Lanka.
+            Preview it in your browser or download the PDF to practise before your exam.
+          </p>
+          <p>
+            Looking for other {paper.courseCode} papers?{" "}
+            <Link href={`/search?course=${encodeURIComponent(paper.courseCode)}`}>
+              See every {paper.courseCode} past paper
+            </Link>
+            , or <Link href="/search">browse the full archive</Link>.
+          </p>
+        </section>
+
         {relatedPapers.length > 0 && (
           <section className="related-section" id="related-papers" aria-labelledby="related-heading">
             <div className="section-head">

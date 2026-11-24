@@ -3,15 +3,17 @@ import { getPublicPapers } from "@/lib/server/publicPapers";
 import { COURSES } from "@/data/curriculum";
 import { papersForCourse } from "@/lib/curriculum";
 
-export const dynamic = "force-dynamic";
+// Cached so Googlebot always gets a fast, complete response instead of a per-request database build.
+export const revalidate = 3600;
 
 // Next.js serves this metadata route as /sitemap.xml; no public/sitemap.xml is needed.
 export default async function sitemap() {
-  const pages = Object.keys(PUBLIC_PAGES).map((path) => ({ url: new URL(path, SITE_URL).href }));
+  const buildDate = new Date();
+  const pages = Object.keys(PUBLIC_PAGES).map((path) => ({ url: new URL(path, SITE_URL).href, lastModified: buildDate }));
   try {
     const papers = await getPublicPapers();
     const courses = COURSES.filter((course) => papersForCourse(papers, course.code).length > 0)
-      .map((course) => ({ url: `${SITE_URL}/search?course=${course.code}` }));
+      .map((course) => ({ url: `${SITE_URL}/search?course=${course.code}`, lastModified: buildDate }));
     return [...pages, ...courses, ...papers.map((paper) => ({
       url: `${SITE_URL}/paper/${encodeURIComponent(paper.docId || paper.id)}`,
       ...(paper.updatedAt || paper.createdAt ? { lastModified: paper.updatedAt || paper.createdAt } : {}),
