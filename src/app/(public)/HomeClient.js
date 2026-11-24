@@ -225,6 +225,13 @@ export default function Home({ summary = null }) {
         <div className="container">
           <h2 className="text-headline-md">Find your next revision resource</h2>
           <p>
+            The ARICT Past Paper Portal is a free, student-run archive for the Faculty of Applied Sciences
+            at Rajarata University of Sri Lanka. It collects end-of-semester examination papers from the
+            Biological Sciences, Chemical Sciences, Computing, Health Promotion and Physical Sciences
+            departments, filed by course code, academic year, semester and exam period, so you can
+            revise from real papers before your exams.
+          </p>
+          <p>
             <Link href="/search">Browse past examination papers</Link>, explore the{" "}
             <Link href="/faculty">Faculty of Applied Sciences departments</Link>, or read our{" "}
             <Link href="/help">guide to finding and downloading papers</Link>.
