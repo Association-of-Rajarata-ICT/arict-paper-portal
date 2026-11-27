@@ -2,15 +2,9 @@
 
 const STORAGE_KEY = "arict-theme";
 
-function getEffectiveTheme() {
-  const explicit = document.documentElement.dataset.theme;
-  if (explicit === "light" || explicit === "dark") return explicit;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
 export default function ThemeToggle({ className = "" }) {
   const handleToggle = () => {
-    const next = getEffectiveTheme() === "dark" ? "light" : "dark";
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem(STORAGE_KEY, next);

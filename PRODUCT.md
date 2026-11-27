@@ -51,4 +51,4 @@ A student-run archive organized the way the university itself organizes exams: b
 
 ## Accessibility & Inclusion
 
-Large, mixed-device student audience; work toward WCAG 2.2 AA, including contrast, visible focus, keyboard-operable filters and dialogs, and reduced-motion support. Light and dark themes (dark follows device setting, with a manual toggle). See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for contributor guidance, reporting routes and known limitations; this target is not a claim of verified conformance.
+Large, mixed-device student audience; work toward WCAG 2.2 AA, including contrast, visible focus, keyboard-operable filters and dialogs, and reduced-motion support. Light and dark themes (light by default, dark chosen with a manual toggle). See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for contributor guidance, reporting routes and known limitations; this target is not a claim of verified conformance.

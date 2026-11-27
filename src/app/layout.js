@@ -33,19 +33,18 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#171d2b" },
-  ],
+  themeColor: "#ffffff",
 };
 
-// Applies the saved theme before first paint so there is no light/dark flash.
+// Light is the default whatever the device setting. A saved choice is applied before first paint so
+// there is no light/dark flash.
 const themeScript = `(function(){try{var t=localStorage.getItem("arict-theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;}}catch(e){}})();`;
 
 export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      data-theme="light"
       className={`${figtree.variable} ${bricolage.variable}`}
       suppressHydrationWarning
     >

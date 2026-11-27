@@ -107,48 +107,7 @@
   --color-on-surface: var(--ink);
 }
 
-/* Late-night revision: deep slate desk */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: #0f1320;
-    --surface: #171d2d;
-    --surface-2: #1f2639;
-    --surface-3: #293148;
-    --ink: #e9ecf5;
-    --ink-2: #bac1d4;
-    --ink-3: #939bb2;
-    --rule: #2a3249;
-    --rule-strong: #434d69;
-    --brand: #ff9d93;
-    --brand-solid: #b3231d;
-    --brand-solid-hover: #c93229;
-    --brand-tint: #34202a;
-    --brand-tint-strong: #5a2f37;
-    --brand-ring: rgba(255, 157, 147, 0.3);
-    --band: #4c0b11;
-    --band-deep: #33060b;
-    --dept-biological: #66d39c;
-    --dept-chemical: #bca2f5;
-    --dept-computing: #85b3ff;
-    --dept-health: #ff94c2;
-    --dept-physical: #f3b55c;
-    --success: #7fd19a;
-    --success-bg: #15281c;
-    --success-border: #2a5537;
-    --error: #ff9b91;
-    --error-bg: #2f1715;
-    --error-border: #5e2b26;
-    --notice-bg: #2a2412;
-    --notice-border: #55461b;
-    --notice-ink: #eed484;
-    --shadow-sheet: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 32px -18px rgba(0, 0, 0, 0.7);
-    --shadow-pop: 0 2px 6px rgba(0, 0, 0, 0.4), 0 28px 60px -18px rgba(0, 0, 0, 0.75);
-    --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 16px 32px -16px rgba(0, 0, 0, 0.65);
-    --scrim: rgba(0, 0, 0, 0.62);
-  }
-}
-
+/* Late-night revision: deep slate desk, chosen with the theme toggle */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --bg: #0f1320;
@@ -1012,16 +971,6 @@ input[type="file"].input-field::file-selector-button {
   color: var(--ink-2);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .brand-logo--light {
-    display: none;
-  }
-
-  :root:not([data-theme="light"]) .brand-logo--dark {
-    display: block;
-  }
-}
-
 :root[data-theme="dark"] .brand-logo--light {
   display: none;
 }
@@ -1084,16 +1033,6 @@ input[type="file"].input-field::file-selector-button {
 /* Theme toggle: icon follows the effective theme without JS state */
 .theme-toggle .icon-light {
   display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-toggle .icon-dark {
-    display: none;
-  }
-
-  :root:not([data-theme="light"]) .theme-toggle .icon-light {
-    display: inline-block;
-  }
 }
 
 :root[data-theme="dark"] .theme-toggle .icon-dark {
