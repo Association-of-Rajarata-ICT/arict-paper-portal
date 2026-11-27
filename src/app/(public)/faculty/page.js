@@ -16,9 +16,12 @@ export default function FacultyPage() {
             ARICT volunteers organise the archive for students' revision.
           </p>
         </div>
-        <div className="about-sections" style={{ marginTop: 0 }}>
+        <div className="faculty-grid">
           {departments.map((department) => (
-            <section key={department.id} className="about-section">
+            <section key={department.id} className="about-section" data-dept={department.id}>
+              <span className="dept-icon" aria-hidden="true">
+                <span className="material-symbols-outlined">{department.icon}</span>
+              </span>
               <h2>{department.name}</h2>
               <p>{department.description}</p>
               <p><Link href={"/search?q=" + encodeURIComponent(department.name)}>

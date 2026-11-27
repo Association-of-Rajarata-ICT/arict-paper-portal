@@ -8,7 +8,7 @@ import PaperCard from "@/components/PaperCard";
 import PaperListItem from "@/components/PaperListItem";
 import Pagination from "@/components/Pagination";
 import CodeBoxes from "@/components/CodeBoxes";
-import { departments } from "@/data/departments";
+import { departmentKey, departments } from "@/data/departments";
 import { filterPapers } from "@/data/papers";
 import {
   courseView,
@@ -316,14 +316,17 @@ function CourseView({ view, loading, backLabel, onBack }) {
 function SearchResultsContent({ initialPapers }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const query = searchParams.get("q") || "";
+  const qParam = searchParams.get("q") || "";
   const courseParam = searchParams.get("course") || "";
   const yearsParam = searchParams.get("years") || "";
   const initialExamPeriods = yearsParam
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
-  const initialDepartments = getDepartmentFilterFromQuery(query);
+  // A department name in ?q= (home tiles, footer, breadcrumbs) ticks that department's filter,
+  // exactly as picking it in the sidebar does. It is not also a text search.
+  const initialDepartments = getDepartmentFilterFromQuery(qParam);
+  const query = initialDepartments.length > 0 ? "" : qParam;
 
   const [viewMode, setViewMode] = useState("compact"); // compact, list
   const [sortBy, setSortBy] = useState("newest");
@@ -341,20 +344,29 @@ function SearchResultsContent({ initialPapers }) {
   // True once a course was opened from this page, so "back" can return to the list as it was.
   const [openedCourse, setOpenedCourse] = useState(false);
 
+  // The URL values the filters were last set from.
+  const appliedParamsRef = useRef(`${qParam}|${yearsParam}`);
+
   useEffect(() => {
-    setSelectedDepartments(getDepartmentFilterFromQuery(query));
+    // A course opened on top of the list leaves the filters alone, so "back" finds them as they were.
+    if (courseParam) return;
+    const key = `${qParam}|${yearsParam}`;
+    if (appliedParamsRef.current === key) return;
+    appliedParamsRef.current = key;
+
+    setSelectedDepartments(getDepartmentFilterFromQuery(qParam));
     setSelectedExamPeriods(
       yearsParam
         .split(",")
         .map((value) => value.trim())
         .filter(Boolean)
     );
-    if (!query && !yearsParam) {
+    if (!qParam && !yearsParam) {
       setSelectedAcademicYears([]);
       setSelectedSemesters([]);
     }
     setCurrentPage(1);
-  }, [query, yearsParam]);
+  }, [qParam, yearsParam, courseParam]);
 
   useEffect(() => {
     if (initialPapers !== null) return;
@@ -470,18 +482,17 @@ function SearchResultsContent({ initialPapers }) {
 
   // Course view: ?course=ICT3301 or a full course code in the search (old codes too). A search by
   // name lists the matching courses to pick from, since several can share words ("Mathematics I",
-  // "Mathematics II"). Department-name searches are filters.
+  // "Mathematics II").
   const searchText = query.trim();
-  const searchIsDepartment = getDepartmentFilterFromQuery(searchText).length > 0;
   const matchingCourses = useMemo(
-    () => (courseParam || !searchText || searchIsDepartment || normalizeCourseCode(searchText) ? [] : findCourses(searchText)),
-    [courseParam, searchText, searchIsDepartment]
+    () => (courseParam || !searchText || normalizeCourseCode(searchText) ? [] : findCourses(searchText)),
+    [courseParam, searchText]
   );
   const activeCourse = useMemo(() => {
     if (courseParam) return courseView(papers, courseParam);
-    if (!searchText || searchIsDepartment || !normalizeCourseCode(searchText)) return null;
+    if (!searchText || !normalizeCourseCode(searchText)) return null;
     return courseView(papers, searchText);
-  }, [papers, courseParam, searchText, searchIsDepartment]);
+  }, [papers, courseParam, searchText]);
 
   // Course lists: one department selected (and no search), grouped by year and semester. Picking
   // years or a semester narrows the lists; with none picked, every year is listed.
@@ -870,7 +881,7 @@ function SearchResultsContent({ initialPapers }) {
           {loading ? (
             <ResultsSkeleton viewMode={yearBlocks ? "list" : viewMode} />
           ) : yearBlocks ? (
-            <div className="year-blocks">
+            <div className="year-blocks" data-dept={departmentKey(courseDepartment)}>
               {yearBlocks.map(({ year, semesters }) => (
                 <div className="year-block" key={year}>
                   {!courseYear && (

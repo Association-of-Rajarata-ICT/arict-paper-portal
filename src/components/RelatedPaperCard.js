@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getPaperRouteId } from "@/lib/papers";
+import { departmentKey } from "@/data/departments";
+import { getPaperRouteId, paperDepartments } from "@/lib/papers";
 
 export default function RelatedPaperCard({ paper }) {
   const encodedId = encodeURIComponent(getPaperRouteId(paper));
@@ -10,6 +11,7 @@ export default function RelatedPaperCard({ paper }) {
       href={`/paper/${encodedId}`}
       className="related-card"
       id={`related-${paper.id}`}
+      data-dept={departmentKey(paperDepartments(paper)[0])}
     >
       <div className="related-card-header">
         <span className="code-tag">{paper.courseCode || "—"}</span>

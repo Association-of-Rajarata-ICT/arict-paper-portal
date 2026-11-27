@@ -101,7 +101,7 @@ export default function Footer() {
               <nav className="footer-column-links" aria-label="Footer">
                 {MAIN_NAV_LINKS.map(({ href, label }) => <Link key={href} href={href}>{label}</Link>)}
                 <a href={GPA_CALCULATOR_URL} target="_blank" rel="noopener">
-                  GPA Calculator ↗
+                  GPA Calculator
                 </a>
               </nav>
             </div>

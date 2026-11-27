@@ -5,85 +5,55 @@ import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import DepartmentCard from "@/components/DepartmentCard";
 import BrowseByExamPeriod from "@/components/BrowseByExamPeriod";
-import CodeBoxes from "@/components/CodeBoxes";
-import { departments } from "@/data/departments";
+import PaperCard from "@/components/PaperCard";
+import RequestPaperButton from "@/components/RequestPaperButton";
+import { departmentKey, departments } from "@/data/departments";
 import { summarizeArchive } from "@/lib/archiveSummary";
-import { fetchAllPapers, getPaperRouteId } from "@/lib/papers";
+import { fetchAllPapers, getPaperRouteId, paperDepartments } from "@/lib/papers";
 
-function getPaperHref(paper) {
-  const encodedId = encodeURIComponent(getPaperRouteId(paper));
-  return `/paper/${encodedId}`;
-}
+// Shown on the sheets when there are no papers to show yet.
+const HOW_IT_WORKS = [
+  { word: "Search", text: "Type a course code or module name" },
+  { word: "Filter", text: "Pick a department, year and semester" },
+  { word: "Save", text: "Preview the paper, then download the PDF" },
+];
 
-function CoverSheet({ paper, loading }) {
-  if (loading) {
+// The newest papers, fanned out like sheets on a desk. The front sheet is the latest one.
+function PaperStack({ papers, loading }) {
+  const sheets = papers.slice(0, 3);
+
+  if (loading || sheets.length === 0) {
     return (
-      <div className="cover-sheet" aria-hidden="true">
-        <div className="cover-sheet-head">
-          <span className="skeleton" style={{ width: 150, height: 12 }} />
-        </div>
-        <span className="skeleton" style={{ width: 200, height: 36 }} />
-        <span className="skeleton" style={{ width: "85%", height: 22, marginTop: 20 }} />
-        <span className="skeleton" style={{ width: "100%", height: 104, marginTop: 20 }} />
-      </div>
+      <ul className="paper-stack" aria-hidden={loading || undefined}>
+        {HOW_IT_WORKS.map((step) => (
+          <li key={step.word} className="stack-item">
+            <div className="stack-sheet">
+              <span className="exam-sheet-uni">ARICT past paper archive</span>
+              <span className="exam-sheet-code">{loading ? "…" : step.word}</span>
+              <span className="stack-sheet-title">{loading ? "Loading papers" : step.text}</span>
+              <span className="exam-sheet-lines" aria-hidden="true" />
+            </div>
+          </li>
+        ))}
+      </ul>
     );
   }
-
-  if (!paper) {
-    return (
-      <div className="cover-sheet">
-        <div className="cover-sheet-head">
-          <span className="cover-sheet-org">
-            ARICT past paper archive
-            <br />
-            Instructions to candidates
-          </span>
-        </div>
-        <ol className="cover-instructions">
-          <li>Type a course code or module name in the search box.</li>
-          <li>Narrow the list by department, academic year and semester.</li>
-          <li>Open a paper to preview it, then download the PDF.</li>
-          <li>Can&rsquo;t find it? Request the paper and ARICT will look for it.</li>
-        </ol>
-      </div>
-    );
-  }
-
-  const fields = [
-    { label: "Department", value: paper.departmentFull || paper.department },
-    { label: "Academic year", value: paper.academicYear },
-    { label: "Semester", value: paper.semester },
-    { label: "Exam period", value: paper.examPeriod },
-  ];
 
   return (
-    <Link href={getPaperHref(paper)} className="cover-sheet" aria-label={`Latest addition: ${paper.courseCode} ${paper.title}`}>
-      <div className="cover-sheet-head">
-        <span className="cover-sheet-org">
-          ARICT past paper archive
-          <br />
-          Latest addition
-        </span>
-        <span className="stamp stamp--land">Just added</span>
-      </div>
-      <span className="cover-sheet-label">Course code</span>
-      <CodeBoxes code={paper.courseCode} size="lg" />
-      <h2 className="cover-sheet-title">{paper.title}</h2>
-      <dl className="cover-fields">
-        {fields.map((field) => (
-          <div key={field.label} className="cover-field">
-            <dt>{field.label}</dt>
-            <dd>{field.value || "—"}</dd>
-          </div>
-        ))}
-      </dl>
-      <div className="cover-sheet-foot">
-        Open paper
-        <span className="material-symbols-outlined" aria-hidden="true">
-          arrow_forward
-        </span>
-      </div>
-    </Link>
+    <ul className="paper-stack" aria-label="Newest papers">
+      {sheets.map((paper, index) => (
+        <li key={paper.id} className="stack-item" data-dept={departmentKey(paperDepartments(paper)[0])}>
+          <Link href={`/paper/${encodeURIComponent(getPaperRouteId(paper))}`} className="stack-sheet">
+            {index === 0 && <span className="highlight-tag">Just added</span>}
+            <span className="exam-sheet-uni">Rajarata University of Sri Lanka</span>
+            <span className="exam-sheet-code">{paper.courseCode}</span>
+            <span className="stack-sheet-title">{paper.title}</span>
+            {paper.examPeriod && <span className="exam-sheet-period">{paper.examPeriod}</span>}
+            <span className="exam-sheet-lines" aria-hidden="true" />
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -91,7 +61,7 @@ export default function Home({ summary = null }) {
   const [departmentList, setDepartmentList] = useState(() => summary?.departmentList || departments);
   const [examPeriods, setExamPeriods] = useState(() => summary?.examPeriods || []);
   const [statsLoading, setStatsLoading] = useState(summary === null);
-  const [latestPaper, setLatestPaper] = useState(() => summary?.latestPaper || null);
+  const [recentPapers, setRecentPapers] = useState(() => summary?.recentPapers || []);
   const [tally, setTally] = useState(() => summary?.tally || null);
 
   useEffect(() => {
@@ -107,19 +77,13 @@ export default function Home({ summary = null }) {
         const next = summarizeArchive(papers);
         setDepartmentList(next.departmentList);
         setExamPeriods(next.examPeriods);
-        setLatestPaper(next.latestPaper);
+        setRecentPapers(next.recentPapers);
         setTally(next.tally);
-      } catch (error) {
+      } catch {
         if (isMounted) {
-          setDepartmentList(
-            departments.map((dept) => ({
-              ...dept,
-              paperCount: 0,
-              courseCount: 0,
-            }))
-          );
+          setDepartmentList(departments.map((dept) => ({ ...dept, paperCount: 0, courseCount: 0 })));
           setExamPeriods([]);
-          setLatestPaper(null);
+          setRecentPapers([]);
           setTally(null);
         }
       } finally {
@@ -141,28 +105,13 @@ export default function Home({ summary = null }) {
       <section className="home-hero" id="hero-section">
         <div className="container home-hero-grid">
           <div className="home-hero-main">
-            <h1 className="home-hero-title">
-              ARICT <em>Past Paper Portal</em>
-            </h1>
+            <h1 className="home-hero-title">ARICT Past Paper Portal</h1>
             <p className="home-hero-lede">
-              Past examination papers for Rajarata University Applied Sciences students, organized by department,
-              course code, academic year and semester. Preview in the browser or
-              download the PDF.
+              Past examination papers for Rajarata University Applied Sciences students, organized by
+              department, course code, academic year and semester. Preview in the browser or download
+              the PDF.
             </p>
             <SearchBar />
-
-            <div className="quick-links" aria-label="Browse by department">
-              <span className="quick-links-label">Browse</span>
-              {departments.map((dept) => (
-                <Link
-                  key={dept.id}
-                  href={`/search?q=${encodeURIComponent(dept.name)}`}
-                  className="quick-link"
-                >
-                  {dept.name}
-                </Link>
-              ))}
-            </div>
 
             {tally && tally.papers > 0 && (
               <dl className="archive-tally" aria-label="Archive totals">
@@ -186,9 +135,7 @@ export default function Home({ summary = null }) {
             )}
           </div>
 
-          <div className="home-hero-aside">
-            <CoverSheet paper={latestPaper} loading={statsLoading} />
-          </div>
+          <PaperStack papers={recentPapers} loading={statsLoading} />
         </div>
       </section>
 
@@ -208,7 +155,7 @@ export default function Home({ summary = null }) {
               </span>
             </Link>
           </div>
-          <ul className="dept-index">
+          <ul className="dept-grid">
             {departmentList.map((dept) => (
               <DepartmentCard key={dept.id} department={dept} loading={statsLoading} />
             ))}
@@ -216,30 +163,79 @@ export default function Home({ summary = null }) {
         </div>
       </section>
 
+      {recentPapers.length > 0 && (
+        <section className="home-section" id="recent-section" aria-labelledby="recent-heading">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2 id="recent-heading" className="text-headline-md">
+                  Recently added
+                </h2>
+                <p>The newest papers in the archive.</p>
+              </div>
+              <Link href="/search" className="link-arrow">
+                Browse and filter
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  arrow_forward
+                </span>
+              </Link>
+            </div>
+            <div className="recent-grid">
+              {recentPapers.map((paper) => (
+                <PaperCard key={paper.id} paper={paper} compact />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="home-section" id="exam-periods-section">
         <div className="container">
           <BrowseByExamPeriod periods={examPeriods} linkBase="/search" loading={statsLoading} />
         </div>
       </section>
+
       <section className="home-section">
         <div className="container">
+          <div className="cta-band">
+            <div>
+              <h2>Can&rsquo;t find the paper you need?</h2>
+              <p>Tell ARICT which one, or share a paper you have so the next batch can use it.</p>
+            </div>
+            <div className="cta-band-actions">
+              <RequestPaperButton className="btn btn-highlight btn-lg" />
+              <Link href="/contribute" className="btn btn-on-brand btn-lg">
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  upload_file
+                </span>
+                Contribute a paper
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-section">
+        <div className="container home-about">
           <h2 className="text-headline-md">Find your next revision resource</h2>
-          <p>
-            The ARICT Past Paper Portal is a free, student-run archive for the Faculty of Applied Sciences
-            at Rajarata University of Sri Lanka. It collects end-of-semester examination papers from the
-            Biological Sciences, Chemical Sciences, Computing, Health Promotion and Physical Sciences
-            departments, filed by course code, academic year, semester and exam period, so you can
-            revise from real papers before your exams.
-          </p>
-          <p>
-            <Link href="/search">Browse past examination papers</Link>, explore the{" "}
-            <Link href="/faculty">Faculty of Applied Sciences departments</Link>, or read our{" "}
-            <Link href="/help">guide to finding and downloading papers</Link>.
-          </p>
-          <p>
-            Learn <Link href="/about">about ARICT and the archive</Link> or{" "}
-            <Link href="/contribute">upload a past paper you have</Link>.
-          </p>
+          <div>
+            <p>
+              The ARICT Past Paper Portal is a free, student-run archive for the Faculty of Applied
+              Sciences at Rajarata University of Sri Lanka. It collects end-of-semester examination
+              papers from the Biological Sciences, Chemical Sciences, Computing, Health Promotion and
+              Physical Sciences departments, filed by course code, academic year, semester and exam
+              period, so you can revise from real papers before your exams.
+            </p>
+            <p>
+              <Link href="/search">Browse past examination papers</Link>, explore the{" "}
+              <Link href="/faculty">Faculty of Applied Sciences departments</Link>, or read our{" "}
+              <Link href="/help">guide to finding and downloading papers</Link>.
+            </p>
+            <p>
+              Learn <Link href="/about">about ARICT and the archive</Link> or{" "}
+              <Link href="/contribute">upload a past paper you have</Link>.
+            </p>
+          </div>
         </div>
       </section>
     </>

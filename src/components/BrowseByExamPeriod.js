@@ -2,15 +2,24 @@
 
 import Link from "next/link";
 
+// Exam periods grouped under the calendar year they were sat in, newest year first.
+function groupByYear(periods) {
+  const groups = new Map();
+  for (const period of periods) {
+    const year = String(period).match(/(?:19|20)\d{2}/)?.[0] || "Other";
+    if (!groups.has(year)) groups.set(year, []);
+    groups.get(year).push(period);
+  }
+  return [...groups].sort(([a], [b]) => (Number(b) || 0) - (Number(a) || 0));
+}
+
 export default function BrowseByExamPeriod({
   periods = [],
   linkBase = "/search",
   queryParamName = "years",
   loading = false,
 }) {
-  const hasPeriods = periods.length > 0;
-  const buildHref = (period) =>
-    `${linkBase}?${queryParamName}=${encodeURIComponent(period)}`;
+  const buildHref = (period) => `${linkBase}?${queryParamName}=${encodeURIComponent(period)}`;
 
   return (
     <section className="exam-period-section" id="exam-period-section" aria-labelledby="exam-period-heading">
@@ -22,27 +31,28 @@ export default function BrowseByExamPeriod({
           <p>Open every paper sat in one exam session.</p>
         </div>
       </div>
-      <div className="period-grid">
-        {loading ? (
-          Array.from({ length: 4 }, (_, index) => (
-            <span key={index} className="skeleton" style={{ height: 60 }} />
-          ))
-        ) : hasPeriods ? (
-          periods.map((period) => (
-            <Link key={period} className="period-slip" href={buildHref(period)}>
-              <span className="material-symbols-outlined" aria-hidden="true">
-                event_note
-              </span>
-              <span className="period-slip-text">{period}</span>
-              <span className="material-symbols-outlined period-slip-arrow" aria-hidden="true">
-                arrow_forward
-              </span>
-            </Link>
-          ))
-        ) : (
-          <p className="period-empty">No examination periods available yet.</p>
-        )}
-      </div>
+      {loading ? (
+        <span className="skeleton" style={{ height: 160 }} />
+      ) : periods.length > 0 ? (
+        <div className="period-table">
+          {groupByYear(periods).map(([year, list]) => (
+            <div key={year} className="period-row">
+              <h3 className="period-year">{year}</h3>
+              <ul className="period-list">
+                {list.map((period) => (
+                  <li key={period}>
+                    <Link className="period-chip" href={buildHref(period)}>
+                      {period}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="period-empty">No examination periods available yet.</p>
+      )}
     </section>
   );
 }

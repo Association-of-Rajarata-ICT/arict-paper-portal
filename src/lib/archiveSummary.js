@@ -10,11 +10,11 @@ import {
 // browser receives a few hundred bytes instead of every paper.
 export function summarizeArchive(papers) {
   const periods = new Set(papers.map((paper) => paper.examPeriod).filter(Boolean));
-  const newest = sortPapersByDate(papers)[0];
+  const dated = sortPapersByDate(papers).filter((paper) => paper.createdAt);
   return {
     departmentList: applyDepartmentStats(departments, papers),
     examPeriods: sortExamPeriods(Array.from(periods)),
-    latestPaper: newest && newest.createdAt ? newest : null,
+    recentPapers: mergeSharedPapers(dated).slice(0, 4),
     tally: {
       // Shared papers filed under several departments count once.
       papers: mergeSharedPapers(papers).length,

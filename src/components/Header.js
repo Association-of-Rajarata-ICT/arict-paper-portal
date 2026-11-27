@@ -10,8 +10,9 @@ import { GPA_CALCULATOR_URL } from "@/lib/constants";
 import { REQUEST_PAPER_EVENT } from "@/lib/requestPaper";
 import { MAIN_NAV_LINKS } from "@/lib/seo";
 
-// "About ARICT" lives in the footer only.
-const navLinks = MAIN_NAV_LINKS.filter(({ href }) => href !== "/about");
+// "About ARICT" lives in the footer only. "Contribute" is covered by the Request / Contribute button.
+const FOOTER_ONLY = ["/about", "/contribute"];
+const navLinks = MAIN_NAV_LINKS.filter(({ href }) => !FOOTER_ONLY.includes(href));
 
 function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
