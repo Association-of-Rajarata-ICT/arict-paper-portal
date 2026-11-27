@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { departments } from "@/data/departments";
+import { departmentKey, departments } from "@/data/departments";
 import { sortAcademicYears, sortSemesters } from "@/lib/papers";
 // import { sortExamPeriods } from "@/lib/papers"; // restore with examination period filter
 
@@ -10,15 +10,16 @@ const defaultDepartmentOptions = departments.map((dept) => ({
   value: dept.name,
 }));
 
-function FilterOption({ label, checked, count, onToggle }) {
+function FilterOption({ label, checked, count, onToggle, dept }) {
   const hasCount = typeof count === "number";
   const classNames = ["filter-option"];
   if (checked) classNames.push("is-checked");
   if (hasCount && count === 0 && !checked) classNames.push("is-empty");
 
   return (
-    <label className={classNames.join(" ")}>
+    <label className={classNames.join(" ")} data-dept={dept}>
       <input type="checkbox" className="tickbox" checked={checked} onChange={onToggle} />
+      {dept && <span className="dept-dot" aria-hidden="true" />}
       <span className="filter-option-label">{label}</span>
       {hasCount && (
         <span className="filter-option-count" aria-label={`${count} papers`}>
@@ -124,17 +125,13 @@ export default function FilterSidebar({
 
         <div className="filter-sidebar-body">
           <fieldset className="filter-group">
-            <legend className="filter-group-title">
-              <span className="material-symbols-outlined" aria-hidden="true">
-                account_balance
-              </span>
-              Department
-            </legend>
+            <legend className="filter-group-title">Department</legend>
             <div className="filter-options">
               {departmentOptions.map((dept) => (
                 <FilterOption
                   key={dept.value}
                   label={dept.label}
+                  dept={departmentKey(dept.value)}
                   checked={selectedDepartments.includes(dept.value)}
                   count={counts?.departments?.[dept.value] ?? (counts ? 0 : undefined)}
                   onToggle={() => handleDeptToggle(dept.value)}
@@ -167,13 +164,8 @@ export default function FilterSidebar({
           */}
 
           <fieldset className="filter-group">
-            <legend className="filter-group-title">
-              <span className="material-symbols-outlined" aria-hidden="true">
-                school
-              </span>
-              Academic year
-            </legend>
-            <div className="filter-options">
+            <legend className="filter-group-title">Academic year</legend>
+            <div className="filter-options filter-options--tiles">
               {sortedAcademicYearOptions.map((year) => (
                 <FilterOption
                   key={year}
@@ -187,13 +179,8 @@ export default function FilterSidebar({
           </fieldset>
 
           <fieldset className="filter-group">
-            <legend className="filter-group-title">
-              <span className="material-symbols-outlined" aria-hidden="true">
-                event
-              </span>
-              Semester
-            </legend>
-            <div className="filter-options">
+            <legend className="filter-group-title">Semester</legend>
+            <div className="filter-options filter-options--tiles">
               {sortedSemesterOptions.map((semester) => (
                 <FilterOption
                   key={semester}

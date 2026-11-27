@@ -1,19 +1,17 @@
-import { Archivo, Martian_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { pageMetadata, SITE_NAME, SITE_URL } from "@/lib/seo";
 
-const archivo = Archivo({
+const figtree = Figtree({
   subsets: ["latin"],
-  axes: ["wdth"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const martianMono = Martian_Mono({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-mono",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -36,8 +34,8 @@ export const metadata = {
 
 export const viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f4f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#121214" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#171d2b" },
   ],
 };
 
@@ -48,7 +46,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${martianMono.variable}`}
+      className={`${figtree.variable} ${bricolage.variable}`}
       suppressHydrationWarning
     >
       <head>

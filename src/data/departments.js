@@ -46,6 +46,11 @@ export const departments = [
   },
 ];
 
+// The id doubles as the colour key: CSS maps [data-dept="<id>"] to that department's colour.
+export function departmentKey(name) {
+  return departments.find((d) => d.name === name)?.id;
+}
+
 export function getDepartmentById(id) {
   return departments.find((d) => d.id === id);
 }

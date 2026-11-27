@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Chip from "./Chip";
+import { departmentKey } from "@/data/departments";
 import { getDownloadUrl, getPaperRouteId, paperDepartments } from "@/lib/papers";
 
 // Inside a course view (courseTitle given) each row leads with its exam period; the course name,
@@ -19,9 +20,13 @@ export default function PaperListItem({ paper, courseTitle = "" }) {
   ).filter(Boolean);
 
   return (
-    <article className="paper-row" id={`paper-list-${paper.id}`}>
-      <div>
-        <span className="code-tag">{paper.courseCode || "—"}</span>
+    <article
+      className="paper-row"
+      id={`paper-list-${paper.id}`}
+      data-dept={departmentKey(paperDepartments(paper)[0])}
+    >
+      <div className="paper-row-sheet">
+        <span className="paper-row-code">{paper.courseCode || "—"}</span>
       </div>
 
       <div style={{ minWidth: 0 }}>

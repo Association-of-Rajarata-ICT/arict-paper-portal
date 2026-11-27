@@ -7,6 +7,7 @@ import Chip from "@/components/Chip";
 import CodeBoxes from "@/components/CodeBoxes";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import RelatedPaperCard from "@/components/RelatedPaperCard";
+import { departmentKey } from "@/data/departments";
 import { getDownloadUrl, getPreviewUrl, paperDepartments } from "@/lib/papers";
 
 export default function PaperDetailClient({ paper, relatedPapers = [] }) {
@@ -100,7 +101,12 @@ export default function PaperDetailClient({ paper, relatedPapers = [] }) {
             )}
           </div>
 
-          <aside className="paper-sheet" id="paper-detail-card" aria-label="Paper details">
+          <aside
+            className="paper-sheet"
+            id="paper-detail-card"
+            aria-label="Paper details"
+            data-dept={departmentKey(departments[0])}
+          >
             <div className="paper-sheet-head">
               <CodeBoxes code={paper.courseCode} size="lg" />
               {paper.isRestricted && <Chip icon="lock">Restricted</Chip>}
