@@ -40,7 +40,8 @@ export function mergeSharedPapers(papers = []) {
       if (!byDepartment.has(department)) byDepartment.set(department, []);
       byDepartment.get(department).push(paper);
     }
-    const lists = [...byDepartment.values()].map((list) =>
+    // Departments in a fixed order, so the same copy always stands for the shared paper.
+    const lists = [...byDepartment.keys()].sort().map((name) => byDepartment.get(name)).map((list) =>
       [...list].sort((a, b) => compactText(a.title).localeCompare(compactText(b.title)))
     );
     const layers = Math.max(...lists.map((list) => list.length));

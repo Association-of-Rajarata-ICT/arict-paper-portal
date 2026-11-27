@@ -92,7 +92,7 @@ function shorten(value, length) {
   return text.length <= length ? text : `${text.slice(0, length - 1).trimEnd()}…`;
 }
 
-export function paperMetadata(paper) {
+export function paperMetadata(paper, canonicalId = paper.docId || paper.id) {
   const title = [paper.courseCode, paper.title, paper.examPeriod].filter(Boolean).join(" — ");
   const code = shorten(paper.courseCode, 12);
   const period = shorten(paper.examPeriod || "past examination", 24);
@@ -100,7 +100,7 @@ export function paperMetadata(paper) {
   const prefix = `Preview ${code} `;
   let description = `${prefix}${shorten(paper.title, 155 - prefix.length - suffix.length)}${suffix}`;
   if (description.length < 120) description += " Prepare for your exams.";
-  return pageMetadata(`/paper/${encodeURIComponent(paper.docId || paper.id)}`, { title, description });
+  return pageMetadata(`/paper/${encodeURIComponent(canonicalId)}`, { title, description });
 }
 
 export function serializeJsonLd(value) {

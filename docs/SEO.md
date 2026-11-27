@@ -63,7 +63,7 @@ Already added:
 - Faculty → “Browse [department] past papers” for each of the five departments.
 - Paper pages → breadcrumb links, related papers, and “All [department] papers”.
 
-Future improvements: link a relevant subject or department name in faculty study guides to its resources. If department pages become important search destinations, create stable department landing pages with useful original text instead of relying only on filtered search URLs. Search filters are interactive, and pagination still uses client controls; the sitemap provides direct discovery of every database-backed paper URL.
+Future improvements: link a relevant subject or department name in faculty study guides to its resources. If department pages become important search destinations, create stable department landing pages with useful original text instead of relying only on filtered search URLs. The Faculty page links every course code that has papers, and each course page lists its papers and sends the browser only those. A paper shared by several departments appears once in the sitemap, and its other copies point to it as canonical. Search filters are interactive, and pagination still uses client controls; the sitemap provides direct discovery of every database-backed paper URL.
 
 ## Before deployment and indexing
 

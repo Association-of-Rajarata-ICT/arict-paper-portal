@@ -8,6 +8,7 @@ import CodeBoxes from "@/components/CodeBoxes";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import RelatedPaperCard from "@/components/RelatedPaperCard";
 import { departmentKey } from "@/data/departments";
+import { canonicalCode, paperCourseCodes, paperCourses } from "@/lib/curriculum";
 import { getDownloadUrl, getPreviewUrl, paperDepartments } from "@/lib/papers";
 
 export default function PaperDetailClient({ paper, relatedPapers = [] }) {
@@ -36,6 +37,9 @@ export default function PaperDetailClient({ paper, relatedPapers = [] }) {
   const instructorName = paper.instructor && paper.instructor.trim() ? paper.instructor.trim() : "";
 
   const departments = paperDepartments(paper);
+  // Link the course page by its canonical code, not the code as printed ("BOT 1203 / BIO 1203").
+  const courseCode =
+    paperCourses(paper)[0]?.code || canonicalCode(paperCourseCodes(paper.courseCode)[0] || "") || paper.courseCode;
   const fields = [
     { label: departments.length > 1 ? "Departments" : "Department", value: departments.join(", ") },
     { label: "Academic year", value: paper.academicYear },
@@ -178,7 +182,7 @@ export default function PaperDetailClient({ paper, relatedPapers = [] }) {
           </p>
           <p>
             Looking for other {paper.courseCode} papers?{" "}
-            <Link href={`/search?course=${encodeURIComponent(paper.courseCode)}`}>
+            <Link href={`/search?course=${encodeURIComponent(courseCode)}`}>
               See every {paper.courseCode} past paper
             </Link>
             , or <Link href="/search">browse the full archive</Link>.

@@ -1,7 +1,8 @@
 import SearchClient from "./SearchClient";
 import { pageMetadata } from "@/lib/seo";
 import { getPublicPapers } from "@/lib/server/publicPapers";
-import { courseView, formatCourseCode } from "@/lib/curriculum";
+import { courseView, formatCourseCode, recordsForCode } from "@/lib/curriculum";
+import { packPapers } from "@/lib/paperPayload";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +23,17 @@ export async function generateMetadata({ searchParams }) {
   return pageMetadata("/search", { noIndex: Object.keys(params).length > 0 });
 }
 
-export default async function SearchPage() {
+export default async function SearchPage({ searchParams }) {
+  const { course } = await searchParams;
   let papers = null;
   try {
     papers = await getPublicPapers();
   } catch {
     console.error("The search page could not load the paper archive.");
   }
-  return <SearchClient initialPapers={papers} />;
+  // A course page only needs its own papers. The key remounts the client when the visitor moves
+  // between a course page and the full archive, so it never keeps the shorter list.
+  const view = papers && typeof course === "string" ? courseView(papers, course) : null;
+  const shown = view ? recordsForCode(papers, view.code) : papers;
+  return <SearchClient key={view?.code || "all"} initialRows={shown && packPapers(shown)} />;
 }

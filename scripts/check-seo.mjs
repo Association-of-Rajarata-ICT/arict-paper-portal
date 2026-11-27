@@ -43,7 +43,9 @@ for (const [path, page] of Object.entries(PUBLIC_PAGES)) {
     const element = body.match(new RegExp(`<(${id === "desktop-nav" ? "nav" : "footer"})\\b[^>]*id="${id}"[^>]*>([\\s\\S]*?)<\\/\\1>`))?.[2];
     assert.ok(element, `${path}: ${id}`);
     const anchors = tags(element, "a");
-    for (const link of MAIN_NAV_LINKS) assert.ok(anchors.some((tag) => tag.href === link.href), `${path}: ${id} link to ${link.href}`);
+    // The header leaves "About" and "Contribute" to the footer (see Header.js).
+    const expected = MAIN_NAV_LINKS.filter((link) => id === "main-footer" || !["/about", "/contribute"].includes(link.href));
+    for (const link of expected) assert.ok(anchors.some((tag) => tag.href === link.href), `${path}: ${id} link to ${link.href}`);
   }
   if (path === "/") {
     const json = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1]);
@@ -76,11 +78,11 @@ assert.equal(sitemapResponse.status, 200);
 const sitemap = await sitemapResponse.text();
 const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => decode(match[1]));
 for (const path of Object.keys(PUBLIC_PAGES)) assert.ok(urls.includes(new URL(path, SITE_URL).href));
-assert.ok(!urls.some((url) => url.includes("/admin") || url.includes("?")));
+assert.ok(!urls.some((url) => url.includes("/admin") || (url.includes("?") && !url.includes("/search?course="))));
 
 for (const [path, width, height] of [
-  ["/favicon-48x48.png", 48, 48],
-  ["/favicon-192x192.png", 192, 192],
+  ["/icon-192.png", 192, 192],
+  ["/icon-512.png", 512, 512],
   ["/apple-touch-icon.png", 180, 180],
   ["/og-image.png", 1200, 630],
 ]) {

@@ -14,7 +14,11 @@ export async function generateMetadata({ params }) {
     description: "This past paper is not in the ARICT archive. Search available Rajarata University examination papers or contact the team to request a missing paper.",
     noIndex: true,
   });
-  return paperMetadata(paper);
+  // Copies of a shared paper point search engines at one of them.
+  const shared = await getPublicPapers()
+    .then((papers) => mergeSharedPapers(papers).find((item) => item.variants.some((v) => v.docId === paper.docId)))
+    .catch(() => null);
+  return paperMetadata(paper, shared?.docId);
 }
 
 export default async function PaperPage({ params }) {

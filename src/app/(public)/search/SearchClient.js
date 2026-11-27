@@ -30,6 +30,7 @@ import {
   sortPapers,
   sortSemesters,
 } from "@/lib/papers";
+import { unpackPapers } from "@/lib/paperPayload";
 import { openRequestPaper } from "@/lib/requestPaper";
 
 function getDepartmentFilterFromQuery(searchQuery = "") {
@@ -313,7 +314,7 @@ function CourseView({ view, loading, backLabel, onBack }) {
   );
 }
 
-function SearchResultsContent({ initialPapers }) {
+function SearchResultsContent({ initialRows }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const qParam = searchParams.get("q") || "";
@@ -335,8 +336,8 @@ function SearchResultsContent({ initialPapers }) {
   const [selectedExamPeriods, setSelectedExamPeriods] = useState(initialExamPeriods);
   const [selectedAcademicYears, setSelectedAcademicYears] = useState([]);
   const [selectedSemesters, setSelectedSemesters] = useState([]);
-  const [papers, setPapers] = useState(initialPapers || []);
-  const [loading, setLoading] = useState(initialPapers === null);
+  const [papers, setPapers] = useState(() => (initialRows ? unpackPapers(initialRows) : []));
+  const [loading, setLoading] = useState(initialRows === null);
   const [loadError, setLoadError] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const resultsTopRef = useRef(null);
@@ -369,7 +370,7 @@ function SearchResultsContent({ initialPapers }) {
   }, [qParam, yearsParam, courseParam]);
 
   useEffect(() => {
-    if (initialPapers !== null) return;
+    if (initialRows !== null) return;
     let isMounted = true;
 
     const fetchPapers = async () => {
@@ -397,7 +398,7 @@ function SearchResultsContent({ initialPapers }) {
     return () => {
       isMounted = false;
     };
-  }, [initialPapers]);
+  }, [initialRows]);
 
   // One entry per shared paper, tagged with every department that offers it.
   const mergedPapers = useMemo(() => mergeSharedPapers(papers), [papers]);
@@ -959,6 +960,6 @@ function SearchResultsContent({ initialPapers }) {
   );
 }
 
-export default function SearchPage({ initialPapers = null }) {
-  return <SearchResultsContent initialPapers={initialPapers} />;
+export default function SearchPage({ initialRows = null }) {
+  return <SearchResultsContent initialRows={initialRows} />;
 }

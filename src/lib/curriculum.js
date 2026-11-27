@@ -122,6 +122,36 @@ export function papersForOldCode(papers, code) {
   return sortPapers(mergeSharedPapers(own), "newest");
 }
 
+// The unmerged records behind one course view: all a course page needs to send to the browser.
+export function recordsForCode(papers, code) {
+  return papers.filter((paper) => {
+    const courses = paperCourses(paper);
+    return courses.length
+      ? courses.some((course) => course.code === code)
+      : paperCourseCodes(paper.courseCode).some((paperCode) => canonicalCode(paperCode) === code);
+  });
+}
+
+// Course pages for codes that are not current courses (older or unconfirmed ones), plus the papers
+// with no readable code at all, which have no course page.
+export function otherCourses(papers) {
+  const codes = new Set();
+  const uncoded = [];
+  for (const paper of papers) {
+    if (paperCourses(paper).length) continue;
+    const own = paperCourseCodes(paper.courseCode).map(canonicalCode);
+    if (own.length) own.forEach((code) => codes.add(code));
+    else uncoded.push(paper);
+  }
+  return {
+    courses: [...codes].sort().map((code) => {
+      const list = papersForOldCode(papers, code);
+      return { code, title: titleFromPapers(list, code), papers: list };
+    }),
+    uncoded: mergeSharedPapers(uncoded),
+  };
+}
+
 // Everything a course view shows, for a current course or an older code. Accepts any spelling of
 // the code ("ict 3301", "MAP1302"). null when the code is unknown and has no papers.
 export function courseView(papers, value) {
